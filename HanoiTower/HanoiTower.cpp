@@ -1,10 +1,9 @@
 #include <cstdio>
 #include <cstring>
 
-#define MAXN 13
-
+const int maxNum = 13;
 int num = 0;
-int stack[3][MAXN];
+int stack[3][maxNum];
 int height[3];
 
 void printChar(char c, int width)
@@ -99,7 +98,7 @@ void solve(int x, char A = 0, char B = 1, char C = 2)
 int main()
 {
 	scanf("%d", &num);
-	if (num <= 0 || num > MAXN)
+	if (num <= 0 || num > maxNum)
 	{
 		printf("Invaild\n");
 	}
