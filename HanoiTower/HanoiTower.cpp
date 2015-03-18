@@ -3,9 +3,9 @@
 
 #define MAXN 13
 
-int n = 0;
-int h[3][MAXN];
-int p[3];
+int num = 0;
+int stack[3][MAXN];
+int height[3];
 
 void printChar(char c, int width)
 {
@@ -19,40 +19,40 @@ void printLine(int width)
 {
 	if (width == -1)
 	{
-		printChar(' ', n - 1);
+		printChar(' ', num - 1);
 		putchar('|');
-		printChar(' ', n - 1);
+		printChar(' ', num - 1);
 	}
 	else
 	{
-		printChar(' ', n - width - 1);
+		printChar(' ', num - width - 1);
 		printChar('-', width * 2 + 1);
-		printChar(' ', n - width - 1);
+		printChar(' ', num - width - 1);
 	}
 }
 
 void printHanoi()
 {
-	for (int i = n - 1; i >= 0; --i)
+	for (int i = num - 1; i >= 0; --i)
 	{
 		for (int j = 0; j < 3; ++j)
 		{
-			printf(" ");
-			if (p[j] <= i)
+			putchar(' ');
+			if (height[j] <= i)
 			{
 				printLine(-1);
 			}
 			else
 			{
-				printLine(h[j][i] - 1);
+				printLine(stack[j][i] - 1);
 			}
 		}
 		putchar('\n');
 	}
 	for (int j = 0; j < 3; ++j)
 	{
-		printChar(' ', n - 1);
-		if (n == 1)
+		printChar(' ', num - 1);
+		if (num == 1)
 		{
 			putchar(' ');
 			putchar(j + 'A');
@@ -63,7 +63,7 @@ void printHanoi()
 			putchar(j + 'A');
 			putchar('-');
 		}
-		printChar(' ', n - 2);
+		printChar(' ', num - 2);
 	}
 	putchar('\n');
 	putchar('\n');
@@ -72,8 +72,8 @@ void printHanoi()
 void move(int from, int to)
 {
 	char output[100];
-	sprintf(output, "Move %d from %c to %c", h[to][p[to]++] = h[from][--p[from]], from + 'A', to + 'A');
-	int l = n * 6 - strlen(output);
+	sprintf(output, "Move %d from %c to %c", stack[to][height[to]++] = stack[from][--height[from]], from + 'A', to + 'A');
+	int l = num * 6 - strlen(output);
 	printChar('-', l / 2);
 	printf("%s", output);
 	printChar('-', l - l / 2);
@@ -82,7 +82,7 @@ void move(int from, int to)
 	printHanoi();
 }
 
-void solve(int x, char A, char B, char C)
+void solve(int x, char A = 0, char B = 1, char C = 2)
 {
 	if (x == 1)
 	{
@@ -98,25 +98,25 @@ void solve(int x, char A, char B, char C)
 
 int main()
 {
-	scanf("%d", &n);
-	if (n <= 0 || n > MAXN)
+	scanf("%d", &num);
+	if (num <= 0 || num > MAXN)
 	{
 		printf("Invaild\n");
 	}
 	else
 	{
-		for (int i = 0; i < n; ++i)
+		for (int i = 0; i < num; ++i)
 		{
-			h[0][i] = n - i;
+			stack[0][i] = num - i;
 		}
-		p[0] = n;
-		p[1] = 0;
-		p[2] = 0;
+		height[0] = num;
+		height[1] = 0;
+		height[2] = 0;
 		printHanoi();
-		solve(n, 0, 1, 2);
-		printChar('-', n * 3 - 3);
+		solve(num);
+		printChar('-', num * 3 - 3);
 		printf("FINISH");
-		printChar('-', n * 3 - 3);
+		printChar('-', num * 3 - 3);
 		putchar('\n');
 	}
 	return 0;
