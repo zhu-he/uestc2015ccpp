@@ -1,9 +1,9 @@
 #include <cstdio>
 #include <cstring>
 
-#define MAXN 10000
+#define MAXN 13
 
-int n;
+int n = 0;
 int h[3][MAXN];
 int p[3];
 
@@ -99,18 +99,25 @@ void solve(int x, char A, char B, char C)
 int main()
 {
 	scanf("%d", &n);
-	for (int i = 0; i < n; ++i)
+	if (n <= 0 || n > MAXN)
 	{
-		h[0][i] = n - i;
+		printf("Invaild\n");
 	}
-	p[0] = n;
-	p[1] = 0;
-	p[2] = 0;
-	printHanoi();
-	solve(n, 0, 1, 2);
-	printChar('-', n * 3 - 3);
-	printf("FINISH");
-	printChar('-', n * 3 - 3);
-	putchar('\n');
+	else
+	{
+		for (int i = 0; i < n; ++i)
+		{
+			h[0][i] = n - i;
+		}
+		p[0] = n;
+		p[1] = 0;
+		p[2] = 0;
+		printHanoi();
+		solve(n, 0, 1, 2);
+		printChar('-', n * 3 - 3);
+		printf("FINISH");
+		printChar('-', n * 3 - 3);
+		putchar('\n');
+	}
 	return 0;
 }
