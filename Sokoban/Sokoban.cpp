@@ -14,7 +14,7 @@
 #else
 	#include <curses.h>
 	#define GETCH() getch()
-	#define INIT() initscr();refresh();noecho();
+	#define INIT() initscr();refresh();noecho()
 	#define END() endwin()
 	inline void clearScreen()
 	{
