@@ -174,7 +174,7 @@ inline void showSokoban()
 	printf("\nPress w, s, a, d to move, press r to restart.\n\nW: Wall\nP: Player\nO: Box\na: Target\n@: Box on target\n");
 }
 
-Direction getDirection()
+inline Direction getDirection()
 {
 	char c = GETCH();
 	switch (c)
@@ -201,7 +201,7 @@ Direction getDirection()
 	}
 }
 
-Movement tryMove(Direction direction)
+inline Movement tryMove(Direction direction)
 {
 	Point nextPos = playerPos + delta[direction];
 	if (sokoban[currentLevel][nextPos.x][nextPos.y] == '#')
@@ -225,7 +225,7 @@ Movement tryMove(Direction direction)
 	return PUSH;
 }
 
-bool isSuccess()
+inline bool isSuccess()
 {
 	for (int i = 0; i < height[currentLevel]; ++i)
 	{
