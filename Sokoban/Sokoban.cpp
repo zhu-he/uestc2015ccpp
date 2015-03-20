@@ -14,7 +14,7 @@
 #else
 	#include <curses.h>
 	#define GETCH() getch()
-	#define INIT() initscr()
+	#define INIT() initscr();refresh();noecho();
 	#define END() endwin()
 	inline void clearScreen()
 	{
@@ -144,7 +144,7 @@ inline void changeLevel(int level)
 inline void showSokoban()
 {
 	clearScreen();
-	printf("Level: %d Step: %d\n", currentLevel, step);
+	printf("Level: %d Step: %d\r\n", currentLevel, step);
 	for (int i = 0; i < height[currentLevel]; ++i)
 	{
 		for (int j = 0; j < width[currentLevel]; ++j)
@@ -169,9 +169,10 @@ inline void showSokoban()
 				putchar(sokoban[currentLevel][i][j]);
 			}
 		}
+		putchar('\r');
 		putchar('\n');
 	}
-	printf("\nPress w, s, a, d to move, press r to restart.\n\nW: Wall\nP: Player\nO: Box\na: Target\n@: Box on target\n");
+	printf("\r\nPress w, s, a, d to move, press r to restart.\r\n\r\nW: Wall\r\nP: Player\r\nO: Box\r\na: Target\r\n@: Box on target\r\n");
 }
 
 inline Direction getDirection()
@@ -265,7 +266,7 @@ int main()
 				}
 			}
 		}
-		printf("\nYou win! Press any key to next level.\n");
+		printf("\r\nYou win! Press any key to next level.\r\n");
 		GETCH();
 	}
 	END();
