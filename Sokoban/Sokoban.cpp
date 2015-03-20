@@ -144,7 +144,7 @@ inline void changeLevel(int level)
 inline void showSokoban()
 {
 	clearScreen();
-	printf("Level: %d Step: %d\r\n", currentLevel, step);
+	printf("Level: %d Step: %d\r\n\r\n", currentLevel, step);
 	for (int i = 0; i < height[currentLevel]; ++i)
 	{
 		for (int j = 0; j < width[currentLevel]; ++j)
@@ -168,11 +168,12 @@ inline void showSokoban()
 			{
 				putchar(sokoban[currentLevel][i][j]);
 			}
+			putchar(' ');
 		}
 		putchar('\r');
 		putchar('\n');
 	}
-	printf("\r\nPress w, s, a, d to move, press r to restart.\r\n\r\nW: Wall\r\nP: Player\r\nO: Box\r\na: Target\r\n@: Box on target\r\n");
+	printf("\r\nPress w, s, a, d to move.\r\nPress r to restart.\r\n\r\nW: Wall\r\nP: Player\r\nO: Box\r\na: Target\r\n@: Box on target\r\n");
 }
 
 inline Direction getDirection()
@@ -266,7 +267,14 @@ int main()
 				}
 			}
 		}
-		printf("\r\nYou win! Press any key to next level.\r\n");
+		if (level == levelCount - 1)
+		{
+			printf("\r\nYou have passed all levels! Press any key to exit.\r\n");
+		}
+		else
+		{
+			printf("\r\nYou win! Press any key to next level.\r\n");
+		}
 		GETCH();
 	}
 	END();
