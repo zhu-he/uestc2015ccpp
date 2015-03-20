@@ -49,7 +49,7 @@ const Point delta[4] =
 	Point(0, 1)
 };
 
-const Point startPos[2] =
+const Point startPos[levelCount] =
 {
 	Point(4, 4),
 	Point(2, 2)
