@@ -80,7 +80,7 @@ const char sokoban[levelCount][maxHeight][maxWidth] =
 	}
 };
 
-const char box[levelCount][maxHeight][maxWidth] =
+const char boxes[levelCount][maxHeight][maxWidth] =
 {
 	{
 		"        ",
@@ -136,7 +136,7 @@ inline bool isSuccess();
 inline void changeLevel(int level)
 {
 	currentLevel = level;
-	memcpy(currentBox, box[level], sizeof(currentBox));
+	memcpy(currentBox, boxes[level], sizeof(currentBox));
 	playerPos = startPos[level];
 	step = 0;
 }
