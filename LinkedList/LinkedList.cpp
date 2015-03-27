@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cassert>
 
+using namespace std;
+
 template <class T>
 class LinkedList
 {
@@ -21,6 +23,15 @@ public:
 		headNode = new Node();
 		headNode->next = NULL;
 		rearNode = headNode;
+	}
+
+	LinkedList<T>(const int size)
+	{
+		_size = 0;
+		headNode = new Node();
+		headNode->next = NULL;
+		rearNode = headNode;
+		resize(size);
 	}
 
 	void resize(const int size)
@@ -173,12 +184,17 @@ public:
 
 int main()
 {
-	LinkedList<int> a;
-	a.resize(4);
-	int b[] = {1, 4, 3, 2};
-	a = b;
-	a.erase(2);
-	a.push_back(123);
-	std::cout << a << '\n';
+	LinkedList<int> a(4); //Initialize with size
+	a = (int[]){1, 4, 3, 2}; //Override '=' operator
+	a.erase(2); //erase int on index 2 ({1, 4, 2})
+	a.push_back(123); //push back int on back ({1, 4, 2, 123})
+	cout << a << '\n';	//Override '<<' operator
+	
+	LinkedList<string> b;
+	for (int i = 0; i < 3; ++i)
+	{
+		cin >> b; //Override '>>' operator
+	}
+	cout << b << '\n';
 	return 0;
 }
