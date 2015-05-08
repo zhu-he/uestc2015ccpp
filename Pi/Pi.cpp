@@ -1,5 +1,5 @@
 #include <iostream>
-// #include <ctime>
+#include <ctime>
 #include "BigDecimal.h"
 
 using namespace std;
@@ -8,8 +8,8 @@ const int scale = 10000;
 
 int main()
 {
-	// time_t startTime = clock();
 	BigDecimal Pi(0, 1, scale);
+	time_t startTime = clock();
 	for (int i = 0; ; ++i)
 	{
 		BigDecimal sum(32, 4 * i + 1, scale);
@@ -33,7 +33,7 @@ int main()
 			Pi -= sum;
 		}
 	}
-	// cout << "Time: " << (double)(clock() - startTime) / CLOCKS_PER_SEC << "s" << endl;
+	cout << "Time: " << (double)(clock() - startTime) / CLOCKS_PER_SEC << "s" << endl;
 	cout << Pi << endl;
 	return 0;
 }
