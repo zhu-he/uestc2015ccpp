@@ -10,12 +10,18 @@ BigDecimal::BigDecimal(int dividend, int divisor, int scale) : scale(scale)
 		sign = true;
 	}
 	arraySize = scale / (32 * log10(2)) + 2;
+	array = (unsigned int*)malloc(arraySize * sizeof(unsigned int));
 	for (int i = 0; i < arraySize; ++i)
 	{
 		array[i] = remain / divisor;
 		remain = remain - array[i] * divisor;
 		remain <<= 32;
 	}
+}
+
+BigDecimal::~BigDecimal()
+{
+	delete[] array;
 }
 
 int BigDecimal::compareAbsTo(const BigDecimal& bigDecimal)
@@ -34,45 +40,28 @@ int BigDecimal::compareAbsTo(const BigDecimal& bigDecimal)
 	return 0;
 }
 
-BigDecimal operator - (BigDecimal bigDecimal)
+bool BigDecimal::isZero()
 {
-	bigDecimal.sign = !bigDecimal.sign;
-	return bigDecimal;
-}
-
-BigDecimal operator + (BigDecimal bigDecimal1, const BigDecimal& bigDecimal2)
-{
-	if (bigDecimal1.sign ^ bigDecimal2.sign)
+	for (int i = arraySize - 1; i >= 0; --i)
 	{
-		return bigDecimal2 - (-bigDecimal1);
-	}
-	else
-	{
-		int remain = 0;
-		for (int i = bigDecimal1.arraySize - 1; i >= 0; --i)
+		if (array[i] > 0)
 		{
-			long long tmp = (long long)bigDecimal1.array[i] + bigDecimal2.array[i] + remain;
-			bigDecimal1.array[i] = tmp & ((1LL << 32) - 1);
-			remain = tmp >> 32;
+			return false;
 		}
-		return bigDecimal1;
 	}
+	return true;
 }
 
-BigDecimal operator - (BigDecimal bigDecimal1, const BigDecimal& bigDecimal2)
+BigDecimal& BigDecimal::operator += (const BigDecimal& bigDecimal)
 {
-	if (bigDecimal1.sign ^ bigDecimal2.sign)
+	if (sign ^ bigDecimal.sign)
 	{
-		return bigDecimal1 + (-bigDecimal2);
-	}
-	else
-	{
-		if (bigDecimal1.compareAbsTo(bigDecimal2) >= 0)
+		if (compareAbsTo(bigDecimal) >= 0)
 		{
 			int remain = 0;
-			for (int i = bigDecimal1.arraySize - 1; i >= 0; --i)
+			for (int i = arraySize - 1; i >= 0; --i)
 			{
-				long long tmp = (long long)bigDecimal1.array[i] - remain - bigDecimal2.array[i];
+				long long tmp = (long long)array[i] - remain - bigDecimal.array[i];
 				if (tmp < 0)
 				{
 					remain = 1;
@@ -82,15 +71,15 @@ BigDecimal operator - (BigDecimal bigDecimal1, const BigDecimal& bigDecimal2)
 				{
 					remain = 0;
 				}
-				bigDecimal1.array[i] = tmp;
+				array[i] = tmp;
 			}
 		}
 		else
 		{
 			int remain = 0;
-			for (int i = bigDecimal1.arraySize - 1; i >= 0; --i)
+			for (int i = arraySize - 1; i >= 0; --i)
 			{
-				long long tmp = (long long)bigDecimal2.array[i] - remain - bigDecimal1.array[i];
+				long long tmp = (long long)bigDecimal.array[i] - remain - array[i];
 				if (tmp < 0)
 				{
 					remain = 1;
@@ -100,54 +89,121 @@ BigDecimal operator - (BigDecimal bigDecimal1, const BigDecimal& bigDecimal2)
 				{
 					remain = 0;
 				}
-				bigDecimal1.array[i] = tmp;
+				array[i] = tmp;
 			}
-			bigDecimal1.sign = !bigDecimal1.sign;
+			sign = !sign;
 		}
-		return bigDecimal1;
 	}
+	else
+	{
+		int remain = 0;
+		for (int i = arraySize - 1; i >= 0; --i)
+		{
+			long long tmp = (long long)array[i] + bigDecimal.array[i] + remain;
+			array[i] = tmp & ((1LL << 32) - 1);
+			remain = tmp >> 32;
+		}
+	}
+	return *this;
 }
 
-BigDecimal operator >> (BigDecimal bigDecimal, const int& delta)
+BigDecimal& BigDecimal::operator -= (const BigDecimal& bigDecimal)
+{
+	if (sign ^ bigDecimal.sign)
+	{
+		int remain = 0;
+		for (int i = arraySize - 1; i >= 0; --i)
+		{
+			long long tmp = (long long)array[i] + bigDecimal.array[i] + remain;
+			array[i] = tmp & ((1LL << 32) - 1);
+			remain = tmp >> 32;
+		}
+	}
+	else
+	{
+		if (compareAbsTo(bigDecimal) >= 0)
+		{
+			int remain = 0;
+			for (int i = arraySize - 1; i >= 0; --i)
+			{
+				long long tmp = (long long)array[i] - remain - bigDecimal.array[i];
+				if (tmp < 0)
+				{
+					remain = 1;
+					tmp += 1LL << 32;
+				}
+				else
+				{
+					remain = 0;
+				}
+				array[i] = tmp;
+			}
+		}
+		else
+		{
+			int remain = 0;
+			for (int i = arraySize - 1; i >= 0; --i)
+			{
+				long long tmp = (long long)bigDecimal.array[i] - remain - array[i];
+				if (tmp < 0)
+				{
+					remain = 1;
+					tmp += 1LL << 32;
+				}
+				else
+				{
+					remain = 0;
+				}
+				array[i] = tmp;
+			}
+			sign = !sign;
+		}
+	}
+	return *this;
+}
+
+BigDecimal& BigDecimal::operator >>= (const int& delta)
 {
 	int bigDelta = delta >> 5;
 	int smallDelta = delta & ((1 << 5) - 1);
-	for (int i = bigDecimal.arraySize - 1; i - bigDelta >= 0; --i)
+	for (int i = arraySize - 1; i - bigDelta >= 0; --i)
 	{
-		bigDecimal.array[i] = bigDecimal.array[i - bigDelta];
+		array[i] = array[i - bigDelta];
 	}
 	for (int i = 0; i < bigDelta; ++i)
 	{
-		bigDecimal.array[i] = 0;
+		array[i] = 0;
 	}
 	if (smallDelta)
 	{
 		int remain = 0;
-		for (int i = bigDelta; i < bigDecimal.arraySize; ++i)
+		for (int i = bigDelta; i < arraySize; ++i)
 		{
-			int newRemain = bigDecimal.array[i] & ((1 << smallDelta) - 1);
-			bigDecimal.array[i] >>= smallDelta;
-			bigDecimal.array[i] += remain << (32 - smallDelta);
+			int newRemain = array[i] & ((1 << smallDelta) - 1);
+			array[i] >>= smallDelta;
+			array[i] += remain << (32 - smallDelta);
 			remain = newRemain;
 		}
 	}
-	return bigDecimal;
+	return *this;
 }
 
-std::ostream& operator << (std::ostream& out, BigDecimal bigDecimal)
+std::ostream& operator << (std::ostream& out, const BigDecimal& bigDecimal)
 {
 	if (bigDecimal.sign)
 	{
 		out << "-";
 	}
 	out << bigDecimal.array[0] << ".";
+	unsigned int tmpArray[bigDecimal.arraySize];
+	memcpy(tmpArray, bigDecimal.array, sizeof(tmpArray));
 	for (int i = 0; i < bigDecimal.scale; ++i)
 	{
 		int remain = 0;
 		for (int j = bigDecimal.arraySize - 1; j >= 1; --j)
 		{
-			long long tmp = bigDecimal.array[j] * 10LL + remain;
-			bigDecimal.array[j] = tmp & ((1LL << 32) - 1);
+			long long tmp = tmpArray[j] * 10LL + remain;
+			tmpArray[j] = tmp & ((1LL << 32) - 1);
 			remain = tmp >> 32;
 		}
 		out << remain;
