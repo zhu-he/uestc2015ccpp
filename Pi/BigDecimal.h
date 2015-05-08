@@ -10,11 +10,10 @@ const float ratio = 32 * log10(2);
 class BigDecimal
 {
 public:
-	BigDecimal(const int& dividend, const int& divisor, const int& scale);
+	BigDecimal(const int& delta, const int& divisor, const int& scale);
 	~BigDecimal();
 	void operator += (const BigDecimal& bigDecimal);
 	void operator -= (const BigDecimal& bigDecimal);
-	void operator >>= (const int& delta);
 	friend std::ostream& operator << (std::ostream& out, const BigDecimal& bigDecimal);
 private:
 	unsigned int* array;

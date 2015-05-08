@@ -1,11 +1,17 @@
 #include "BigDecimal.h"
 
-BigDecimal::BigDecimal(const int& dividend, const int& divisor, const int& scale) : scale(scale)
+BigDecimal::BigDecimal(const int& delta, const int& divisor, const int& scale) : scale(scale)
 {
-	long long remain = dividend;
 	arraySize = scale / ratio + 2;
 	array = new unsigned int[arraySize];
-	for (int i = 0; i < arraySize; ++i)
+	int bigDelta = delta >> 5;
+	int smallDelta = delta & ((1 << 5) - 1);
+	for (int i = 0; i < bigDelta && i < arraySize; ++i)
+	{
+		array[i] = 0;
+	}
+	long long remain = 1LL << (32 - smallDelta);
+	for (int i = bigDelta; i < arraySize; ++i)
 	{
 		array[i] = remain / divisor;
 		remain = remain - array[i] * divisor;
@@ -37,31 +43,6 @@ void BigDecimal::operator -= (const BigDecimal& bigDecimal)
 		long long tmp = (long long)array[i] - bigDecimal.array[i] + remain;
 		array[i] = tmp & ((1LL << 32) - 1);
 		remain = tmp >> 32;
-	}
-}
-
-void BigDecimal::operator >>= (const int& delta)
-{
-	int bigDelta = delta >> 5;
-	int smallDelta = delta & ((1 << 5) - 1);
-	for (int i = arraySize - 1; i - bigDelta >= 0; --i)
-	{
-		array[i] = array[i - bigDelta];
-	}
-	for (int i = 0; i < bigDelta && i < arraySize; ++i)
-	{
-		array[i] = 0;
-	}
-	if (smallDelta)
-	{
-		int remain = 0;
-		for (int i = bigDelta; i < arraySize; ++i)
-		{
-			int newRemain = array[i] & ((1 << smallDelta) - 1);
-			array[i] >>= smallDelta;
-			array[i] += remain << (32 - smallDelta);
-			remain = newRemain;
-		}
 	}
 }
 

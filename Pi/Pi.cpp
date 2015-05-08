@@ -20,14 +20,13 @@ int main()
 	#pragma omp parallel for
 	for (int i = 0; i < scale / 3 + 3; ++i)
 	{
-		BigDecimal sum(256, 10 * i + 1, scale);
-		sum += BigDecimal(1, 10 * i + 9, scale);
-		sum -= BigDecimal(1, 4 * i + 3, scale);
-		sum -= BigDecimal(64, 10 * i + 3, scale);
-		sum -= BigDecimal(4, 10 * i + 5, scale);
-		sum -= BigDecimal(4, 10 * i + 7, scale);
-		sum -= BigDecimal(32, 4 * i + 1, scale);
-		sum >>= 10 * i + 6;
+		BigDecimal sum(10 * i + 30, 10 * i + 1, scale);
+		sum += BigDecimal(10 * i + 38, 10 * i + 9, scale);
+		sum -= BigDecimal(10 * i + 38, 4 * i + 3, scale);
+		sum -= BigDecimal(10 * i + 32, 10 * i + 3, scale);
+		sum -= BigDecimal(10 * i + 36, 10 * i + 5, scale);
+		sum -= BigDecimal(10 * i + 36, 10 * i + 7, scale);
+		sum -= BigDecimal(10 * i + 33, 4 * i + 1, scale);
 		if (i % 2 == 1)
 		{
 			*Pi[omp_get_thread_num()] -= sum;
