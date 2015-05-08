@@ -1,16 +1,23 @@
 #include <iostream>
+#include <omp.h>
 #include <ctime>
 #include "BigDecimal.h"
 
 using namespace std;
 
-const int scale = 10000;
+const int scale = 100000;
 
 int main()
 {
-	BigDecimal Pi(0, 1, scale);
 	time_t startTime = clock();
-	for (int i = 0; ; ++i)
+	int coreNum = omp_get_num_procs();
+	BigDecimal* Pi[coreNum];
+	for (int i = 0; i < coreNum; ++i)
+	{
+		Pi[i] = new BigDecimal(0, 1, scale);
+	}
+	#pragma omp parallel for
+	for (int i = 0; i < scale / 3 + 3; ++i)
 	{
 		BigDecimal sum(32, 4 * i + 1, scale);
 		sum += BigDecimal(1, 4 * i + 3, scale);
@@ -20,20 +27,20 @@ int main()
 		sum -= BigDecimal(256, 10 * i + 1, scale);
 		sum -= BigDecimal(1, 10 * i + 9, scale);
 		sum >>= 10 * i + 6;
-		if (sum.isZero())
-		{
-			break;
-		}
 		if (i % 2 == 1)
 		{
-			Pi += sum;
+			*Pi[omp_get_thread_num()] += sum;
 		}
 		else
 		{
-			Pi -= sum;
+			*Pi[omp_get_thread_num()] -= sum;
 		}
 	}
 	cout << "Time: " << (double)(clock() - startTime) / CLOCKS_PER_SEC << "s" << endl;
-	cout << Pi << endl;
+	for (int i = 1; i < coreNum; ++i)
+	{
+		*Pi[0] += *Pi[i];
+	}
+	cout << *Pi[0] << endl;
 	return 0;
 }

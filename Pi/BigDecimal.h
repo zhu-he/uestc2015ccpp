@@ -13,9 +13,9 @@ public:
 	~BigDecimal();
 	int compareAbsTo(const BigDecimal& bigDecimal);
 	bool isZero();
-	BigDecimal& operator += (const BigDecimal& bigDecimal);
-	BigDecimal& operator -= (const BigDecimal& bigDecimal);
-	BigDecimal& operator >>= (const int& delta);
+	void operator += (const BigDecimal& bigDecimal);
+	void operator -= (const BigDecimal& bigDecimal);
+	void operator >>= (const int& delta);
 	friend std::ostream& operator << (std::ostream& out, const BigDecimal& bigDecimal);
 private:
 	unsigned int* array;

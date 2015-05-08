@@ -10,7 +10,7 @@ BigDecimal::BigDecimal(int dividend, int divisor, int scale) : scale(scale)
 		sign = true;
 	}
 	arraySize = scale / (32 * log10(2)) + 2;
-	array = (unsigned int*)malloc(arraySize * sizeof(unsigned int));
+	array = new unsigned int[arraySize];
 	for (int i = 0; i < arraySize; ++i)
 	{
 		array[i] = remain / divisor;
@@ -21,7 +21,7 @@ BigDecimal::BigDecimal(int dividend, int divisor, int scale) : scale(scale)
 
 BigDecimal::~BigDecimal()
 {
-	delete[] array;
+	delete array;
 }
 
 int BigDecimal::compareAbsTo(const BigDecimal& bigDecimal)
@@ -52,7 +52,7 @@ bool BigDecimal::isZero()
 	return true;
 }
 
-BigDecimal& BigDecimal::operator += (const BigDecimal& bigDecimal)
+void BigDecimal::operator += (const BigDecimal& bigDecimal)
 {
 	if (sign ^ bigDecimal.sign)
 	{
@@ -104,10 +104,9 @@ BigDecimal& BigDecimal::operator += (const BigDecimal& bigDecimal)
 			remain = tmp >> 32;
 		}
 	}
-	return *this;
 }
 
-BigDecimal& BigDecimal::operator -= (const BigDecimal& bigDecimal)
+void BigDecimal::operator -= (const BigDecimal& bigDecimal)
 {
 	if (sign ^ bigDecimal.sign)
 	{
@@ -159,10 +158,9 @@ BigDecimal& BigDecimal::operator -= (const BigDecimal& bigDecimal)
 			sign = !sign;
 		}
 	}
-	return *this;
 }
 
-BigDecimal& BigDecimal::operator >>= (const int& delta)
+void BigDecimal::operator >>= (const int& delta)
 {
 	int bigDelta = delta >> 5;
 	int smallDelta = delta & ((1 << 5) - 1);
@@ -170,7 +168,7 @@ BigDecimal& BigDecimal::operator >>= (const int& delta)
 	{
 		array[i] = array[i - bigDelta];
 	}
-	for (int i = 0; i < bigDelta; ++i)
+	for (int i = 0; i < bigDelta && i < arraySize; ++i)
 	{
 		array[i] = 0;
 	}
@@ -185,7 +183,6 @@ BigDecimal& BigDecimal::operator >>= (const int& delta)
 			remain = newRemain;
 		}
 	}
-	return *this;
 }
 
 std::ostream& operator << (std::ostream& out, const BigDecimal& bigDecimal)
