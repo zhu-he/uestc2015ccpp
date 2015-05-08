@@ -1,15 +1,9 @@
 #include "BigDecimal.h"
 
-BigDecimal::BigDecimal(int dividend, int divisor, int scale) : scale(scale)
+BigDecimal::BigDecimal(const int& dividend, const int& divisor, const int& scale) : scale(scale)
 {
 	long long remain = dividend;
-	sign = false;
-	if (remain < 0)
-	{
-		remain = -remain;
-		sign = true;
-	}
-	arraySize = scale / (32 * log10(2)) + 2;
+	arraySize = scale / ratio + 2;
 	array = new unsigned int[arraySize];
 	for (int i = 0; i < arraySize; ++i)
 	{
@@ -24,139 +18,25 @@ BigDecimal::~BigDecimal()
 	delete array;
 }
 
-int BigDecimal::compareAbsTo(const BigDecimal& bigDecimal)
-{
-	for (int i = 0; i < arraySize; ++i)
-	{
-		if (array[i] > bigDecimal.array[i])
-		{
-			return 1;
-		}
-		if (array[i] < bigDecimal.array[i])
-		{
-			return -1;
-		}
-	}
-	return 0;
-}
-
-bool BigDecimal::isZero()
-{
-	for (int i = arraySize - 1; i >= 0; --i)
-	{
-		if (array[i] > 0)
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
 void BigDecimal::operator += (const BigDecimal& bigDecimal)
 {
-	if (sign ^ bigDecimal.sign)
+	int remain = 0;
+	for (int i = arraySize - 1; i >= 0; --i)
 	{
-		if (compareAbsTo(bigDecimal) >= 0)
-		{
-			int remain = 0;
-			for (int i = arraySize - 1; i >= 0; --i)
-			{
-				long long tmp = (long long)array[i] - remain - bigDecimal.array[i];
-				if (tmp < 0)
-				{
-					remain = 1;
-					tmp += 1LL << 32;
-				}
-				else
-				{
-					remain = 0;
-				}
-				array[i] = tmp;
-			}
-		}
-		else
-		{
-			int remain = 0;
-			for (int i = arraySize - 1; i >= 0; --i)
-			{
-				long long tmp = (long long)bigDecimal.array[i] - remain - array[i];
-				if (tmp < 0)
-				{
-					remain = 1;
-					tmp += 1LL << 32;
-				}
-				else
-				{
-					remain = 0;
-				}
-				array[i] = tmp;
-			}
-			sign = !sign;
-		}
-	}
-	else
-	{
-		int remain = 0;
-		for (int i = arraySize - 1; i >= 0; --i)
-		{
-			long long tmp = (long long)array[i] + bigDecimal.array[i] + remain;
-			array[i] = tmp & ((1LL << 32) - 1);
-			remain = tmp >> 32;
-		}
+		long long tmp = (long long)array[i] + bigDecimal.array[i] + remain;
+		array[i] = tmp & ((1LL << 32) - 1);
+		remain = tmp >> 32;
 	}
 }
 
 void BigDecimal::operator -= (const BigDecimal& bigDecimal)
 {
-	if (sign ^ bigDecimal.sign)
+	int remain = 0;
+	for (int i = arraySize - 1; i >= 0; --i)
 	{
-		int remain = 0;
-		for (int i = arraySize - 1; i >= 0; --i)
-		{
-			long long tmp = (long long)array[i] + bigDecimal.array[i] + remain;
-			array[i] = tmp & ((1LL << 32) - 1);
-			remain = tmp >> 32;
-		}
-	}
-	else
-	{
-		if (compareAbsTo(bigDecimal) >= 0)
-		{
-			int remain = 0;
-			for (int i = arraySize - 1; i >= 0; --i)
-			{
-				long long tmp = (long long)array[i] - remain - bigDecimal.array[i];
-				if (tmp < 0)
-				{
-					remain = 1;
-					tmp += 1LL << 32;
-				}
-				else
-				{
-					remain = 0;
-				}
-				array[i] = tmp;
-			}
-		}
-		else
-		{
-			int remain = 0;
-			for (int i = arraySize - 1; i >= 0; --i)
-			{
-				long long tmp = (long long)bigDecimal.array[i] - remain - array[i];
-				if (tmp < 0)
-				{
-					remain = 1;
-					tmp += 1LL << 32;
-				}
-				else
-				{
-					remain = 0;
-				}
-				array[i] = tmp;
-			}
-			sign = !sign;
-		}
+		long long tmp = (long long)array[i] - bigDecimal.array[i] + remain;
+		array[i] = tmp & ((1LL << 32) - 1);
+		remain = tmp >> 32;
 	}
 }
 
@@ -187,10 +67,6 @@ void BigDecimal::operator >>= (const int& delta)
 
 std::ostream& operator << (std::ostream& out, const BigDecimal& bigDecimal)
 {
-	if (bigDecimal.sign)
-	{
-		out << "-";
-	}
 	out << bigDecimal.array[0] << ".";
 	unsigned int tmpArray[bigDecimal.arraySize];
 	memcpy(tmpArray, bigDecimal.array, sizeof(tmpArray));

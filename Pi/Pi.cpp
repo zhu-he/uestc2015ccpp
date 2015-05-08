@@ -1,6 +1,7 @@
 #include <iostream>
 #include <omp.h>
 #include <ctime>
+#include <cmath>
 #include "BigDecimal.h"
 
 using namespace std;
@@ -19,21 +20,21 @@ int main()
 	#pragma omp parallel for
 	for (int i = 0; i < scale / 3 + 3; ++i)
 	{
-		BigDecimal sum(32, 4 * i + 1, scale);
-		sum += BigDecimal(1, 4 * i + 3, scale);
-		sum += BigDecimal(64, 10 * i + 3, scale);
-		sum += BigDecimal(4, 10 * i + 5, scale);
-		sum += BigDecimal(4, 10 * i + 7, scale);
-		sum -= BigDecimal(256, 10 * i + 1, scale);
-		sum -= BigDecimal(1, 10 * i + 9, scale);
+		BigDecimal sum(256, 10 * i + 1, scale);
+		sum += BigDecimal(1, 10 * i + 9, scale);
+		sum -= BigDecimal(1, 4 * i + 3, scale);
+		sum -= BigDecimal(64, 10 * i + 3, scale);
+		sum -= BigDecimal(4, 10 * i + 5, scale);
+		sum -= BigDecimal(4, 10 * i + 7, scale);
+		sum -= BigDecimal(32, 4 * i + 1, scale);
 		sum >>= 10 * i + 6;
 		if (i % 2 == 1)
 		{
-			*Pi[omp_get_thread_num()] += sum;
+			*Pi[omp_get_thread_num()] -= sum;
 		}
 		else
 		{
-			*Pi[omp_get_thread_num()] -= sum;
+			*Pi[omp_get_thread_num()] += sum;
 		}
 	}
 	cout << "Time: " << (double)(clock() - startTime) / CLOCKS_PER_SEC << "s" << endl;

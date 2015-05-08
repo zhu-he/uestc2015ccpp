@@ -2,24 +2,22 @@
 #define __BIG_DECIMAL__
 
 #include <iostream>
-#include <cstdlib>
 #include <cstring>
 #include <cmath>
+
+const float ratio = 32 * log10(2);
 
 class BigDecimal
 {
 public:
-	BigDecimal(int dividend, int divisor, int scale);
+	BigDecimal(const int& dividend, const int& divisor, const int& scale);
 	~BigDecimal();
-	int compareAbsTo(const BigDecimal& bigDecimal);
-	bool isZero();
 	void operator += (const BigDecimal& bigDecimal);
 	void operator -= (const BigDecimal& bigDecimal);
 	void operator >>= (const int& delta);
 	friend std::ostream& operator << (std::ostream& out, const BigDecimal& bigDecimal);
 private:
 	unsigned int* array;
-	bool sign;
 	int scale;
 	int arraySize;
 };
