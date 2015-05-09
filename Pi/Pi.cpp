@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const int scale = 100000;
+const int scale = 10000;
 
 int main()
 {
