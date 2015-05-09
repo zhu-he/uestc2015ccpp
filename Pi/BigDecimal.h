@@ -19,6 +19,7 @@ private:
 	unsigned int* array;
 	int scale;
 	int arraySize;
+	int bigDelta;
 };
 
 #endif // __BIG_DECIMAL__

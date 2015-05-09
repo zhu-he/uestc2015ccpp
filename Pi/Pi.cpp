@@ -1,7 +1,6 @@
 #include <iostream>
 #include <omp.h>
 #include <ctime>
-#include <cmath>
 #include "BigDecimal.h"
 
 using namespace std;

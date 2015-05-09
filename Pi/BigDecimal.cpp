@@ -4,13 +4,9 @@ BigDecimal::BigDecimal(const int& delta, const int& divisor, const int& scale) :
 {
 	arraySize = scale / ratio + 2;
 	array = new unsigned int[arraySize];
-	int bigDelta = delta >> 5;
-	int smallDelta = delta & ((1 << 5) - 1);
-	for (int i = 0; i < bigDelta && i < arraySize; ++i)
-	{
-		array[i] = 0;
-	}
-	long long remain = 1LL << (32 - smallDelta);
+	bigDelta = delta >> 5;
+	memset(array, 0, (bigDelta > arraySize ? arraySize : bigDelta) * sizeof(unsigned int));
+	long long remain = 1LL << (32 - (delta & ((1 << 5) - 1)));
 	for (int i = bigDelta; i < arraySize; ++i)
 	{
 		array[i] = remain / divisor;
@@ -27,7 +23,7 @@ BigDecimal::~BigDecimal()
 void BigDecimal::operator += (const BigDecimal& bigDecimal)
 {
 	int remain = 0;
-	for (int i = arraySize - 1; i >= 0; --i)
+	for (int i = arraySize - 1; i >= bigDelta; --i)
 	{
 		long long tmp = (long long)array[i] + bigDecimal.array[i] + remain;
 		array[i] = tmp & ((1LL << 32) - 1);
@@ -38,7 +34,7 @@ void BigDecimal::operator += (const BigDecimal& bigDecimal)
 void BigDecimal::operator -= (const BigDecimal& bigDecimal)
 {
 	int remain = 0;
-	for (int i = arraySize - 1; i >= 0; --i)
+	for (int i = arraySize - 1; i >= bigDelta; --i)
 	{
 		long long tmp = (long long)array[i] - bigDecimal.array[i] + remain;
 		array[i] = tmp & ((1LL << 32) - 1);
