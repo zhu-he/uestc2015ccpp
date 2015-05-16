@@ -44,6 +44,7 @@ bool SpriteSheet::loadFromFile(const std::string& filename)
                     y = 0;
                     origX = 0;
                     origY = 0;
+                    it = m_sheet.end();
                 }
                 it = m_sheet.insert(make_pair(line, sf::Texture())).first;
             }
@@ -67,6 +68,10 @@ bool SpriteSheet::loadFromFile(const std::string& filename)
                 ss >> origX >> comma >> origY;
             }
         }
+    }
+    if (it != m_sheet.end())
+    {
+        it->second.loadFromImage(image, sf::IntRect(x, y, origX, origY));
     }
     file.close();
     m_filename = filename;

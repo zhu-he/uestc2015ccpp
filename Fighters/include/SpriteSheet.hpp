@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <iostream>
 #include <map>
 #include <SFML/Graphics/Texture.hpp>
 
