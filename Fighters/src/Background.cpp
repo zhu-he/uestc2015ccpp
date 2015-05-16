@@ -2,7 +2,7 @@
 
 Background::Background()
 {
-	m_backgroundTexture.loadFromFile(backGroundImage);
+	m_backgroundTexture.loadFromFile(backGroundImagePath);
 	m_backgroundTexture.setRepeated(true);
 	setTexture(m_backgroundTexture);
 	m_backgroundTextureHeight = getTextureRect().height;
@@ -22,4 +22,14 @@ void Background::animate()
 	{
 		setPosition(0, getPosition().y - m_backgroundTextureHeight);
 	}
+}
+
+std::string Background::getType()
+{
+	return "Background";
+}
+
+bool Background::isAlive()
+{
+	return true;
 }

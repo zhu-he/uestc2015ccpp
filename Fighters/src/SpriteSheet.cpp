@@ -1,9 +1,8 @@
 #include "SpriteSheet.hpp"
 
-SpriteSheet::SpriteSheet()
-{
-
-}
+std::string SpriteSheet::m_filename;
+std::string SpriteSheet::m_textureFilename;
+std::map<std::string, sf::Texture> SpriteSheet::m_sheet;
 
 bool SpriteSheet::loadFromFile(const std::string& filename)
 {
