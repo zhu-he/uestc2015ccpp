@@ -15,6 +15,8 @@ Hero::Hero()
 	setOrigin(getTextureRect().width / 2, 0);
 	setPosition(screenWidth / 2, screenHeight - getTextureRect().height);
 	m_isAlive = true;
+	m_bulletSoundBuffer.loadFromFile(bulletSoundPath);
+	m_bulletSound.setBuffer(m_bulletSoundBuffer);
 }
 
 Hero::~Hero()
@@ -24,7 +26,7 @@ Hero::~Hero()
 
 void Hero::moveLeft()
 {
-	if (getPosition().x - getTextureRect().width / 2 > 0)
+	if (getPosition().x > 0)
 	{
 		move(-heroSpeed, 0);
 	}
@@ -32,7 +34,7 @@ void Hero::moveLeft()
 
 void Hero::moveRight()
 {
-	if (getPosition().x + getTextureRect().width / 2 < screenWidth)
+	if (getPosition().x < screenWidth)
 	{
 		move(heroSpeed, 0);
 	}
@@ -48,9 +50,10 @@ void Hero::fire()
 {
 	if (m_lastShootTime.getElapsedTime() >= sf::seconds(bulletInterval))
 	{
+		m_bulletSound.play();
 		Bullet* bullet = new Bullet();
-		bullet->setPosition(getPosition());
-		m_stage->addEntity(*bullet);
+		bullet->setPosition(getPosition() + sf::Vector2f(0, bulletOffsetY));
+		m_stage->addEntity(bullet);
 		m_lastShootTime.restart();
 	}
 }

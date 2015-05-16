@@ -2,14 +2,18 @@
 #define BACKGROUND_HPP
 
 #include <SFML/Graphics.hpp>
+#include <string>
 #include "Global.hpp"
+#include "Entity.hpp"
 
-class Background : public sf::Sprite
+class Background : public Entity
 {
 	public:
 		Background();
 		virtual ~Background();
 		void animate();
+		bool isAlive();
+		std::string getType();
 	private:
 		sf::Texture m_backgroundTexture;
 		float m_backgroundTextureHeight;

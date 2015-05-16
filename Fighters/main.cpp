@@ -1,20 +1,32 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <cstdlib>
+#include <ctime>
 #include "SpriteSheet.hpp"
-#include <iostream>
 #include "Background.hpp"
 #include "Hero.hpp"
+#include "Enemy.hpp"
 #include "Global.hpp"
+#include "Stage.hpp"
 
 using namespace std;
 
-sf::Texture backgroundTexture;
-sf::Sprite backgroundSprite;
-
 int main()
 {
+	srand((int)time(0));
+	SpriteSheet::loadFromFile(packPath);
     sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "Fighters");
+    Stage stage(window);
     Background background;
     Hero hero;
+    stage.addEntity(&background);
+    stage.addEntity(&hero);
+    sf::SoundBuffer buffer;
+    buffer.loadFromFile(gameMusicPath);
+    sf::Sound sound;
+    sound.setBuffer(buffer);
+    sound.play();
+    sf::Clock enemyClock;
     while (window.isOpen())
     {
         sf::Event event;
@@ -41,13 +53,13 @@ int main()
 		{
 			hero.fire();
 		}
-		background.animate();
-        hero.animate();
-        window.clear();
-        window.draw(background);
-        window.draw(hero);
-        window.display();
+		if (enemyClock.getElapsedTime() >= sf::seconds(enemySpawnTime))
+		{
+			Enemy* enemy = new Enemy(rand() % 3);
+            stage.addEntity(enemy);
+            enemyClock.restart();
+		}
+        stage.update();
     }
-
     return 0;
 }

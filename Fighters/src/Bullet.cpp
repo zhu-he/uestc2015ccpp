@@ -21,6 +21,11 @@ bool Bullet::isAlive()
 	return m_isAlive;
 }
 
+void Bullet::die()
+{
+	m_isAlive = false;
+}
+
 void Bullet::animate()
 {
 	move(0, -bulletSpeed);

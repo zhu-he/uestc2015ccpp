@@ -2,7 +2,7 @@
 
 Background::Background()
 {
-	m_backgroundTexture.loadFromFile(backGroundImagePath);
+	m_backgroundTexture.loadFromFile(backgroundImagePath);
 	m_backgroundTexture.setRepeated(true);
 	setTexture(m_backgroundTexture);
 	m_backgroundTextureHeight = getTextureRect().height;

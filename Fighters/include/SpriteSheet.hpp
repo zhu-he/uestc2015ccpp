@@ -11,16 +11,15 @@
 class SpriteSheet
 {
 public:
-    SpriteSheet();
-    bool loadFromFile(const std::string& filename);
-    sf::Texture& getTexture(const std::string& texturename);
-    std::string getFilename();
-    std::string getTextureFilename();
+    static bool loadFromFile(const std::string& filename);
+    static sf::Texture& getTexture(const std::string& texturename);
+    static std::string getFilename();
+    static std::string getTextureFilename();
 private:
-    std::string m_filename;
-    std::string m_textureFilename;
-    std::map<std::string, sf::Texture> m_sheet;
-    void trim(std::string& str);
+    static std::string m_filename;
+    static std::string m_textureFilename;
+    static std::map<std::string, sf::Texture> m_sheet;
+    static void trim(std::string& str);
 };
 
 #endif // SFML_SPRITESHEET_HPP
