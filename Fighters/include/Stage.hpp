@@ -19,7 +19,11 @@ class Stage
 	private:
 		sf::RenderWindow& m_window;
 		std::vector<Entity*> entitys;
+		int m_score;
+		sf::Font m_font;
+		sf::Text m_scoreText;
 		void draw();
+		void addScore(int score);
 };
 
 #endif // STAGE_HPP

@@ -14,8 +14,9 @@ class Background : public Entity
 		void animate();
 		bool isAlive();
 		std::string getType();
+		static void loadResources();
 	private:
-		sf::Texture m_backgroundTexture;
+		static sf::Texture m_backgroundTexture;
 		float m_backgroundTextureHeight;
 };
 

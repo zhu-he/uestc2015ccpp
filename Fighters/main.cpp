@@ -15,6 +15,10 @@ int main()
 {
 	srand((int)time(0));
 	SpriteSheet::loadFromFile(packPath);
+	Background::loadResources();
+	Hero::loadResources();
+	Enemy::loadResources();
+	Bullet::loadResources();
     sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "Fighters");
     Stage stage(window);
     Background background;

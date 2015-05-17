@@ -18,21 +18,23 @@ class Enemy : public Entity
 		void die();
 		void hit();
 		std::string getType();
+		Status getStatus();
 		bool isAlive();
+		int getEnemyType();
+		static void loadResources();
 	private:
-		std::vector<sf::Texture> m_enemyTexture;
-		std::vector<sf::Texture> m_enemyDownTexture;
-		sf::Texture m_enemyHitTexture;
-		int m_enemyImagePos;
+		static std::vector<sf::Texture> m_enemyTexture[3];
+		static std::vector<sf::Texture> m_enemyDownTexture[3];
+		static sf::Texture m_enemyHitTexture[3];
+		static sf::SoundBuffer m_enemyDownSoundBuffer[3];
+		static sf::Sound m_enemyDownSound[3];
+        sf::Clock m_enemyAnimateClock;
+		int m_enemyImageCounter;
 		bool m_isAlive;
 		int m_hp;
 		float m_speed;
-		sf::SoundBuffer m_enemyDownSoundBuffer;
-		sf::Sound m_enemyDownSound;
-		int m_status;
-		static const int Normal = 0;
-		static const int Hit = 1;
-		static const int Die = 2;
+		Status m_status;
+		int m_enemyType;
 };
 
 #endif // ENEMY_HPP

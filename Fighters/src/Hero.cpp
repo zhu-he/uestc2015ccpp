@@ -1,17 +1,12 @@
 #include "Hero.hpp"
 
+std::vector<sf::Texture> Hero::m_heroTexture;
+std::vector<sf::Texture> Hero::m_heroBlowupTexture;
+
 Hero::Hero()
 {
-    for (int i = 0; i < (int)heroImage.size(); ++i)
-	{
-		m_heroTexture.push_back(SpriteSheet::getTexture(heroImage[i]));
-	}
-    for (int i = 0; i < (int)heroBlowupImage.size(); ++i)
-	{
-		m_heroBlowupTexture.push_back(SpriteSheet::getTexture(heroBlowupImage[i]));
-	}
 	setTexture(m_heroTexture[0]);
-	m_heroImagePos = 0;
+	m_heroImageCounter = 0;
 	setOrigin(getTextureRect().width / 2, 0);
 	setPosition(screenWidth / 2, screenHeight - getTextureRect().height);
 	m_isAlive = true;
@@ -22,6 +17,18 @@ Hero::Hero()
 Hero::~Hero()
 {
 
+}
+
+void Hero::loadResources()
+{
+    for (int i = 0; i < (int)heroImage.size(); ++i)
+	{
+		m_heroTexture.push_back(SpriteSheet::getTexture(heroImage[i]));
+	}
+    for (int i = 0; i < (int)heroBlowupImage.size(); ++i)
+	{
+		m_heroBlowupTexture.push_back(SpriteSheet::getTexture(heroBlowupImage[i]));
+	}
 }
 
 void Hero::moveLeft()
@@ -42,8 +49,8 @@ void Hero::moveRight()
 
 void Hero::animate()
 {
-	m_heroImagePos = (m_heroImagePos + 1) % heroImage.size();
-	setTexture(m_heroTexture[m_heroImagePos]);
+	setTexture(m_heroTexture[m_heroImageCounter]);
+	m_heroImageCounter = (m_heroImageCounter + 1) % heroImage.size();
 }
 
 void Hero::fire()

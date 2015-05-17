@@ -1,11 +1,9 @@
 #include "Bullet.hpp"
 
+std::vector<sf::Texture> Bullet::m_bulletTexture;
+
 Bullet::Bullet()
 {
-    for (int i = 0; i < (int)bulletImage.size(); ++i)
-	{
-        m_bulletTexture.push_back(SpriteSheet::getTexture(bulletImage[i]));
-	}
 	setTexture(m_bulletTexture[1]);
 	setOrigin(getTextureRect().width / 2, getTextureRect().height);
 	m_isAlive = true;
@@ -14,6 +12,14 @@ Bullet::Bullet()
 Bullet::~Bullet()
 {
 
+}
+
+void Bullet::loadResources()
+{
+	for (int i = 0; i < (int)bulletImage.size(); ++i)
+	{
+		m_bulletTexture.push_back(SpriteSheet::getTexture(bulletImage[i]));
+	}
 }
 
 bool Bullet::isAlive()

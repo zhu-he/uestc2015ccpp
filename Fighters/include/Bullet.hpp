@@ -17,8 +17,9 @@ class Bullet : public Entity
 		bool isAlive();
 		void die();
 		std::string getType();
+		static void loadResources();
 	private:
-		std::vector<sf::Texture> m_bulletTexture;
+		static std::vector<sf::Texture> m_bulletTexture;
 		bool m_isAlive;
 };
 

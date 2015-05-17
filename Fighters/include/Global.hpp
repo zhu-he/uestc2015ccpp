@@ -1,12 +1,21 @@
-#ifndef GLOBAL_H_INCLUDED
-#define GLOBAL_H_INCLUDED
+#ifndef GLOBAL_HPP_INCLUDED
+#define GLOBAL_HPP_INCLUDED
 
 #include <string>
 #include <vector>
 
+enum Status
+{
+	Normal,
+	Hit,
+	Dying
+};
+
 const int screenWidth = 360;
 
 const int screenHeight = 600;
+
+const std::string fontPath = "resources/font/STHeiti Light.ttc";
 
 const std::string gameMusicPath = "resources/sound/game_music.ogg";
 
@@ -95,6 +104,13 @@ const std::vector<int> enemyHp =
 	5
 };
 
+const std::vector<int> enemyScore =
+{
+	1,
+	2,
+	5
+};
+
 const std::vector<float> enemySpeed =
 {
 	0.1f,
@@ -104,7 +120,7 @@ const std::vector<float> enemySpeed =
 
 const float heroSpeed = 0.2f;
 
-const float backgroundSpeed = 0.1f;
+const float backgroundSpeed = 0.05f;
 
 const float bulletSpeed = 0.5f;
 
@@ -114,4 +130,6 @@ const float bulletOffsetY = 5.0f;
 
 const float enemySpawnTime = 1.0f;
 
-#endif // GLOBAL_H_INCLUDED
+const float animateInterval = 0.05f;
+
+#endif // GLOBAL_HPP_INCLUDED

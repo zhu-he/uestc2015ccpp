@@ -22,14 +22,19 @@ class Hero : public Entity
 		void die();
 		std::string getType();
 		bool isAlive();
+		void hit();
+		static void loadResources();
 	private:
-		std::vector<sf::Texture> m_heroTexture;
-		std::vector<sf::Texture> m_heroBlowupTexture;
-		int m_heroImagePos;
+		static std::vector<sf::Texture> m_heroTexture;
+		static std::vector<sf::Texture> m_heroBlowupTexture;
+		int m_heroImageCounter;
 		bool m_isAlive;
+		Status m_status;
+        sf::Clock m_enemyAnimateClock;
 		sf::Clock m_lastShootTime;
 		sf::SoundBuffer m_bulletSoundBuffer;
 		sf::Sound m_bulletSound;
+		int m_hp;
 };
 
 #endif // HERO_HPP
