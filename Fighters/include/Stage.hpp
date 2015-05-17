@@ -16,12 +16,16 @@ class Stage
 		virtual ~Stage();
 		void addEntity(Entity* entity);
 		void update();
+		void gameOver();
+		void setHpText(int hp);
 	private:
 		sf::RenderWindow& m_window;
 		std::vector<Entity*> entitys;
 		int m_score;
 		sf::Font m_font;
 		sf::Text m_scoreText;
+		sf::Text m_hpText;
+		Status m_status;
 		void draw();
 		void addScore(int score);
 };

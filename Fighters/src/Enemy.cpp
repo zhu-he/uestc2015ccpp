@@ -72,6 +72,8 @@ void Enemy::animate()
 			m_enemyDownSound[m_enemyType].play();
 		}
 		break;
+	default:
+		break;
     }
 }
 

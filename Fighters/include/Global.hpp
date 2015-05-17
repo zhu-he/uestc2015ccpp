@@ -8,7 +8,8 @@ enum Status
 {
 	Normal,
 	Hit,
-	Dying
+	Dying,
+	Over
 };
 
 const int screenWidth = 360;
@@ -128,8 +129,10 @@ const float bulletInterval = 0.2f;
 
 const float bulletOffsetY = 5.0f;
 
-const float enemySpawnTime = 0.1f;
+const float enemySpawnTime = 1.0f;
 
 const float animateInterval = 0.05f;
+
+const int heroHp = 3;
 
 #endif // GLOBAL_HPP_INCLUDED

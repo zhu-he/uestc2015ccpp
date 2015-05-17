@@ -1,6 +1,7 @@
 #include "Stage.hpp"
 #include "Enemy.hpp"
 #include "Bullet.hpp"
+#include "Hero.hpp"
 
 Stage::Stage(sf::RenderWindow& window) : m_window(window)
 {
@@ -10,8 +11,15 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window)
 	m_scoreText.setString("Score: 0");
 	m_scoreText.setCharacterSize(24);
 	m_scoreText.setColor(sf::Color::Black);
-	m_scoreText.setPosition(5, 5);
+	m_scoreText.setPosition(10, 5);
 	m_scoreText.setStyle(sf::Text::Bold);
+	m_hpText.setFont(m_font);
+	m_hpText.setString(L"♥♥♥");
+	m_hpText.setCharacterSize(30);
+	m_hpText.setColor(sf::Color::Red);
+	m_hpText.setStyle(sf::Text::Bold);
+	m_hpText.setPosition(screenWidth - m_hpText.getLocalBounds().width - 10, 0);
+	m_status = Normal;
 }
 
 Stage::~Stage()
@@ -31,6 +39,18 @@ void Stage::addScore(int score)
 	m_scoreText.setString("Score: " + std::to_string(m_score));
 }
 
+void Stage::setHpText(int hp)
+{
+	wchar_t heartString[4];
+	for (int i = 0; i < hp; ++i)
+	{
+		heartString[i] = L'♥';
+	}
+	heartString[hp] = 0;
+	m_hpText.setString(heartString);
+	m_hpText.setPosition(screenWidth - m_hpText.getLocalBounds().width - 10, 0);
+}
+
 void Stage::draw()
 {
 	m_window.clear();
@@ -40,34 +60,36 @@ void Stage::draw()
 		m_window.draw(*entity);
 	}
 	m_window.draw(m_scoreText);
+	m_window.draw(m_hpText);
 	m_window.display();
+}
+
+void Stage::gameOver()
+{
+    m_status = Over;
 }
 
 void Stage::update()
 {
-	for (int i = 0; i < (int)entitys.size() - 1; ++i)
+	if (m_status == Over)
 	{
-		if (!entitys[i]->isAlive() || entitys[i]->getType() == "Background")
+		return;
+	}
+	for (Entity* entityA : entitys)
+	{
+		for (Entity* entityB : entitys)
 		{
-			continue;
-		}
-		for (int j = i + 1; j < (int)entitys.size(); ++j)
-		{
-			if (!entitys[j]->isAlive() || entitys[j]->getType() == "Background" || entitys[i]->getType() == entitys[j]->getType())
+			if (entityA->getGlobalBounds().intersects(entityB->getGlobalBounds()))
 			{
-				continue;
-			}
-			if (entitys[i]->getGlobalBounds().intersects(entitys[j]->getGlobalBounds()))
-			{
-				if (entitys[i]->getType() == "Enemy" && entitys[j]->getType() == "Bullet" && ((Enemy*)entitys[i])->getStatus() != Dying)
+				if (entityA->getType() == "Enemy" && entityB->getType() == "Bullet" && ((Enemy*)entityA)->getStatus() != Dying)
 				{
-					((Enemy*)entitys[i])->hit();
-					((Bullet*)entitys[j])->die();
+					((Enemy*)entityA)->hit();
+					((Bullet*)entityB)->die();
 				}
-				else if (entitys[i]->getType() == "Bullet" && entitys[j]->getType() == "Enemy" && ((Enemy*)entitys[j])->getStatus() != Dying)
+				else if (entityA->getType() == "Enemy" && entityB->getType() == "Hero" && ((Enemy*)entityA)->getStatus() != Dying)
 				{
-					((Bullet*)entitys[i])->die();
-					((Enemy*)entitys[j])->hit();
+					((Enemy*)entityA)->die();
+					((Hero*)entityB)->hit();
 				}
 			}
 		}
@@ -79,6 +101,10 @@ void Stage::update()
 			if ((*it)->getType() == "Enemy")
 			{
 				addScore(enemyScore[((Enemy*)(*it))->getEnemyType()]);
+			}
+			else if ((*it)->getType() == "Hero")
+			{
+				gameOver();
 			}
 			entitys.erase(it);
 			it--;

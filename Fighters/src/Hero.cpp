@@ -12,6 +12,7 @@ Hero::Hero()
 	m_isAlive = true;
 	m_bulletSoundBuffer.loadFromFile(bulletSoundPath);
 	m_bulletSound.setBuffer(m_bulletSoundBuffer);
+	m_hp = heroHp;
 }
 
 Hero::~Hero()
@@ -47,10 +48,46 @@ void Hero::moveRight()
 	}
 }
 
+void Hero::hit()
+{
+    m_hp--;
+    m_stage->setHpText(m_hp);
+    if (m_hp <= 0 && m_status != Dying)
+	{
+		die();
+	}
+}
+
+void Hero::die()
+{
+	m_status = Dying;
+	m_heroImageCounter = 0;
+}
+
 void Hero::animate()
 {
-	setTexture(m_heroTexture[m_heroImageCounter]);
-	m_heroImageCounter = (m_heroImageCounter + 1) % heroImage.size();
+	if (m_enemyAnimateClock.getElapsedTime() < sf::seconds(animateInterval))
+	{
+		return;
+	}
+	m_enemyAnimateClock.restart();
+	switch (m_status)
+	{
+	case Normal:
+		setTexture(m_heroTexture[m_heroImageCounter]);
+		m_heroImageCounter = (m_heroImageCounter + 1) % heroImage.size();
+		break;
+	case Dying:
+		setTexture(m_heroBlowupTexture[m_heroImageCounter]);
+		m_heroImageCounter++;
+		if (m_heroImageCounter == (int)m_heroBlowupTexture.size())
+		{
+			m_isAlive = false;
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 void Hero::fire()
