@@ -128,7 +128,7 @@ const float bulletInterval = 0.2f;
 
 const float bulletOffsetY = 5.0f;
 
-const float enemySpawnTime = 1.0f;
+const float enemySpawnTime = 0.1f;
 
 const float animateInterval = 0.05f;
 
