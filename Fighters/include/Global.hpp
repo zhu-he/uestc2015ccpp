@@ -3,14 +3,30 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
+
+enum GameStatus
+{
+	Waiting,
+	Playing,
+	Pausing,
+	Over
+};
 
 enum Status
 {
 	Normal,
 	Hit,
-	Dying,
-	Over
+	Dying
 };
+
+enum BulletType
+{
+	HeroBullet,
+	EnemyBullet
+};
+
+const float PI = acos(-1);
 
 const int screenWidth = 360;
 
@@ -19,6 +35,8 @@ const int screenHeight = 600;
 const std::string fontPath = "resources/font/STHeiti Light.ttc";
 
 const std::string gameMusicPath = "resources/sound/game_music.ogg";
+
+const std::string gameOverPath = "resources/sound/game_over.ogg";
 
 const std::string bulletSoundPath = "resources/sound/bullet.ogg";
 
@@ -101,8 +119,8 @@ const std::vector<std::vector<std::string> > enemyDownImage =
 const std::vector<int> enemyHp =
 {
 	1,
-	2,
-	5
+	3,
+	10
 };
 
 const std::vector<int> enemyScore =
@@ -114,24 +132,37 @@ const std::vector<int> enemyScore =
 
 const std::vector<float> enemySpeed =
 {
-	0.1f,
-	0.1f,
-	0.1f
+	3.0f,
+	2.5f,
+	2.0f
 };
 
-const float heroSpeed = 0.2f;
+const float heroSpeed = 8.0f;
 
-const float backgroundSpeed = 0.05f;
+const float backgroundSpeed = 2.0f;
 
-const float bulletSpeed = 0.5f;
+const std::vector<float> bulletSpeed =
+{
+	-20.0f,
+	4.0f
+};
 
-const float bulletInterval = 0.2f;
+const float heroBulletInterval = 0.2f;
 
-const float bulletOffsetY = 5.0f;
+const std::vector<float> enemyBulletInterval =
+{
+	1.0f,
+	1.0f,
+	1.0f
+};
 
-const float enemySpawnTime = 1.0f;
+const float bulletOffsetY = -60.0f;
+
+const float enemySpawnTime = 2.0f;
 
 const float animateInterval = 0.05f;
+
+const float enemyFireDistance = 200.0f;
 
 const int heroHp = 3;
 

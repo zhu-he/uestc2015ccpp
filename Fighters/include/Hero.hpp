@@ -20,6 +20,8 @@ class Hero : public Entity
 		void fire();
 		void animate();
 		void die();
+		void revive();
+		sf::ConvexShape getCollision();
 		std::string getType();
 		bool isAlive();
 		void hit();

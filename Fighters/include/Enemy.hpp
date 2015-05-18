@@ -17,6 +17,8 @@ class Enemy : public Entity
 		void animate();
 		void die();
 		void hit();
+		void fire(const sf::Vector2f& heroPosition);
+		sf::ConvexShape getCollision();
 		std::string getType();
 		Status getStatus();
 		bool isAlive();
@@ -29,6 +31,7 @@ class Enemy : public Entity
 		static sf::SoundBuffer m_enemyDownSoundBuffer[3];
 		static sf::Sound m_enemyDownSound[3];
         sf::Clock m_enemyAnimateClock;
+        sf::Clock m_lastShootTime;
 		int m_enemyImageCounter;
 		bool m_isAlive;
 		int m_hp;

@@ -15,6 +15,11 @@ Background::~Background()
 
 }
 
+sf::ConvexShape Background::getCollision()
+{
+	return m_collision;
+}
+
 void Background::loadResources()
 {
 	m_backgroundTexture.loadFromFile(backgroundImagePath);

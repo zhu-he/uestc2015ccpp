@@ -13,9 +13,17 @@ class Entity : public sf::Sprite
 		virtual std::string getType() = 0;
 		virtual bool isAlive() = 0;
 		virtual void animate() = 0;
+		virtual sf::ConvexShape getCollision() = 0;
+		void setPosition(float x, float y);
+		void setPosition(const sf::Vector2f& position);
+		void setOrigin(float x, float y);
+		void move(float offsetX, float offsetY);
+		void move(const sf::Vector2f& offset);
+		void rotate(float angle);
 		friend class Stage;
 	protected:
 		Stage* m_stage;
+		sf::ConvexShape m_collision;
 };
 
 #endif // ENTITY_HPP

@@ -25,45 +25,54 @@ int main()
     Hero hero;
     stage.addEntity(&background);
     stage.addEntity(&hero);
-    sf::SoundBuffer buffer;
-    buffer.loadFromFile(gameMusicPath);
-    sf::Sound sound;
-    sound.setBuffer(buffer);
-    sound.play();
-    sf::Clock enemyClock;
+    window.setFramerateLimit(60);
     while (window.isOpen())
     {
         sf::Event event;
-        while (window.pollEvent(event))
-        {
-            switch (event.type)
-            {
-            case sf::Event::Closed:
-                window.close();
-                break;
-			default:
-				break;
-            }
-        }
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        if (stage.getGameStatus() == Waiting || stage.getGameStatus() == Over)
 		{
-			hero.moveLeft();
+			while (window.pollEvent(event))
+			{
+				switch (event.type)
+				{
+				case sf::Event::Closed:
+					window.close();
+					break;
+				case sf::Event::KeyPressed:
+					stage.play();
+					break;
+				default:
+					break;
+				}
+			}
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		else if (stage.getGameStatus() == Playing)
 		{
-			hero.moveRight();
+			while (window.pollEvent(event))
+			{
+				switch (event.type)
+				{
+				case sf::Event::Closed:
+					window.close();
+					break;
+				default:
+					break;
+				}
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+			{
+				hero.moveLeft();
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+			{
+				hero.moveRight();
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+			{
+				hero.fire();
+			}
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-		{
-			hero.fire();
-		}
-		if (enemyClock.getElapsedTime() >= sf::seconds(enemySpawnTime))
-		{
-			Enemy* enemy = new Enemy(rand() % 3);
-            stage.addEntity(enemy);
-            enemyClock.restart();
-		}
-        stage.update();
+		stage.update();
     }
     return 0;
 }

@@ -19,7 +19,19 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window)
 	m_hpText.setColor(sf::Color::Red);
 	m_hpText.setStyle(sf::Text::Bold);
 	m_hpText.setPosition(screenWidth - m_hpText.getLocalBounds().width - 10, 0);
-	m_status = Normal;
+	m_waitingText.setFont(m_font);
+	m_waitingText.setString("Press any key to start");
+	m_waitingText.setCharacterSize(30);
+	m_waitingText.setColor(sf::Color::Black);
+	m_waitingText.setStyle(sf::Text::Bold);
+	m_waitingText.setPosition(screenWidth / 2 - m_waitingText.getLocalBounds().width / 2, screenHeight / 2 - m_waitingText.getLocalBounds().height / 2);
+	m_gameStatus = Waiting;
+	m_gameMusicSoundBuffer.loadFromFile(gameMusicPath);
+	m_gameOverSoundBuffer.loadFromFile(gameOverPath);
+	m_gameMusicSound.setBuffer(m_gameMusicSoundBuffer);
+	m_gameOverSound.setBuffer(m_gameOverSoundBuffer);
+	m_gameMusicSound.setLoop(true);
+	m_gameMusicSound.play();
 }
 
 Stage::~Stage()
@@ -31,6 +43,10 @@ void Stage::addEntity(Entity* entity)
 {
 	entitys.push_back(entity);
 	entity->m_stage = this;
+	if (entity->getType() == "Hero")
+	{
+		m_hero = entity;
+	}
 }
 
 void Stage::addScore(int score)
@@ -39,8 +55,22 @@ void Stage::addScore(int score)
 	m_scoreText.setString("Score: " + std::to_string(m_score));
 }
 
+GameStatus Stage::getGameStatus()
+{
+	return m_gameStatus;
+}
+
+int Stage::getScore()
+{
+	return m_score;
+}
+
 void Stage::setHpText(int hp)
 {
+	if (hp < 0)
+	{
+		hp = 0;
+	}
 	wchar_t heartString[4];
 	for (int i = 0; i < hp; ++i)
 	{
@@ -51,39 +81,86 @@ void Stage::setHpText(int hp)
 	m_hpText.setPosition(screenWidth - m_hpText.getLocalBounds().width - 10, 0);
 }
 
+void Stage::play()
+{
+	m_gameMusicSound.play();
+	m_score = 0;
+	m_scoreText.setString("Score: 0");
+	setHpText(heroHp);
+	m_gameStatus = Playing;
+	((Hero*)m_hero)->revive();
+	enemyClock.restart();
+	for (std::vector<Entity*>::iterator it = entitys.begin(); it != entitys.end(); ++it)
+	{
+		if ((*it)->getType() != "Background" && (*it)->getType() != "Hero")
+		{
+			delete *it;
+			entitys.erase(it);
+			it--;
+		}
+	}
+}
+
 void Stage::draw()
 {
 	m_window.clear();
 	for (Entity* entity : entitys)
 	{
-		entity->animate();
-		m_window.draw(*entity);
+		if (entity->isAlive())
+		{
+			entity->animate();
+			m_window.draw(*entity);
+			// m_window.draw(entity->getCollision());
+		}
 	}
 	m_window.draw(m_scoreText);
 	m_window.draw(m_hpText);
+	if (m_gameStatus == Waiting)
+	{
+		m_window.draw(m_waitingText);
+	}
 	m_window.display();
 }
 
 void Stage::gameOver()
 {
-    m_status = Over;
+    m_gameStatus = Over;
+    m_gameMusicSound.stop();
+	m_gameOverSound.play();
 }
 
 void Stage::update()
 {
-	if (m_status == Over)
+	if (m_gameStatus == Over || m_gameStatus == Waiting)
 	{
+		draw();
 		return;
+	}
+	if (enemyClock.getElapsedTime() >= sf::seconds(enemySpawnTime))
+	{
+		Enemy* enemy = new Enemy(rand() % 3);
+		addEntity(enemy);
+		enemyClock.restart();
 	}
 	for (Entity* entityA : entitys)
 	{
 		for (Entity* entityB : entitys)
 		{
-			if (entityA->getGlobalBounds().intersects(entityB->getGlobalBounds()))
+			if (hitTest(entityA->getCollision(), entityB->getCollision()))
 			{
-				if (entityA->getType() == "Enemy" && entityB->getType() == "Bullet" && ((Enemy*)entityA)->getStatus() != Dying)
+				if (entityA->getType() == "Enemy" &&
+					entityB->getType() == "Bullet" &&
+					((Enemy*)entityA)->getStatus() != Dying &&
+					((Bullet*)entityB)->getBulletType() == HeroBullet)
 				{
 					((Enemy*)entityA)->hit();
+					((Bullet*)entityB)->die();
+				}
+				else if (entityA->getType() == "Hero" &&
+					entityB->getType() == "Bullet" &&
+					((Bullet*)entityB)->getBulletType() == EnemyBullet)
+				{
+					((Hero*)entityA)->hit();
 					((Bullet*)entityB)->die();
 				}
 				else if (entityA->getType() == "Enemy" && entityB->getType() == "Hero" && ((Enemy*)entityA)->getStatus() != Dying)
@@ -98,17 +175,48 @@ void Stage::update()
 	{
 		if (!(*it)->isAlive())
 		{
-			if ((*it)->getType() == "Enemy")
-			{
-				addScore(enemyScore[((Enemy*)(*it))->getEnemyType()]);
-			}
-			else if ((*it)->getType() == "Hero")
+			if ((*it)->getType() == "Hero")
 			{
 				gameOver();
 			}
-			entitys.erase(it);
-			it--;
+			else
+			{
+				delete *it;
+				entitys.erase(it);
+				it--;
+			}
+		}
+	}
+	for (Entity* entity : entitys)
+	{
+		if (entity->getType() == "Enemy" && ((Enemy*)entity)->getStatus() != Dying)
+		{
+			((Enemy*)entity)->fire(m_hero->getPosition());
 		}
 	}
     draw();
+}
+
+float Stage::cross(const sf::Vector2f& vectorA, const sf::Vector2f& vectorB) const
+{
+	return vectorA.x * vectorB.y - vectorA.y * vectorB.x;
+}
+
+bool Stage::hitTest(const sf::ConvexShape& collisionA, const sf::ConvexShape& collisionB) const
+{
+    for	(int i = 0; i < (int)collisionA.getPointCount(); ++i)
+	{
+		for	(int j = 0; j < (int)collisionB.getPointCount(); ++j)
+		{
+			const sf::Vector2f& A = collisionA.getTransform().transformPoint(collisionA.getPoint(i));
+			const sf::Vector2f& B = collisionA.getTransform().transformPoint(collisionA.getPoint((i + 1) % collisionA.getPointCount()));
+			const sf::Vector2f& C = collisionB.getTransform().transformPoint(collisionB.getPoint(j));
+			const sf::Vector2f& D = collisionB.getTransform().transformPoint(collisionB.getPoint((j + 1) % collisionB.getPointCount()));
+			if (cross(B - A, C - A) * cross(B - A, D - A) < 0 && cross(D - C, A - C) * cross(D - C, B - C) < 0)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
 }

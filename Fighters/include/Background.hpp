@@ -13,6 +13,7 @@ class Background : public Entity
 		virtual ~Background();
 		void animate();
 		bool isAlive();
+		sf::ConvexShape getCollision();
 		std::string getType();
 		static void loadResources();
 	private:

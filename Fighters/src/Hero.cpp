@@ -7,12 +7,18 @@ Hero::Hero()
 {
 	setTexture(m_heroTexture[0]);
 	m_heroImageCounter = 0;
-	setOrigin(getTextureRect().width / 2, 0);
-	setPosition(screenWidth / 2, screenHeight - getTextureRect().height);
+	setOrigin(getTextureRect().width / 2, getTextureRect().height / 2);
+	setPosition(screenWidth / 2, screenHeight - getTextureRect().height / 2);
 	m_isAlive = true;
 	m_bulletSoundBuffer.loadFromFile(bulletSoundPath);
 	m_bulletSound.setBuffer(m_bulletSoundBuffer);
 	m_hp = heroHp;
+	m_status = Normal;
+	m_collision.setPointCount(3);
+	m_collision.setPoint(0, sf::Vector2f(52, 0));
+	m_collision.setPoint(1, sf::Vector2f(2, 90));
+	m_collision.setPoint(2, sf::Vector2f(102, 90));
+	m_collision.setFillColor(sf::Color(255, 0, 0, 100));
 }
 
 Hero::~Hero()
@@ -64,6 +70,11 @@ void Hero::die()
 	m_heroImageCounter = 0;
 }
 
+sf::ConvexShape Hero::getCollision()
+{
+	return m_collision;
+}
+
 void Hero::animate()
 {
 	if (m_enemyAnimateClock.getElapsedTime() < sf::seconds(animateInterval))
@@ -90,12 +101,21 @@ void Hero::animate()
 	}
 }
 
+void Hero::revive()
+{
+    m_status = Normal;
+	m_hp = heroHp;
+	m_isAlive = true;
+	m_heroImageCounter = 0;
+	setPosition(screenWidth / 2, screenHeight - getTextureRect().height / 2);
+}
+
 void Hero::fire()
 {
-	if (m_lastShootTime.getElapsedTime() >= sf::seconds(bulletInterval))
+	if (m_lastShootTime.getElapsedTime() >= sf::seconds(heroBulletInterval))
 	{
 		m_bulletSound.play();
-		Bullet* bullet = new Bullet();
+		Bullet* bullet = new Bullet(HeroBullet);
 		bullet->setPosition(getPosition() + sf::Vector2f(0, bulletOffsetY));
 		m_stage->addEntity(bullet);
 		m_lastShootTime.restart();

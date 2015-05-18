@@ -2,6 +2,7 @@
 #define STAGE_HPP
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include <iostream>
 #include "Global.hpp"
@@ -17,7 +18,11 @@ class Stage
 		void addEntity(Entity* entity);
 		void update();
 		void gameOver();
+		GameStatus getGameStatus();
+		int getScore();
+		void play();
 		void setHpText(int hp);
+		void addScore(int score);
 	private:
 		sf::RenderWindow& m_window;
 		std::vector<Entity*> entitys;
@@ -25,9 +30,17 @@ class Stage
 		sf::Font m_font;
 		sf::Text m_scoreText;
 		sf::Text m_hpText;
-		Status m_status;
+		sf::Text m_waitingText;
+		sf::SoundBuffer m_gameMusicSoundBuffer;
+		sf::SoundBuffer m_gameOverSoundBuffer;
+		sf::Sound m_gameMusicSound;
+		sf::Sound m_gameOverSound;
+		sf::Clock enemyClock;
+		GameStatus m_gameStatus;
+		Entity* m_hero;
 		void draw();
-		void addScore(int score);
+		float cross(const sf::Vector2f& vectorA, const sf::Vector2f& vectorB) const;
+		bool hitTest(const sf::ConvexShape& collisionA, const sf::ConvexShape& collisionB) const;
 };
 
 #endif // STAGE_HPP
