@@ -20,6 +20,7 @@ int main()
 	Enemy::loadResources();
 	Bullet::loadResources();
     sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "Fighters");
+    window.setSize(sf::Vector2u(360, 600));
     Stage stage(window);
     Background background;
     Hero hero;

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 #include <cmath>
 
 enum GameStatus
@@ -28,9 +29,9 @@ enum BulletType
 
 const float PI = acos(-1);
 
-const int screenWidth = 360;
+const int screenWidth = 480;
 
-const int screenHeight = 600;
+const int screenHeight = 800;
 
 const std::string fontPath = "resources/font/STHeiti Light.ttc";
 
@@ -143,7 +144,7 @@ const float backgroundSpeed = 2.0f;
 
 const std::vector<float> bulletSpeed =
 {
-	-20.0f,
+	20.0f,
 	4.0f
 };
 
@@ -151,9 +152,22 @@ const float heroBulletInterval = 0.2f;
 
 const std::vector<float> enemyBulletInterval =
 {
-	1.0f,
-	1.0f,
-	1.0f
+	0.6f,
+	0.6f,
+	0.6f
+};
+
+const std::vector<std::vector<float> > enemyBulletDirection =
+{
+	{
+		-20, 0, 20
+	},
+	{
+		-40, -20, 0, 20, 40
+	},
+	{
+		-60, -40, -20, 0, 20, 40, 60
+	}
 };
 
 const float bulletOffsetY = -60.0f;
@@ -164,6 +178,12 @@ const float animateInterval = 0.05f;
 
 const float enemyFireDistance = 200.0f;
 
+const float waitingFlashInterval = 0.5f;
+
 const int heroHp = 3;
+
+const float invincibleTime = 2.0f;
+
+const float invincibleFlashInterval = 0.08f;
 
 #endif // GLOBAL_HPP_INCLUDED

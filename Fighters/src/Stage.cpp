@@ -8,13 +8,11 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window)
 	m_score = 0;
 	m_font.loadFromFile(fontPath);
 	m_scoreText.setFont(m_font);
-	m_scoreText.setString("Score: 0");
 	m_scoreText.setCharacterSize(24);
 	m_scoreText.setColor(sf::Color::Black);
 	m_scoreText.setPosition(10, 5);
 	m_scoreText.setStyle(sf::Text::Bold);
 	m_hpText.setFont(m_font);
-	m_hpText.setString(L"♥♥♥");
 	m_hpText.setCharacterSize(30);
 	m_hpText.setColor(sf::Color::Red);
 	m_hpText.setStyle(sf::Text::Bold);
@@ -25,6 +23,20 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window)
 	m_waitingText.setColor(sf::Color::Black);
 	m_waitingText.setStyle(sf::Text::Bold);
 	m_waitingText.setPosition(screenWidth / 2 - m_waitingText.getLocalBounds().width / 2, screenHeight / 2 - m_waitingText.getLocalBounds().height / 2);
+	m_overScoreText.setFont(m_font);
+	m_overScoreText.setCharacterSize(40);
+	m_overScoreText.setColor(sf::Color::Black);
+	m_overScoreText.setStyle(sf::Text::Bold);
+	m_overHighScoreText.setFont(m_font);
+	m_overHighScoreText.setCharacterSize(40);
+	m_overHighScoreText.setColor(sf::Color::Black);
+	m_overHighScoreText.setStyle(sf::Text::Bold);
+	m_overText.setFont(m_font);
+	m_overText.setString("Game Over");
+	m_overText.setCharacterSize(40);
+	m_overText.setColor(sf::Color::Black);
+	m_overText.setStyle(sf::Text::Bold);
+	m_overText.setPosition(screenWidth / 2 - m_overText.getLocalBounds().width / 2, screenHeight / 2 - m_overText.getLocalBounds().height * 4);
 	m_gameStatus = Waiting;
 	m_gameMusicSoundBuffer.loadFromFile(gameMusicPath);
 	m_gameOverSoundBuffer.loadFromFile(gameOverPath);
@@ -32,6 +44,8 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window)
 	m_gameOverSound.setBuffer(m_gameOverSoundBuffer);
 	m_gameMusicSound.setLoop(true);
 	m_gameMusicSound.play();
+	m_waitingTextSwitch = true;
+	m_highScore = 0;
 }
 
 Stage::~Stage()
@@ -89,7 +103,7 @@ void Stage::play()
 	setHpText(heroHp);
 	m_gameStatus = Playing;
 	((Hero*)m_hero)->revive();
-	enemyClock.restart();
+	m_enemyClock.restart();
 	for (std::vector<Entity*>::iterator it = entitys.begin(); it != entitys.end(); ++it)
 	{
 		if ((*it)->getType() != "Background" && (*it)->getType() != "Hero")
@@ -113,11 +127,28 @@ void Stage::draw()
 			// m_window.draw(entity->getCollision());
 		}
 	}
-	m_window.draw(m_scoreText);
-	m_window.draw(m_hpText);
+	if (m_gameStatus == Playing)
+	{
+		m_window.draw(m_scoreText);
+		m_window.draw(m_hpText);
+	}
 	if (m_gameStatus == Waiting)
 	{
-		m_window.draw(m_waitingText);
+		if (m_waitingFlashClock.getElapsedTime() >= sf::seconds(waitingFlashInterval))
+		{
+			m_waitingTextSwitch = !m_waitingTextSwitch;
+			m_waitingFlashClock.restart();
+		}
+		if (m_waitingTextSwitch)
+		{
+			m_window.draw(m_waitingText);
+		}
+	}
+	else if (m_gameStatus == Over)
+	{
+		m_window.draw(m_overText);
+		m_window.draw(m_overScoreText);
+		m_window.draw(m_overHighScoreText);
 	}
 	m_window.display();
 }
@@ -127,6 +158,14 @@ void Stage::gameOver()
     m_gameStatus = Over;
     m_gameMusicSound.stop();
 	m_gameOverSound.play();
+	if (m_highScore < m_score)
+	{
+		m_highScore = m_score;
+	}
+	m_overScoreText.setString("Score: " + std::to_string(m_score));
+	m_overHighScoreText.setString("High Score: " + std::to_string(m_highScore));
+	m_overScoreText.setPosition(screenWidth / 2 - m_overScoreText.getLocalBounds().width / 2, screenHeight / 2 - m_overScoreText.getLocalBounds().height);
+	m_overHighScoreText.setPosition(screenWidth / 2 - m_overHighScoreText.getLocalBounds().width / 2, screenHeight / 2 + 20);
 }
 
 void Stage::update()
@@ -136,11 +175,11 @@ void Stage::update()
 		draw();
 		return;
 	}
-	if (enemyClock.getElapsedTime() >= sf::seconds(enemySpawnTime))
+	if (m_enemyClock.getElapsedTime() >= sf::seconds(enemySpawnTime))
 	{
 		Enemy* enemy = new Enemy(rand() % 3);
 		addEntity(enemy);
-		enemyClock.restart();
+		m_enemyClock.restart();
 	}
 	for (Entity* entityA : entitys)
 	{
@@ -157,13 +196,15 @@ void Stage::update()
 					((Bullet*)entityB)->die();
 				}
 				else if (entityA->getType() == "Hero" &&
-					entityB->getType() == "Bullet" &&
-					((Bullet*)entityB)->getBulletType() == EnemyBullet)
+						entityB->getType() == "Bullet" &&
+						((Bullet*)entityB)->getBulletType() == EnemyBullet)
 				{
 					((Hero*)entityA)->hit();
 					((Bullet*)entityB)->die();
 				}
-				else if (entityA->getType() == "Enemy" && entityB->getType() == "Hero" && ((Enemy*)entityA)->getStatus() != Dying)
+				else if (entityA->getType() == "Enemy" &&
+						entityB->getType() == "Hero" &&
+						((Enemy*)entityA)->getStatus() != Dying)
 				{
 					((Enemy*)entityA)->die();
 					((Hero*)entityB)->hit();

@@ -165,8 +165,13 @@ void Enemy::fire(const sf::Vector2f& heroPosition)
 {
 	if (m_lastShootTime.getElapsedTime() >= sf::seconds(enemyBulletInterval[m_enemyType]) && getPosition().y + enemyFireDistance < heroPosition.y)
 	{
-		Bullet* bullet = new Bullet(EnemyBullet, getPosition(), heroPosition);
-		m_stage->addEntity(bullet);
+		for (int i = 0; i < (int)enemyBulletDirection[m_enemyType].size(); ++i)
+		{
+			sf::Transform transform;
+			transform.rotate(enemyBulletDirection[m_enemyType][i]);
+			Bullet* bullet = new Bullet(EnemyBullet, getPosition(), transform.transformPoint(heroPosition - getPosition()));
+			m_stage->addEntity(bullet);
+		}
 		m_lastShootTime.restart();
 	}
 }

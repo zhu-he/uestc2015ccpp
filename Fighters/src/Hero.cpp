@@ -15,9 +15,9 @@ Hero::Hero()
 	m_hp = heroHp;
 	m_status = Normal;
 	m_collision.setPointCount(3);
-	m_collision.setPoint(0, sf::Vector2f(52, 0));
-	m_collision.setPoint(1, sf::Vector2f(2, 90));
-	m_collision.setPoint(2, sf::Vector2f(102, 90));
+	m_collision.setPoint(0, sf::Vector2f(52, 5));
+	m_collision.setPoint(1, sf::Vector2f(7, 85));
+	m_collision.setPoint(2, sf::Vector2f(97, 85));
 	m_collision.setFillColor(sf::Color(255, 0, 0, 100));
 }
 
@@ -56,11 +56,20 @@ void Hero::moveRight()
 
 void Hero::hit()
 {
+	if (m_invincible.getElapsedTime() < sf::seconds(invincibleTime))
+	{
+		return;
+	}
     m_hp--;
     m_stage->setHpText(m_hp);
     if (m_hp <= 0 && m_status != Dying)
 	{
 		die();
+	}
+	else
+	{
+		m_invincible.restart();
+		m_invincibleFlash.restart();
 	}
 }
 
@@ -77,6 +86,26 @@ sf::ConvexShape Hero::getCollision()
 
 void Hero::animate()
 {
+	if (m_invincible.getElapsedTime() < sf::seconds(invincibleTime) && m_stage->getGameStatus() == Playing)
+	{
+		if (m_invincibleFlash.getElapsedTime() >= sf::seconds(invincibleFlashInterval))
+		{
+			m_isFlash = !m_isFlash;
+			m_invincibleFlash.restart();
+		}
+	}
+	else
+	{
+		m_isFlash = false;
+	}
+	if (m_isFlash)
+	{
+		setColor(sf::Color::Transparent);
+	}
+	else
+	{
+		setColor(sf::Color::White);
+	}
 	if (m_enemyAnimateClock.getElapsedTime() < sf::seconds(animateInterval))
 	{
 		return;
@@ -108,6 +137,8 @@ void Hero::revive()
 	m_isAlive = true;
 	m_heroImageCounter = 0;
 	setPosition(screenWidth / 2, screenHeight - getTextureRect().height / 2);
+	m_invincible.restart();
+	m_invincibleFlash.restart();
 }
 
 void Hero::fire()
@@ -115,9 +146,12 @@ void Hero::fire()
 	if (m_lastShootTime.getElapsedTime() >= sf::seconds(heroBulletInterval))
 	{
 		m_bulletSound.play();
-		Bullet* bullet = new Bullet(HeroBullet);
-		bullet->setPosition(getPosition() + sf::Vector2f(0, bulletOffsetY));
+		Bullet* bullet = new Bullet(HeroBullet, getPosition() + sf::Vector2f(0, bulletOffsetY), sf::Vector2f(0, -1));
 		m_stage->addEntity(bullet);
+		Bullet* bulletLeft = new Bullet(HeroBullet, getPosition() + sf::Vector2f(10, bulletOffsetY), sf::Vector2f(0, -1));
+		m_stage->addEntity(bulletLeft);
+		Bullet* bulletRight = new Bullet(HeroBullet, getPosition() + sf::Vector2f(-10, bulletOffsetY), sf::Vector2f(0, -1));
+		m_stage->addEntity(bulletRight);
 		m_lastShootTime.restart();
 	}
 }

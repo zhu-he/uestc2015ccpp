@@ -3,32 +3,23 @@
 
 std::vector<sf::Texture> Bullet::m_bulletTexture;
 
-Bullet::Bullet(BulletType bulletType)
+Bullet::Bullet(BulletType bulletType, const sf::Vector2f& position, const sf::Vector2f& direction)
 {
 	m_bulletType = bulletType;
 	setTexture(m_bulletTexture[bulletType]);
 	setOrigin(getTextureRect().width / 2, getTextureRect().height / 2);
 	m_isAlive = true;
-	m_bulletSpeed.x = 0;
-	m_bulletSpeed.y = bulletSpeed[bulletType];
 	m_collision.setPointCount(4);
 	m_collision.setPoint(0, sf::Vector2f(2, 0));
 	m_collision.setPoint(1, sf::Vector2f(7, 0));
 	m_collision.setPoint(2, sf::Vector2f(7, 20));
 	m_collision.setPoint(3, sf::Vector2f(2, 20));
 	m_collision.setFillColor(sf::Color(255, 0, 0, 100));
-}
-
-Bullet::Bullet(BulletType bulletType, const sf::Vector2f& from, const sf::Vector2f& to)
-{
-	*this = Bullet(bulletType);
-	setPosition(from);
-	sf::Vector2f arrow = to - from;
-	rotate(atan2(arrow.y, arrow.x) * 180 / PI + 90);
-	float distance = sqrt(arrow.x * arrow.x + arrow.y * arrow.y);
-	arrow.x *= bulletSpeed[bulletType] / distance;
-	arrow.y *= bulletSpeed[bulletType] / distance;
-	m_bulletSpeed = arrow;
+	setPosition(position);
+	rotate(atan2(direction.y, direction.x) * 180 / PI + 90);
+	float distance = sqrt(direction.x * direction.x + direction.y * direction.y);
+	m_bulletSpeed.x = direction.x * bulletSpeed[bulletType] / distance;
+	m_bulletSpeed.y = direction.y * bulletSpeed[bulletType] / distance;
 }
 
 Bullet::~Bullet()
@@ -70,7 +61,7 @@ void Bullet::animate()
 	if (getPosition().x + getTextureRect().width / 2 < 0 ||
 		getPosition().y + getTextureRect().height / 2 < 0 ||
 		getPosition().x - getTextureRect().width / 2 > screenWidth ||
-		getPosition().y + getTextureRect().height / 2 > screenHeight)
+		getPosition().y - getTextureRect().height / 2 > screenHeight)
 	{
 		m_isAlive = false;
 	}

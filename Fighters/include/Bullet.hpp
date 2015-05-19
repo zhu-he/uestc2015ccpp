@@ -11,7 +11,6 @@
 class Bullet : public Entity
 {
 	public:
-		Bullet(BulletType bulletType);
 		Bullet(BulletType bulletType, const sf::Vector2f& from, const sf::Vector2f& to);
 		virtual ~Bullet();
 		void animate();

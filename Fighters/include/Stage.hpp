@@ -26,18 +26,24 @@ class Stage
 	private:
 		sf::RenderWindow& m_window;
 		std::vector<Entity*> entitys;
+		int m_highScore;
 		int m_score;
 		sf::Font m_font;
 		sf::Text m_scoreText;
 		sf::Text m_hpText;
 		sf::Text m_waitingText;
+		sf::Text m_overText;
+		sf::Text m_overScoreText;
+		sf::Text m_overHighScoreText;
 		sf::SoundBuffer m_gameMusicSoundBuffer;
 		sf::SoundBuffer m_gameOverSoundBuffer;
 		sf::Sound m_gameMusicSound;
 		sf::Sound m_gameOverSound;
-		sf::Clock enemyClock;
+		sf::Clock m_enemyClock;
+		sf::Clock m_waitingFlashClock;
 		GameStatus m_gameStatus;
 		Entity* m_hero;
+		bool m_waitingTextSwitch;
 		void draw();
 		float cross(const sf::Vector2f& vectorA, const sf::Vector2f& vectorB) const;
 		bool hitTest(const sf::ConvexShape& collisionA, const sf::ConvexShape& collisionB) const;
