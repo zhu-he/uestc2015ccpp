@@ -119,7 +119,11 @@ void Enemy::hit()
 	m_hp--;
 	if (m_hp <= 0)
 	{
-		die();
+		if (m_status != Dying)
+		{
+			m_stage->addScore(enemyScore[m_enemyType]);
+			die();
+		}
 	}
 	else
 	{
@@ -131,7 +135,6 @@ void Enemy::die()
 {
 	if (m_status != Dying)
 	{
-		m_stage->addScore(enemyScore[m_enemyType]);
 		m_status = Dying;
 		m_enemyImageCounter = 0;
 	}

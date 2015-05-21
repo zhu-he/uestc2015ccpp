@@ -53,16 +53,28 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window)
 	m_renderStates.blendMode = sf::BlendAdd;
 	m_renderTexture.create(screenWidth, screenHeight);
 	m_lightSprite.setTexture(m_renderTexture.getTexture());
+	m_highScoreIfstream.open(highScorePath, std::ios::in);
+	if (!m_highScoreIfstream.is_open())
+	{
+		m_highScore = 0;
+	}
+	else
+	{
+		m_highScoreIfstream >> m_highScore;
+		m_highScoreIfstream.close();
+	}
 }
 
 Stage::~Stage()
 {
-
+	m_highScoreOfstream.open(highScorePath, std::ios::out);
+	m_highScoreOfstream << m_highScore;
+	m_highScoreOfstream.close();
 }
 
 void Stage::addEntity(Entity* entity)
 {
-	entitys.push_back(entity);
+	m_entitys.push_back(entity);
 	entity->m_stage = this;
 	if (entity->getType() == "Hero")
 	{
@@ -111,12 +123,12 @@ void Stage::play()
 	m_gameStatus = Playing;
 	((Hero*)m_hero)->revive();
 	m_enemyClock.restart();
-	for (std::vector<Entity*>::iterator it = entitys.begin(); it != entitys.end(); ++it)
+	for (std::vector<Entity*>::iterator it = m_entitys.begin(); it != m_entitys.end(); ++it)
 	{
 		if ((*it)->getType() != "Background" && (*it)->getType() != "Hero")
 		{
 			delete *it;
-			entitys.erase(it);
+			m_entitys.erase(it);
 			it--;
 		}
 	}
@@ -126,7 +138,7 @@ void Stage::draw()
 {
 	m_renderTexture.clear(sf::Color::Transparent);
 	m_window.clear();
-	for (Entity* entity : entitys)
+	for (Entity* entity : m_entitys)
 	{
 		if (entity->isAlive())
 		{
@@ -224,9 +236,9 @@ void Stage::update()
 		addEntity(enemy);
 		m_enemyClock.restart();
 	}
-	for (Entity* entityA : entitys)
+	for (Entity* entityA : m_entitys)
 	{
-		for (Entity* entityB : entitys)
+		for (Entity* entityB : m_entitys)
 		{
 			if (hitTest(entityA->getCollision(), entityB->getCollision()))
 			{
@@ -255,7 +267,7 @@ void Stage::update()
 			}
 		}
 	}
-	for (std::vector<Entity*>::iterator it = entitys.begin(); it != entitys.end(); ++it)
+	for (std::vector<Entity*>::iterator it = m_entitys.begin(); it != m_entitys.end(); ++it)
 	{
 		if (!(*it)->isAlive())
 		{
@@ -266,16 +278,17 @@ void Stage::update()
 			else
 			{
 				delete *it;
-				entitys.erase(it);
+				m_entitys.erase(it);
 				it--;
 			}
 		}
 	}
-	for (Entity* entity : entitys)
+	int sz = m_entitys.size();
+	for (int i = 0; i < sz; ++i)
 	{
-		if (entity->getType() == "Enemy" && ((Enemy*)entity)->getStatus() != Dying)
+		if (m_entitys[i]->getType() == "Enemy" && ((Enemy*)m_entitys[i])->getStatus() != Dying)
 		{
-			((Enemy*)entity)->fire(m_hero->getPosition());
+			((Enemy*)m_entitys[i])->fire(m_hero->getPosition());
 		}
 	}
     draw();

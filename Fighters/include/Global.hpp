@@ -47,6 +47,8 @@ const std::string backgroundImagePath = "resources/image/background.png";
 
 const std::string packPath = "resources/image/shoot.pack";
 
+const std::string highScorePath = "highscore";
+
 const std::vector<std::string> heroImage =
 {
 	"hero1",

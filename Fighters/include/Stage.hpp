@@ -5,6 +5,7 @@
 #include <SFML/Audio.hpp>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include "Global.hpp"
 #include "Entity.hpp"
 
@@ -25,7 +26,9 @@ class Stage
 		void addScore(int score);
 	private:
 		sf::RenderWindow& m_window;
-		std::vector<Entity*> entitys;
+		std::vector<Entity*> m_entitys;
+		std::ifstream m_highScoreIfstream;
+		std::ofstream m_highScoreOfstream;
 		int m_highScore;
 		int m_score;
 		sf::Font m_font;
