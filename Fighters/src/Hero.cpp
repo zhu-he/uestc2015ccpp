@@ -16,8 +16,8 @@ Hero::Hero()
 	m_status = Normal;
 	m_collision.setPointCount(3);
 	m_collision.setPoint(0, sf::Vector2f(52, 5));
-	m_collision.setPoint(1, sf::Vector2f(7, 85));
-	m_collision.setPoint(2, sf::Vector2f(97, 85));
+	m_collision.setPoint(1, sf::Vector2f(12, 85));
+	m_collision.setPoint(2, sf::Vector2f(92, 85));
 	m_collision.setFillColor(sf::Color(255, 0, 0, 100));
 }
 
@@ -104,7 +104,7 @@ void Hero::animate()
 	}
 	else
 	{
-		setColor(sf::Color::White);
+		setColor(sf::Color(255, 64, 64));
 	}
 	if (m_enemyAnimateClock.getElapsedTime() < sf::seconds(animateInterval))
 	{
@@ -146,11 +146,11 @@ void Hero::fire()
 	if (m_lastShootTime.getElapsedTime() >= sf::seconds(heroBulletInterval))
 	{
 		m_bulletSound.play();
-		Bullet* bullet = new Bullet(HeroBullet, getPosition() + sf::Vector2f(0, bulletOffsetY), sf::Vector2f(0, -1));
-		m_stage->addEntity(bullet);
-		Bullet* bulletLeft = new Bullet(HeroBullet, getPosition() + sf::Vector2f(10, bulletOffsetY), sf::Vector2f(0, -1));
+		// Bullet* bullet = new Bullet(HeroBullet, getPosition() + sf::Vector2f(0, bulletOffsetY), sf::Vector2f(0, -1));
+		// m_stage->addEntity(bullet);
+		Bullet* bulletLeft = new Bullet(HeroBullet, getPosition() + sf::Vector2f(5, bulletOffsetY), sf::Vector2f(0, -1));
 		m_stage->addEntity(bulletLeft);
-		Bullet* bulletRight = new Bullet(HeroBullet, getPosition() + sf::Vector2f(-10, bulletOffsetY), sf::Vector2f(0, -1));
+		Bullet* bulletRight = new Bullet(HeroBullet, getPosition() + sf::Vector2f(-5, bulletOffsetY), sf::Vector2f(0, -1));
 		m_stage->addEntity(bulletRight);
 		m_lastShootTime.restart();
 	}

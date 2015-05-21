@@ -48,6 +48,7 @@ Enemy::Enemy(const int& enemyType)
 	default:
 		break;
 	}
+	setColor(sf::Color(64, 64, 255));
 }
 
 Enemy::~Enemy()

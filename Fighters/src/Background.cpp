@@ -8,6 +8,7 @@ Background::Background()
 	m_backgroundTextureHeight = getTextureRect().height;
 	setPosition(0, -m_backgroundTextureHeight);
 	setTextureRect(sf::IntRect(0, 0, getTextureRect().width, getTextureRect().height * 2));
+	setColor(sf::Color(128, 128, 128));
 }
 
 Background::~Background()

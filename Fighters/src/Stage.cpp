@@ -9,34 +9,33 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window)
 	m_font.loadFromFile(fontPath);
 	m_scoreText.setFont(m_font);
 	m_scoreText.setCharacterSize(24);
-	m_scoreText.setColor(sf::Color::Black);
+	m_scoreText.setColor(textColor);
 	m_scoreText.setPosition(10, 5);
 	m_scoreText.setStyle(sf::Text::Bold);
 	m_hpText.setFont(m_font);
 	m_hpText.setCharacterSize(30);
-	m_hpText.setColor(sf::Color::Red);
+	m_hpText.setColor(heartColor);
 	m_hpText.setStyle(sf::Text::Bold);
 	m_hpText.setPosition(screenWidth - m_hpText.getLocalBounds().width - 10, 0);
 	m_waitingText.setFont(m_font);
 	m_waitingText.setString("Press any key to start");
 	m_waitingText.setCharacterSize(30);
-	m_waitingText.setColor(sf::Color::Black);
+	m_waitingText.setColor(textColor);
 	m_waitingText.setStyle(sf::Text::Bold);
 	m_waitingText.setPosition(screenWidth / 2 - m_waitingText.getLocalBounds().width / 2, screenHeight / 2 - m_waitingText.getLocalBounds().height / 2);
 	m_overScoreText.setFont(m_font);
 	m_overScoreText.setCharacterSize(40);
-	m_overScoreText.setColor(sf::Color::Black);
+	m_overScoreText.setColor(textColor);
 	m_overScoreText.setStyle(sf::Text::Bold);
 	m_overHighScoreText.setFont(m_font);
 	m_overHighScoreText.setCharacterSize(40);
-	m_overHighScoreText.setColor(sf::Color::Black);
+	m_overHighScoreText.setColor(textColor);
 	m_overHighScoreText.setStyle(sf::Text::Bold);
 	m_overText.setFont(m_font);
 	m_overText.setString("Game Over");
 	m_overText.setCharacterSize(40);
-	m_overText.setColor(sf::Color::Black);
+	m_overText.setColor(textColor);
 	m_overText.setStyle(sf::Text::Bold);
-	m_overText.setPosition(screenWidth / 2 - m_overText.getLocalBounds().width / 2, screenHeight / 2 - m_overText.getLocalBounds().height * 4);
 	m_gameStatus = Waiting;
 	m_gameMusicSoundBuffer.loadFromFile(gameMusicPath);
 	m_gameOverSoundBuffer.loadFromFile(gameOverPath);
@@ -46,6 +45,14 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window)
 	m_gameMusicSound.play();
 	m_waitingTextSwitch = true;
 	m_highScore = 0;
+	m_lightShader.loadFromFile("resources/shader/light.frag", sf::Shader::Fragment);
+	m_lightShader.setParameter("frag_LightAttenuation", 200);
+	m_invertShader.loadFromFile("resources/shader/invert.frag", sf::Shader::Fragment);
+	m_invertShader.setParameter("texture", m_invertShader.CurrentTexture);
+	m_renderStates.shader = &m_lightShader;
+	m_renderStates.blendMode = sf::BlendAdd;
+	m_renderTexture.create(screenWidth, screenHeight);
+	m_lightSprite.setTexture(m_renderTexture.getTexture());
 }
 
 Stage::~Stage()
@@ -117,16 +124,39 @@ void Stage::play()
 
 void Stage::draw()
 {
+	m_renderTexture.clear(sf::Color::Transparent);
 	m_window.clear();
 	for (Entity* entity : entitys)
 	{
 		if (entity->isAlive())
 		{
 			entity->animate();
-			m_window.draw(*entity);
+			if (entity->getType() == "Bullet")
+			{
+				m_lightShader.setParameter("frag_LightOrigin", entity->getPosition());
+				if (((Bullet*)entity)->getBulletType() == EnemyBullet)
+				{
+					m_lightShader.setParameter("frag_LightColor", 0, 0, 255);
+				}
+				else
+				{
+					m_lightShader.setParameter("frag_LightColor", 255, 0, 0);
+				}
+				m_renderTexture.draw(m_lightSprite, m_renderStates);
+				m_window.draw(*entity);
+			}
+			else if (entity->getType() == "Background")
+			{
+				m_window.draw(*entity, &m_invertShader);
+			}
+			else
+			{
+				m_window.draw(*entity);
+			}
 			// m_window.draw(entity->getCollision());
 		}
 	}
+	m_window.draw(m_lightSprite, sf::BlendAdd);
 	if (m_gameStatus == Playing)
 	{
 		m_window.draw(m_scoreText);
@@ -144,7 +174,7 @@ void Stage::draw()
 			m_window.draw(m_waitingText);
 		}
 	}
-	else if (m_gameStatus == Over)
+	else if (m_gameStatus == Overing || m_gameStatus == Over)
 	{
 		m_window.draw(m_overText);
 		m_window.draw(m_overScoreText);
@@ -155,7 +185,7 @@ void Stage::draw()
 
 void Stage::gameOver()
 {
-    m_gameStatus = Over;
+    m_gameStatus = Overing;
     m_gameMusicSound.stop();
 	m_gameOverSound.play();
 	if (m_highScore < m_score)
@@ -164,12 +194,25 @@ void Stage::gameOver()
 	}
 	m_overScoreText.setString("Score: " + std::to_string(m_score));
 	m_overHighScoreText.setString("High Score: " + std::to_string(m_highScore));
-	m_overScoreText.setPosition(screenWidth / 2 - m_overScoreText.getLocalBounds().width / 2, screenHeight / 2 - m_overScoreText.getLocalBounds().height);
-	m_overHighScoreText.setPosition(screenWidth / 2 - m_overHighScoreText.getLocalBounds().width / 2, screenHeight / 2 + 20);
+	m_overScoreText.setPosition(screenWidth / 2 - m_overScoreText.getLocalBounds().width / 2, screenHeight);
+	m_overHighScoreText.setPosition(screenWidth / 2 - m_overHighScoreText.getLocalBounds().width / 2, screenHeight + m_overScoreText.getLocalBounds().height + 20);
+	m_overText.setPosition(screenWidth / 2 - m_overText.getLocalBounds().width / 2, -m_overText.getLocalBounds().height * 4);
 }
 
 void Stage::update()
 {
+	if (m_gameStatus == Overing)
+	{
+		m_overText.move(0, 10);
+		m_overScoreText.move(0, -10);
+		m_overHighScoreText.move(0, -10);
+		if (m_overText.getPosition().y >= screenHeight / 2 - m_overText.getLocalBounds().height * 4)
+		{
+			m_gameStatus = Over;
+		}
+		draw();
+		return;
+	}
 	if (m_gameStatus == Over || m_gameStatus == Waiting)
 	{
 		draw();

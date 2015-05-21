@@ -1,6 +1,7 @@
 #ifndef GLOBAL_HPP_INCLUDED
 #define GLOBAL_HPP_INCLUDED
 
+#include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
 #include <functional>
@@ -11,6 +12,7 @@ enum GameStatus
 	Waiting,
 	Playing,
 	Pausing,
+	Overing,
 	Over
 };
 
@@ -120,8 +122,8 @@ const std::vector<std::vector<std::string> > enemyDownImage =
 const std::vector<int> enemyHp =
 {
 	1,
-	3,
-	10
+	5,
+	15
 };
 
 const std::vector<int> enemyScore =
@@ -152,9 +154,9 @@ const float heroBulletInterval = 0.2f;
 
 const std::vector<float> enemyBulletInterval =
 {
-	0.6f,
-	0.6f,
-	0.6f
+	0.7f,
+	0.7f,
+	0.7f
 };
 
 const std::vector<std::vector<float> > enemyBulletDirection =
@@ -176,7 +178,7 @@ const float enemySpawnTime = 2.0f;
 
 const float animateInterval = 0.05f;
 
-const float enemyFireDistance = 200.0f;
+const float enemyFireDistance = 300.0f;
 
 const float waitingFlashInterval = 0.5f;
 
@@ -185,5 +187,9 @@ const int heroHp = 3;
 const float invincibleTime = 2.0f;
 
 const float invincibleFlashInterval = 0.08f;
+
+const sf::Color textColor = sf::Color(196, 196, 196);
+
+const sf::Color heartColor = sf::Color(196, 0, 0);
 
 #endif // GLOBAL_HPP_INCLUDED

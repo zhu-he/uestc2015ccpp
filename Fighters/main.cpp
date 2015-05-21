@@ -19,7 +19,8 @@ int main()
 	Hero::loadResources();
 	Enemy::loadResources();
 	Bullet::loadResources();
-    sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "Fighters");
+	sf::Sprite iconSprite;
+    sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "Fighters", sf::Style::Titlebar | sf::Style::Close);
     window.setSize(sf::Vector2u(360, 600));
     Stage stage(window);
     Background background;
@@ -30,36 +31,25 @@ int main()
     while (window.isOpen())
     {
         sf::Event event;
-        if (stage.getGameStatus() == Waiting || stage.getGameStatus() == Over)
+        while (window.pollEvent(event))
 		{
-			while (window.pollEvent(event))
+			switch (event.type)
 			{
-				switch (event.type)
+			case sf::Event::Closed:
+				window.close();
+				break;
+			case sf::Event::KeyPressed:
+				if (stage.getGameStatus() == Waiting || stage.getGameStatus() == Over)
 				{
-				case sf::Event::Closed:
-					window.close();
-					break;
-				case sf::Event::KeyPressed:
 					stage.play();
-					break;
-				default:
-					break;
 				}
+				break;
+			default:
+				break;
 			}
 		}
-		else if (stage.getGameStatus() == Playing)
+		if (stage.getGameStatus() == Playing)
 		{
-			while (window.pollEvent(event))
-			{
-				switch (event.type)
-				{
-				case sf::Event::Closed:
-					window.close();
-					break;
-				default:
-					break;
-				}
-			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			{
 				hero.moveLeft();

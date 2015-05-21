@@ -41,6 +41,11 @@ class Stage
 		sf::Sound m_gameOverSound;
 		sf::Clock m_enemyClock;
 		sf::Clock m_waitingFlashClock;
+		sf::Shader m_lightShader;
+		sf::Shader m_invertShader;
+		sf::RenderStates m_renderStates;
+		sf::RenderTexture m_renderTexture;
+		sf::Sprite m_lightSprite;
 		GameStatus m_gameStatus;
 		Entity* m_hero;
 		bool m_waitingTextSwitch;
