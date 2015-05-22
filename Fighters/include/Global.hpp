@@ -7,6 +7,8 @@
 #include <functional>
 #include <cmath>
 
+static sf::Clock gameClock;
+
 enum GameStatus
 {
 	Waiting,
@@ -29,6 +31,12 @@ enum BulletType
 	EnemyBullet
 };
 
+enum UfoType
+{
+	Weapon,
+	Bomb
+};
+
 const float PI = acos(-1);
 
 const int screenWidth = 480;
@@ -43,11 +51,15 @@ const std::string gameOverPath = "resources/sound/game_over.ogg";
 
 const std::string bulletSoundPath = "resources/sound/bullet.ogg";
 
+const std::string useBombSoundPath = "resources/sound/use_bomb.ogg";
+
 const std::string backgroundImagePath = "resources/image/background.png";
 
 const std::string packPath = "resources/image/shoot.pack";
 
 const std::string highScorePath = "highscore";
+
+const std::string bombImage = "bomb";
 
 const std::vector<std::string> heroImage =
 {
@@ -67,6 +79,18 @@ const std::vector<std::string> bulletImage =
 {
 	"bullet1",
 	"bullet2"
+};
+
+const std::vector<std::string> ufoImage =
+{
+	"ufo1",
+	"ufo2"
+};
+
+const std::vector<std::string> ufoSoundPath =
+{
+	"resources/sound/get_double_laser.ogg",
+	"resources/sound/get_bomb.ogg"
 };
 
 const std::vector<std::vector<std::string> > enemyImage =
@@ -93,8 +117,8 @@ const std::vector<std::string> enemyHitImage =
 const std::vector<std::string> enemyDownSoundPath =
 {
 	"resources/sound/enemy1_down.ogg",
-	"resources/sound/enemy2_down.ogg",
-	"resources/sound/enemy3_down.ogg"
+	"resources/sound/enemy3_down.ogg",
+	"resources/sound/enemy2_down.ogg"
 };
 
 const std::vector<std::vector<std::string> > enemyDownImage =
@@ -124,8 +148,8 @@ const std::vector<std::vector<std::string> > enemyDownImage =
 const std::vector<int> enemyHp =
 {
 	1,
-	5,
-	15
+	2,
+	5
 };
 
 const std::vector<int> enemyScore =
@@ -146,6 +170,8 @@ const float heroSpeed = 8.0f;
 
 const float backgroundSpeed = 2.0f;
 
+const float ufoSpeed = 3.0f;
+
 const std::vector<float> bulletSpeed =
 {
 	20.0f,
@@ -156,33 +182,74 @@ const float heroBulletInterval = 0.2f;
 
 const std::vector<float> enemyBulletInterval =
 {
-	0.7f,
-	0.7f,
-	0.7f
+	2.0f,
+	2.0f,
+	2.0f
 };
 
 const std::vector<std::vector<float> > enemyBulletDirection =
 {
 	{
+		0
+	},
+	{
 		-20, 0, 20
 	},
 	{
 		-40, -20, 0, 20, 40
+	}
+};
+
+const std::vector<std::vector<sf::Vector2i> > heroBulletDirection =
+{
+	{
+		{0, 0}
 	},
 	{
-		-60, -40, -20, 0, 20, 40, 60
+		{-7, 0},
+		{7, 0}
+	},
+	{
+		{-12, 0},
+		{0, 0},
+		{12, 0}
+	},
+	{
+		{-12, -15},
+		{-12, 0},
+		{0, 0},
+		{12, 0},
+		{12, 15}
+	},
+	{
+		{-12, -30},
+		{-12, -15},
+		{-12, 0},
+		{0, 0},
+		{12, 0},
+		{12, 15},
+		{12, 30}
 	}
+};
+
+const std::vector<float> enemySpawnTime =
+{
+	5.0f,
+	17.0f,
+	23.0f,
 };
 
 const float bulletOffsetY = -60.0f;
 
-const float enemySpawnTime = 2.0f;
+const float ufoSpawnTime = 10.0f;
 
 const float animateInterval = 0.05f;
 
-const float enemyFireDistance = 300.0f;
+const float enemyFireDistance = 500.0f;
 
 const float waitingFlashInterval = 0.5f;
+
+const float bombTime = 0.8f;
 
 const int heroHp = 3;
 

@@ -1,3 +1,6 @@
+// *** ADDED BY HEADER FIXUP ***
+#include <istream>
+// *** END ***
 #ifndef SFML_SPRITESHEET_HPP
 #define SFML_SPRITESHEET_HPP
 

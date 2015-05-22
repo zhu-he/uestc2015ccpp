@@ -11,9 +11,9 @@ Bullet::Bullet(BulletType bulletType, const sf::Vector2f& position, const sf::Ve
 	m_isAlive = true;
 	m_collision.setPointCount(4);
 	m_collision.setPoint(0, sf::Vector2f(2, 0));
-	m_collision.setPoint(1, sf::Vector2f(7, 0));
+	m_collision.setPoint(1, sf::Vector2f(2, 20));
 	m_collision.setPoint(2, sf::Vector2f(7, 20));
-	m_collision.setPoint(3, sf::Vector2f(2, 20));
+	m_collision.setPoint(3, sf::Vector2f(7, 0));
 	m_collision.setFillColor(sf::Color(255, 0, 0, 100));
 	setPosition(position);
 	rotate(atan2(direction.y, direction.x) * 180 / PI + 90);
@@ -25,11 +25,6 @@ Bullet::Bullet(BulletType bulletType, const sf::Vector2f& position, const sf::Ve
 Bullet::~Bullet()
 {
 
-}
-
-sf::ConvexShape Bullet::getCollision()
-{
-	return m_collision;
 }
 
 BulletType Bullet::getBulletType()

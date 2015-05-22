@@ -8,6 +8,7 @@
 #include "Enemy.hpp"
 #include "Global.hpp"
 #include "Stage.hpp"
+#include "Ufo.hpp"
 
 using namespace std;
 
@@ -19,13 +20,14 @@ int main()
 	Hero::loadResources();
 	Enemy::loadResources();
 	Bullet::loadResources();
+	Ufo::loadResources();
 	sf::Sprite iconSprite;
     sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "Fighters", sf::Style::Titlebar | sf::Style::Close);
     window.setSize(sf::Vector2u(360, 600));
     Stage stage(window);
     Background background;
     Hero hero;
-    stage.addEntity(&background);
+    stage.setBackground(&background);
     stage.addEntity(&hero);
     window.setFramerateLimit(60);
     while (window.isOpen())
@@ -58,9 +60,21 @@ int main()
 			{
 				hero.moveRight();
 			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+			{
+				hero.moveUp();
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+			{
+				hero.moveDown();
+			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 			{
 				hero.fire();
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+			{
+				stage.useBomb();
 			}
 		}
 		stage.update();

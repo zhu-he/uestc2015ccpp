@@ -35,3 +35,8 @@ void Entity::rotate(float angle)
 	sf::Sprite::rotate(angle);
 	m_collision.rotate(angle);
 }
+
+sf::ConvexShape Entity::getCollision()
+{
+	return m_collision;
+}

@@ -17,13 +17,16 @@ class Hero : public Entity
 		virtual ~Hero();
 		void moveLeft();
 		void moveRight();
+		void moveUp();
+		void moveDown();
 		void fire();
 		void animate();
 		void die();
 		void revive();
-		sf::ConvexShape getCollision();
+		void levelup();
 		std::string getType();
 		bool isAlive();
+		bool isFlash();
 		void hit();
 		static void loadResources();
 	private:
@@ -40,6 +43,7 @@ class Hero : public Entity
 		sf::Sound m_bulletSound;
 		bool m_isFlash;
 		int m_hp;
+		int m_level;
 };
 
 #endif // HERO_HPP

@@ -10,7 +10,7 @@ sf::Sound Enemy::m_enemyDownSound[3];
 Enemy::Enemy(const int& enemyType)
 {
 	m_enemyType = enemyType;
-	m_hp = enemyHp[enemyType];
+	m_hp = enemyType == 0 ? enemyHp[enemyType] : enemyHp[enemyType] * (gameClock.getElapsedTime().asSeconds() / 30 + 1);
 	setTexture(m_enemyTexture[enemyType][0]);
 	m_enemyImageCounter = 0;
 	setOrigin(getTextureRect().width / 2, getTextureRect().height);
@@ -22,27 +22,29 @@ Enemy::Enemy(const int& enemyType)
 	{
 	case 0:
 		m_collision.setPointCount(3);
-		m_collision.setPoint(0, sf::Vector2f(0, 10));
-		m_collision.setPoint(1, sf::Vector2f(60, 10));
-		m_collision.setPoint(2, sf::Vector2f(30, 45));
+		m_collision.setPoint(0, sf::Vector2f(10, 17));
+		m_collision.setPoint(1, sf::Vector2f(31, 38));
+		m_collision.setPoint(2, sf::Vector2f(52, 17));
 		m_collision.setFillColor(sf::Color(255, 0, 0, 100));
 		break;
 	case 1:
 		m_collision.setPointCount(4);
-		m_collision.setPoint(0, sf::Vector2f(35, 0));
-		m_collision.setPoint(1, sf::Vector2f(0, 50));
-		m_collision.setPoint(2, sf::Vector2f(35, 95));
-		m_collision.setPoint(3, sf::Vector2f(70, 50));
+		m_collision.setPoint(0, sf::Vector2f(35, 35));
+		m_collision.setPoint(1, sf::Vector2f(4, 47));
+		m_collision.setPoint(2, sf::Vector2f(35, 92));
+		m_collision.setPoint(3, sf::Vector2f(66, 47));
 		m_collision.setFillColor(sf::Color(255, 0, 0, 100));
 		break;
 	case 2:
-		m_collision.setPointCount(6);
-		m_collision.setPoint(0, sf::Vector2f(20, 0));
-		m_collision.setPoint(1, sf::Vector2f(0, 200));
-		m_collision.setPoint(2, sf::Vector2f(40, 240));
-		m_collision.setPoint(3, sf::Vector2f(130, 240));
-		m_collision.setPoint(4, sf::Vector2f(170, 200));
-		m_collision.setPoint(5, sf::Vector2f(150, 0));
+		m_collision.setPointCount(8);
+		m_collision.setPoint(0, sf::Vector2f(26, 130));
+		m_collision.setPoint(1, sf::Vector2f(26, 214));
+		m_collision.setPoint(2, sf::Vector2f(40, 230));
+		m_collision.setPoint(3, sf::Vector2f(130, 230));
+		m_collision.setPoint(4, sf::Vector2f(144, 214));
+		m_collision.setPoint(5, sf::Vector2f(144, 130));
+		m_collision.setPoint(6, sf::Vector2f(135, 120));
+		m_collision.setPoint(7, sf::Vector2f(35, 120));
 		m_collision.setFillColor(sf::Color(255, 0, 0, 100));
 		break;
 	default:
@@ -112,6 +114,7 @@ void Enemy::animate()
 	default:
 		break;
     }
+	m_stage->drawLight(getPosition() - sf::Vector2f(0, getLocalBounds().height / 2), sf::Color(0, 0, 5 / m_lastShootTime.getElapsedTime().asSeconds()), 10);
 }
 
 void Enemy::hit()
@@ -160,14 +163,9 @@ Status Enemy::getStatus()
 	return m_status;
 }
 
-sf::ConvexShape Enemy::getCollision()
-{
-	return m_collision;
-}
-
 void Enemy::fire(const sf::Vector2f& heroPosition)
 {
-	if (m_lastShootTime.getElapsedTime() >= sf::seconds(enemyBulletInterval[m_enemyType]) && getPosition().y + enemyFireDistance < heroPosition.y)
+	if (m_lastShootTime.getElapsedTime() >= sf::seconds(enemyBulletInterval[m_enemyType]) && getPosition().y < enemyFireDistance)
 	{
 		for (int i = 0; i < (int)enemyBulletDirection[m_enemyType].size(); ++i)
 		{

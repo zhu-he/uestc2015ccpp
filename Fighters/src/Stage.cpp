@@ -2,6 +2,8 @@
 #include "Enemy.hpp"
 #include "Bullet.hpp"
 #include "Hero.hpp"
+#include "Ufo.hpp"
+#include "SpriteSheet.hpp"
 
 Stage::Stage(sf::RenderWindow& window) : m_window(window)
 {
@@ -39,20 +41,28 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window)
 	m_gameStatus = Waiting;
 	m_gameMusicSoundBuffer.loadFromFile(gameMusicPath);
 	m_gameOverSoundBuffer.loadFromFile(gameOverPath);
+	m_useBombSoundBuffer.loadFromFile(useBombSoundPath);
 	m_gameMusicSound.setBuffer(m_gameMusicSoundBuffer);
 	m_gameOverSound.setBuffer(m_gameOverSoundBuffer);
+	m_useBombSound.setBuffer(m_useBombSoundBuffer);
 	m_gameMusicSound.setLoop(true);
 	m_gameMusicSound.play();
 	m_waitingTextSwitch = true;
 	m_highScore = 0;
+	m_bombCount = 0;
 	m_lightShader.loadFromFile("resources/shader/light.frag", sf::Shader::Fragment);
-	m_lightShader.setParameter("frag_LightAttenuation", 200);
 	m_invertShader.loadFromFile("resources/shader/invert.frag", sf::Shader::Fragment);
 	m_invertShader.setParameter("texture", m_invertShader.CurrentTexture);
-	m_renderStates.shader = &m_lightShader;
-	m_renderStates.blendMode = sf::BlendAdd;
-	m_renderTexture.create(screenWidth, screenHeight);
-	m_lightSprite.setTexture(m_renderTexture.getTexture());
+	m_shadowShader.loadFromFile("resources/shader/shadow.frag", sf::Shader::Fragment);
+	m_lightRenderStates.shader = &m_lightShader;
+	m_lightRenderStates.blendMode = sf::BlendAdd;
+	m_lightRenderTexture.create(screenWidth, screenHeight);
+	m_lightSprite.setTexture(m_lightRenderTexture.getTexture());
+	m_shadowRenderTexture.create(screenWidth, screenHeight);
+	m_shadowSprite.setTexture(m_shadowRenderTexture.getTexture());
+	m_shadowRenderStates.shader = &m_shadowShader;
+	m_bombTexture = SpriteSheet::getTexture(bombImage);
+	m_bombSprite.setTexture(m_bombTexture);
 	m_highScoreIfstream.open(highScorePath, std::ios::in);
 	if (!m_highScoreIfstream.is_open())
 	{
@@ -82,6 +92,11 @@ void Stage::addEntity(Entity* entity)
 	}
 }
 
+void Stage::setBackground(Background* background)
+{
+	m_background = background;
+}
+
 void Stage::addScore(int score)
 {
 	m_score += score;
@@ -104,7 +119,7 @@ void Stage::setHpText(int hp)
 	{
 		hp = 0;
 	}
-	wchar_t heartString[4];
+	wchar_t heartString[heroHp + 1];
 	for (int i = 0; i < hp; ++i)
 	{
 		heartString[i] = L'♥';
@@ -118,14 +133,20 @@ void Stage::play()
 {
 	m_gameMusicSound.play();
 	m_score = 0;
+	m_bombCount = 0;
 	m_scoreText.setString("Score: 0");
 	setHpText(heroHp);
 	m_gameStatus = Playing;
 	((Hero*)m_hero)->revive();
-	m_enemyClock.restart();
+	gameClock.restart();
+	for (int i = 0; i < 3; ++i)
+	{
+		m_enemyClock[i].restart();
+	}
+	m_ufoClock.restart();
 	for (std::vector<Entity*>::iterator it = m_entitys.begin(); it != m_entitys.end(); ++it)
 	{
-		if ((*it)->getType() != "Background" && (*it)->getType() != "Hero")
+		if ((*it) != m_hero)
 		{
 			delete *it;
 			m_entitys.erase(it);
@@ -136,8 +157,9 @@ void Stage::play()
 
 void Stage::draw()
 {
-	m_renderTexture.clear(sf::Color::Transparent);
 	m_window.clear();
+	m_background->animate();
+	m_window.draw(*m_background, &m_invertShader);
 	for (Entity* entity : m_entitys)
 	{
 		if (entity->isAlive())
@@ -145,28 +167,47 @@ void Stage::draw()
 			entity->animate();
 			if (entity->getType() == "Bullet")
 			{
-				m_lightShader.setParameter("frag_LightOrigin", entity->getPosition());
 				if (((Bullet*)entity)->getBulletType() == EnemyBullet)
 				{
-					m_lightShader.setParameter("frag_LightColor", 0, 0, 255);
+					drawLight(entity->getPosition(), sf::Color(0, 0, 255), 200);
 				}
 				else
 				{
-					m_lightShader.setParameter("frag_LightColor", 255, 0, 0);
+					drawLight(entity->getPosition(), sf::Color(255, 0, 0), 200);
 				}
-				m_renderTexture.draw(m_lightSprite, m_renderStates);
-				m_window.draw(*entity);
 			}
-			else if (entity->getType() == "Background")
+			else if (entity->getType() == "Ufo")
 			{
-				m_window.draw(*entity, &m_invertShader);
+				if (((Ufo*)entity)->getUfoType() == Weapon)
+				{
+					drawLight(entity->getPosition(), sf::Color(0, 0, 255), 100);
+				}
+				else
+				{
+					drawLight(entity->getPosition(), sf::Color(255, 0, 0), 100);
+				}
 			}
-			else
-			{
-				m_window.draw(*entity);
-			}
+		}
+	}
+	for (int i = 0; i < m_bombCount; ++i)
+	{
+		drawLight(sf::Vector2f((i + 0.5f) * m_bombTexture.getSize().x , screenHeight - m_bombTexture.getSize().y / 2), sf::Color::Red, 100);
+	}
+	m_shadowRenderTexture.clear(sf::Color::Transparent);
+	drawShadow(sf::Vector2f(screenWidth / 2, screenHeight / 2), 50);
+	m_window.draw(m_shadowSprite);
+	for (Entity* entity : m_entitys)
+	{
+		if (entity->isAlive())
+		{
+			m_window.draw(*entity);
 			// m_window.draw(entity->getCollision());
 		}
+	}
+	for (int i = 0; i < m_bombCount; ++i)
+	{
+		m_bombSprite.setPosition(i * m_bombTexture.getSize().x, screenHeight - m_bombTexture.getSize().y);
+		m_window.draw(m_bombSprite);
 	}
 	m_window.draw(m_lightSprite, sf::BlendAdd);
 	if (m_gameStatus == Playing)
@@ -193,6 +234,7 @@ void Stage::draw()
 		m_window.draw(m_overHighScoreText);
 	}
 	m_window.display();
+	m_lightRenderTexture.clear(sf::Color::Transparent);
 }
 
 void Stage::gameOver()
@@ -213,6 +255,31 @@ void Stage::gameOver()
 
 void Stage::update()
 {
+	if (m_isBombing)
+	{
+		if (m_bombClock.getElapsedTime() >= sf::seconds(bombTime))
+		{
+			for (Entity* entity : m_entitys)
+			{
+				if (entity->isAlive())
+				{
+					if (entity->getType() == "Enemy")
+					{
+						((Enemy*)entity)->die();
+					}
+					else if (entity->getType() == "Bullet" && ((Bullet*)entity)->getBulletType() == EnemyBullet)
+					{
+						((Bullet*)entity)->die();
+					}
+				}
+			}
+			m_isBombing = false;
+		}
+		else
+		{
+			drawLight(sf::Vector2f(screenWidth / 2, screenHeight / 2), sf::Color::White, 0.5 / m_bombClock.getElapsedTime().asSeconds());
+		}
+	}
 	if (m_gameStatus == Overing)
 	{
 		m_overText.move(0, 10);
@@ -230,11 +297,20 @@ void Stage::update()
 		draw();
 		return;
 	}
-	if (m_enemyClock.getElapsedTime() >= sf::seconds(enemySpawnTime))
+	for (int i = 0; i < 3; ++i)
 	{
-		Enemy* enemy = new Enemy(rand() % 3);
-		addEntity(enemy);
-		m_enemyClock.restart();
+		if (m_enemyClock[i].getElapsedTime() >= sf::seconds(enemySpawnTime[i] / (gameClock.getElapsedTime().asSeconds() / 30 + 1)))
+		{
+			Enemy* enemy = new Enemy(i);
+			addEntity(enemy);
+			m_enemyClock[i].restart();
+		}
+	}
+	if (m_ufoClock.getElapsedTime() >= sf::seconds(ufoSpawnTime * (gameClock.getElapsedTime().asSeconds() / 30 + 1)))
+	{
+		Ufo* ufo = new Ufo((UfoType)(rand() % 2));
+		addEntity(ufo);
+		m_ufoClock.restart();
 	}
 	for (Entity* entityA : m_entitys)
 	{
@@ -252,17 +328,32 @@ void Stage::update()
 				}
 				else if (entityA->getType() == "Hero" &&
 						entityB->getType() == "Bullet" &&
-						((Bullet*)entityB)->getBulletType() == EnemyBullet)
+						((Bullet*)entityB)->getBulletType() == EnemyBullet &&
+						!m_isBombing)
 				{
 					((Hero*)entityA)->hit();
 					((Bullet*)entityB)->die();
 				}
 				else if (entityA->getType() == "Enemy" &&
 						entityB->getType() == "Hero" &&
-						((Enemy*)entityA)->getStatus() != Dying)
+						((Enemy*)entityA)->getStatus() != Dying &&
+						!m_isBombing)
 				{
 					((Enemy*)entityA)->die();
 					((Hero*)entityB)->hit();
+				}
+				else if (entityA->getType() == "Ufo" &&
+						entityB->getType() == "Hero")
+				{
+					if (((Ufo*)entityA)->getUfoType() == Weapon)
+					{
+						((Hero*)m_hero)->levelup();
+					}
+					else
+					{
+						m_bombCount++;
+					}
+					((Ufo*)entityA)->die();
 				}
 			}
 		}
@@ -283,8 +374,7 @@ void Stage::update()
 			}
 		}
 	}
-	int sz = m_entitys.size();
-	for (int i = 0; i < sz; ++i)
+	for (int i = 0; i < (int)m_entitys.size(); ++i)
 	{
 		if (m_entitys[i]->getType() == "Enemy" && ((Enemy*)m_entitys[i])->getStatus() != Dying)
 		{
@@ -301,6 +391,10 @@ float Stage::cross(const sf::Vector2f& vectorA, const sf::Vector2f& vectorB) con
 
 bool Stage::hitTest(const sf::ConvexShape& collisionA, const sf::ConvexShape& collisionB) const
 {
+	if (!collisionA.getGlobalBounds().intersects(collisionB.getGlobalBounds()))
+	{
+		return false;
+	}
     for	(int i = 0; i < (int)collisionA.getPointCount(); ++i)
 	{
 		for	(int j = 0; j < (int)collisionB.getPointCount(); ++j)
@@ -316,4 +410,47 @@ bool Stage::hitTest(const sf::ConvexShape& collisionA, const sf::ConvexShape& co
 		}
 	}
 	return false;
+}
+
+void Stage::drawLight(sf::Vector2f lightPosition, sf::Color color, float lightAttenuation)
+{
+	m_lightShader.setParameter("frag_LightAttenuation", lightAttenuation);
+	m_lightShader.setParameter("frag_LightOrigin", lightPosition);
+	m_lightShader.setParameter("frag_LightColor", color.r, color.g, color.b, color.a);
+	m_lightRenderTexture.draw(m_lightSprite, m_lightRenderStates);
+}
+
+void Stage::drawShadow(sf::Vector2f lightPosition, float shadowAttenuation)
+{
+	m_shadowShader.setParameter("frag_LightOrigin", lightPosition);
+	m_shadowShader.setParameter("frag_shadowAttenuation", shadowAttenuation);
+	for (Entity* castEntity : m_entitys)
+	{
+		if (castEntity->isAlive() && castEntity->getType() != "Bullet" && !(castEntity->getType() == "Hero" && ((Hero*)castEntity)->isFlash()))
+		{
+			sf::Transform transform = castEntity->getCollision().getTransform();
+			for	(int i = 0; i < (int)castEntity->getCollision().getPointCount(); ++i)
+			{
+				const sf::Vector2f& A = transform.transformPoint(castEntity->getCollision().getPoint(i % castEntity->getCollision().getPointCount()));
+				const sf::Vector2f& B = transform.transformPoint(castEntity->getCollision().getPoint((i + 1) % castEntity->getCollision().getPointCount()));
+				if (cross(lightPosition - A, B - A) > 0)
+				{
+					m_shadowShader.setParameter("frag_castPosition1", A);
+					m_shadowShader.setParameter("frag_castPosition2", B);
+					m_shadowRenderTexture.draw(m_shadowSprite, m_shadowRenderStates);
+				}
+			}
+		}
+	}
+}
+
+void Stage::useBomb()
+{
+	if (m_bombCount > 0 && !m_isBombing)
+	{
+		m_bombCount--;
+		m_isBombing = true;
+		m_bombClock.restart();
+		m_useBombSound.play();
+	}
 }

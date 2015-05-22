@@ -4,17 +4,13 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "Global.hpp"
-#include "Entity.hpp"
 
-class Background : public Entity
+class Background : public sf::Sprite
 {
 	public:
 		Background();
 		virtual ~Background();
 		void animate();
-		bool isAlive();
-		sf::ConvexShape getCollision();
-		std::string getType();
 		static void loadResources();
 	private:
 		static sf::Texture m_backgroundTexture;

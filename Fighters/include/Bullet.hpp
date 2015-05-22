@@ -17,7 +17,6 @@ class Bullet : public Entity
 		bool isAlive();
 		void die();
 		BulletType getBulletType();
-		sf::ConvexShape getCollision();
 		std::string getType();
 		static void loadResources();
 	private:

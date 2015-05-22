@@ -13,7 +13,7 @@ class Entity : public sf::Sprite
 		virtual std::string getType() = 0;
 		virtual bool isAlive() = 0;
 		virtual void animate() = 0;
-		virtual sf::ConvexShape getCollision() = 0;
+		virtual sf::ConvexShape getCollision();
 		void setPosition(float x, float y);
 		void setPosition(const sf::Vector2f& position);
 		void setOrigin(float x, float y);

@@ -18,7 +18,6 @@ class Enemy : public Entity
 		void die();
 		void hit();
 		void fire(const sf::Vector2f& heroPosition);
-		sf::ConvexShape getCollision();
 		std::string getType();
 		Status getStatus();
 		bool isAlive();

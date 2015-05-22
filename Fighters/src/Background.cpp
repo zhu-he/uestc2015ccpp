@@ -16,11 +16,6 @@ Background::~Background()
 
 }
 
-sf::ConvexShape Background::getCollision()
-{
-	return m_collision;
-}
-
 void Background::loadResources()
 {
 	m_backgroundTexture.loadFromFile(backgroundImagePath);
@@ -34,14 +29,4 @@ void Background::animate()
 	{
 		setPosition(0, getPosition().y - m_backgroundTextureHeight);
 	}
-}
-
-std::string Background::getType()
-{
-	return "Background";
-}
-
-bool Background::isAlive()
-{
-	return true;
 }
