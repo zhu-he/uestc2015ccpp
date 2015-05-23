@@ -20,7 +20,7 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window)
 	m_hpText.setStyle(sf::Text::Bold);
 	m_hpText.setPosition(screenWidth - m_hpText.getLocalBounds().width - 10, 0);
 	m_waitingText.setFont(m_font);
-	m_waitingText.setString("Press any key to start");
+	m_waitingText.setString("Press any key to start\n\nMove: \tArrow Keys\nFire: \t\tSpace\nBomb: \tShift\n");
 	m_waitingText.setCharacterSize(30);
 	m_waitingText.setColor(textColor);
 	m_waitingText.setStyle(sf::Text::Bold);
@@ -50,6 +50,7 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window)
 	m_waitingTextSwitch = true;
 	m_highScore = 0;
 	m_bombCount = 0;
+	m_isBombing = false;
 	m_lightShader.loadFromFile("resources/shader/light.frag", sf::Shader::Fragment);
 	m_invertShader.loadFromFile("resources/shader/invert.frag", sf::Shader::Fragment);
 	m_invertShader.setParameter("texture", m_invertShader.CurrentTexture);
@@ -169,22 +170,22 @@ void Stage::draw()
 			{
 				if (((Bullet*)entity)->getBulletType() == EnemyBullet)
 				{
-					drawLight(entity->getPosition(), sf::Color(0, 0, 255), 200);
+					drawLight(entity->getPosition(), sf::Color::Blue, 200);
 				}
 				else
 				{
-					drawLight(entity->getPosition(), sf::Color(255, 0, 0), 200);
+					drawLight(entity->getPosition(), sf::Color::Red, 200);
 				}
 			}
 			else if (entity->getType() == "Ufo")
 			{
 				if (((Ufo*)entity)->getUfoType() == Weapon)
 				{
-					drawLight(entity->getPosition(), sf::Color(0, 0, 255), 100);
+					drawLight(entity->getPosition(), sf::Color::Blue, 100);
 				}
 				else
 				{
-					drawLight(entity->getPosition(), sf::Color(255, 0, 0), 100);
+					drawLight(entity->getPosition(), sf::Color::Red, 100);
 				}
 			}
 		}
@@ -257,7 +258,11 @@ void Stage::update()
 {
 	if (m_isBombing)
 	{
-		if (m_bombClock.getElapsedTime() >= sf::seconds(bombTime))
+		if (m_bombClock.getElapsedTime() < sf::seconds(bombTime))
+		{
+			drawLight(sf::Vector2f(screenWidth / 2, screenHeight / 2), sf::Color(255, 128, 128), 0.2 / m_bombClock.getElapsedTime().asSeconds());
+		}
+		else if (m_bombClock.getElapsedTime() < sf::seconds(bombTime * 1.5))
 		{
 			for (Entity* entity : m_entitys)
 			{
@@ -273,11 +278,11 @@ void Stage::update()
 					}
 				}
 			}
-			m_isBombing = false;
+			drawLight(sf::Vector2f(screenWidth / 2, screenHeight / 2), sf::Color(255, 128, 128), 0.2 / (bombTime * 3 - m_bombClock.getElapsedTime().asSeconds() * 2));
 		}
 		else
 		{
-			drawLight(sf::Vector2f(screenWidth / 2, screenHeight / 2), sf::Color::White, 0.5 / m_bombClock.getElapsedTime().asSeconds());
+			m_isBombing = false;
 		}
 	}
 	if (m_gameStatus == Overing)
@@ -299,7 +304,7 @@ void Stage::update()
 	}
 	for (int i = 0; i < 3; ++i)
 	{
-		if (m_enemyClock[i].getElapsedTime() >= sf::seconds(enemySpawnTime[i] / (gameClock.getElapsedTime().asSeconds() / 30 + 1)))
+		if (m_enemyClock[i].getElapsedTime() >= sf::seconds(enemySpawnTime[i] / (gameClock.getElapsedTime().asSeconds() / 45 + 1)))
 		{
 			Enemy* enemy = new Enemy(i);
 			addEntity(enemy);
@@ -314,8 +319,16 @@ void Stage::update()
 	}
 	for (Entity* entityA : m_entitys)
 	{
+		if (!entityA->isAlive())
+		{
+			continue;
+		}
 		for (Entity* entityB : m_entitys)
 		{
+			if (!entityB->isAlive())
+			{
+				continue;
+			}
 			if (hitTest(entityA->getCollision(), entityB->getCollision()))
 			{
 				if (entityA->getType() == "Enemy" &&
