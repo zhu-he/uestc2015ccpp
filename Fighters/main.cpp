@@ -1,13 +1,17 @@
 #include <ctime>
+#include <SFML/System.hpp>
 #include "SpriteSheet.hpp"
 #include "Background.hpp"
 #include "Hero.hpp"
 #include "Enemy.hpp"
-#include "Global.hpp"
 #include "Ufo.hpp"
 #include "Game.hpp"
 
 using namespace std;
+
+sf::Clock gameClock;
+bool musicSwitch = true;
+bool sfxSwitch = true;
 
 int main()
 {

@@ -5,6 +5,8 @@
 #include "Ufo.hpp"
 #include "SpriteSheet.hpp"
 
+extern sf::Clock gameClock;
+
 Stage::Stage(sf::RenderWindow& window) : m_window(window)
 {
 	m_score = 0;

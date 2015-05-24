@@ -1,8 +1,11 @@
 #include "Menu.hpp"
+#include "Global.hpp"
+
+extern bool musicSwitch;
+extern bool sfxSwitch;
 
 Menu::Menu(MenuStatus menuStatus, float offsetY)
 {
-	m_offsetY = offsetY;
 	m_font.loadFromFile(fontPath);
 	setMenu(menuStatus, offsetY);
 }
@@ -69,14 +72,34 @@ MenuStatus Menu::getMenuStatus()
 void Menu::setMenu(MenuStatus menuStatus, float offsetY)
 {
 	m_menuStatus = menuStatus;
+	m_offsetY = offsetY;
+	m_menuCursor = 0;
+	refresh();
+}
+
+void Menu::refresh()
+{
 	m_menuItems.clear();
-    for (int i = 0; i < (int)menuString[menuStatus].size(); ++i)
+    for (int i = 0; i < (int)menuString[m_menuStatus].size(); ++i)
 	{
-		sf::Text text(menuString[menuStatus][i], m_font, 40);
+		sf::Text text;
+		text.setFont(m_font);
+		text.setCharacterSize(40);
+		if (menuString[m_menuStatus][i] == "Music")
+		{
+			text.setString(menuString[m_menuStatus][i] + (musicSwitch ? ": ON" : ": OFF"));
+		}
+		else if (menuString[m_menuStatus][i] == "SFX")
+		{
+			text.setString(menuString[m_menuStatus][i] + (sfxSwitch ? ": ON" : ": OFF"));
+		}
+		else
+		{
+			text.setString(menuString[m_menuStatus][i]);
+		}
 		text.setColor(textColor);
-		text.setPosition(screenWidth / 2 - text.getLocalBounds().width / 2, offsetY + (i - menuString[menuStatus].size() / 2.0f) * 60);
+		text.setPosition(screenWidth / 2 - text.getLocalBounds().width / 2, m_offsetY + (i - menuString[m_menuStatus].size() / 2.0f) * 60);
 		m_menuItems.push_back(text);
 	}
-	m_menuCursor = 0;
 	highlight();
 }

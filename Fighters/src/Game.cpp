@@ -4,6 +4,9 @@
 #include "Hero.hpp"
 #include "Global.hpp"
 
+extern bool musicSwitch;
+extern bool sfxSwitch;
+
 Game::Game() : m_window(sf::VideoMode(screenWidth, screenHeight), "Fighters", sf::Style::Titlebar | sf::Style::Close)
 {
 	m_window.setFramerateLimit(60);
@@ -98,10 +101,12 @@ void Game::play()
 						switch (menu.getMenuCursor())
 						{
 						case 0:
-
+							musicSwitch = !musicSwitch;
+							menu.refresh();
 							break;
 						case 1:
-
+							sfxSwitch = !sfxSwitch;
+							menu.refresh();
 							break;
 						case 2:
 							menu.setMenu(MainMenu, screenHeight / 2 + 150);

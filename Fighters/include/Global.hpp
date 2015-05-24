@@ -7,8 +7,6 @@
 #include <functional>
 #include <cmath>
 
-static sf::Clock gameClock;
-
 enum MenuStatus
 {
 	MainMenu,

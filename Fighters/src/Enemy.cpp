@@ -1,6 +1,8 @@
 #include "Enemy.hpp"
 #include "Bullet.hpp"
 
+extern sf::Clock gameClock;
+
 std::vector<sf::Texture> Enemy::m_enemyTexture[3];
 std::vector<sf::Texture> Enemy::m_enemyDownTexture[3];
 sf::Texture Enemy::m_enemyHitTexture[3];

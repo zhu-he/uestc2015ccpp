@@ -2,6 +2,7 @@
 #define __MENU_HPP__
 
 #include <SFML/Graphics.hpp>
+#include <iostream>
 #include <vector>
 #include <Global.hpp>
 
@@ -15,6 +16,7 @@ class Menu : public sf::Drawable
 		void previous();
 		MenuStatus getMenuStatus();
 		int getMenuCursor();
+		void refresh();
 		void setMenu(MenuStatus menuStatus, float offsetY);
 	private:
 		MenuStatus m_menuStatus;
