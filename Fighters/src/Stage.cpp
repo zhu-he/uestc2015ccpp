@@ -154,6 +154,49 @@ void Stage::play()
 			it--;
 		}
 	}
+	while (m_window.isOpen())
+    {
+        sf::Event event;
+        while (m_window.pollEvent(event))
+		{
+			switch (event.type)
+			{
+			case sf::Event::Closed:
+				m_window.close();
+				break;
+			default:
+				break;
+			}
+		}
+		if (getGameStatus() == Playing)
+		{
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+			{
+				((Hero*)m_hero)->moveLeft();
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+			{
+				((Hero*)m_hero)->moveRight();
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+			{
+				((Hero*)m_hero)->moveUp();
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+			{
+				((Hero*)m_hero)->moveDown();
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+			{
+				((Hero*)m_hero)->fire();
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+			{
+				useBomb();
+			}
+		}
+		update();
+    }
 }
 
 void Stage::draw()

@@ -9,6 +9,14 @@
 
 static sf::Clock gameClock;
 
+enum MenuStatus
+{
+	MainMenu,
+	MultiplayerMenu,
+	SettingMenu,
+	PauseMenu
+};
+
 enum GameStatus
 {
 	Waiting,
@@ -35,6 +43,30 @@ enum UfoType
 {
 	Weapon,
 	Bomb
+};
+
+const std::vector<std::vector<std::string> > menuString =
+{
+	{
+		"Single Player",
+		"Multi Player",
+		"Setting",
+		"Quit"
+	},
+	{
+		"Create Game",
+		"Join Game",
+		"Back"
+	},
+	{
+		"Music",
+		"SFX",
+		"Back"
+	},
+	{
+		"Resume",
+		"Back To Menu"
+	}
 };
 
 const float PI = acos(-1);

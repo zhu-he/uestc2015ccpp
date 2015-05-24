@@ -20,6 +20,7 @@ Hero::Hero()
 	m_collision.setPoint(2, sf::Vector2f(80, 85));
 	m_collision.setFillColor(sf::Color(255, 0, 0, 100));
 	m_level = 0;
+	m_isFlash = false;
 }
 
 Hero::~Hero()
