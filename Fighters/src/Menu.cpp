@@ -59,6 +59,12 @@ void Menu::lowlight()
 	m_menuItems[m_menuCursor].setPosition(screenWidth / 2 - m_menuItems[m_menuCursor].getLocalBounds().width / 2, m_offsetY + (m_menuCursor - menuString[m_menuStatus].size() / 2.0f) * 60);
 }
 
+void Menu::setMenuCursor(int menuCursor)
+{
+	m_menuCursor = menuCursor;
+	refresh();
+}
+
 int Menu::getMenuCursor()
 {
 	return m_menuCursor;

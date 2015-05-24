@@ -7,7 +7,7 @@
 
 extern sf::Clock gameClock;
 
-Stage::Stage(sf::RenderWindow& window) : m_window(window)
+Stage::Stage(sf::RenderWindow& window) : m_window(window), m_pausedMenu(PauseMenu, screenHeight / 2)
 {
 	m_score = 0;
 	m_font.loadFromFile(fontPath);
@@ -66,6 +66,7 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window)
 	m_shadowRenderStates.shader = &m_shadowShader;
 	m_bombTexture = SpriteSheet::getTexture(bombImage);
 	m_bombSprite.setTexture(m_bombTexture);
+	m_isRunning = true;
 	m_highScoreIfstream.open(highScorePath, std::ios::in);
 	if (!m_highScoreIfstream.is_open())
 	{
@@ -132,11 +133,12 @@ void Stage::setHpText(int hp)
 	m_hpText.setPosition(screenWidth - m_hpText.getLocalBounds().width - 10, 0);
 }
 
-void Stage::play()
+void Stage::init()
 {
 	m_gameMusicSound.play();
 	m_score = 0;
 	m_bombCount = 0;
+	m_isRunning = true;
 	m_scoreText.setString("Score: 0");
 	setHpText(heroHp);
 	m_gameStatus = Playing;
@@ -156,7 +158,12 @@ void Stage::play()
 			it--;
 		}
 	}
-	while (m_window.isOpen())
+}
+
+void Stage::play()
+{
+	init();
+	while (m_window.isOpen() && m_isRunning)
     {
         sf::Event event;
         while (m_window.pollEvent(event))
@@ -165,6 +172,36 @@ void Stage::play()
 			{
 			case sf::Event::Closed:
 				m_window.close();
+				break;
+			case sf::Event::KeyPressed:
+				if (event.key.code == sf::Keyboard::Escape)
+				{
+					m_gameStatus = Paused;
+					m_pausedMenu.setMenuCursor(0);
+				}
+				else if (event.key.code == sf::Keyboard::Down && m_gameStatus == Paused)
+				{
+					m_pausedMenu.next();
+				}
+				else if (event.key.code == sf::Keyboard::Up && m_gameStatus == Paused)
+				{
+					m_pausedMenu.previous();
+				}
+				else if ((event.key.code == sf::Keyboard::Space || event.key.code == sf::Keyboard::Return) && m_gameStatus == Paused)
+				{
+					if (m_pausedMenu.getMenuCursor() == 0)
+					{
+						m_gameStatus = Playing;
+					}
+					else if (m_pausedMenu.getMenuCursor() == 1)
+					{
+						init();
+					}
+					else
+					{
+						m_isRunning = false;
+					}
+				}
 				break;
 			default:
 				break;
@@ -204,13 +241,11 @@ void Stage::play()
 void Stage::draw()
 {
 	m_window.clear();
-	m_background->animate();
 	m_window.draw(*m_background, &m_invertShader);
 	for (Entity* entity : m_entitys)
 	{
 		if (entity->isAlive())
 		{
-			entity->animate();
 			if (entity->getType() == "Bullet")
 			{
 				if (((Bullet*)entity)->getBulletType() == EnemyBullet)
@@ -256,7 +291,7 @@ void Stage::draw()
 		m_window.draw(m_bombSprite);
 	}
 	m_window.draw(m_lightSprite, sf::BlendAdd);
-	if (m_gameStatus == Playing)
+	if (m_gameStatus == Playing || m_gameStatus == Paused)
 	{
 		m_window.draw(m_scoreText);
 		m_window.draw(m_hpText);
@@ -279,6 +314,10 @@ void Stage::draw()
 		m_window.draw(m_overScoreText);
 		m_window.draw(m_overHighScoreText);
 	}
+	else if (m_gameStatus == Paused)
+	{
+		m_window.draw(m_pausedMenu);
+	}
 	m_window.display();
 	m_lightRenderTexture.clear(sf::Color::Transparent);
 }
@@ -297,6 +336,18 @@ void Stage::gameOver()
 	m_overScoreText.setPosition(screenWidth / 2 - m_overScoreText.getLocalBounds().width / 2, screenHeight);
 	m_overHighScoreText.setPosition(screenWidth / 2 - m_overHighScoreText.getLocalBounds().width / 2, screenHeight + m_overScoreText.getLocalBounds().height + 20);
 	m_overText.setPosition(screenWidth / 2 - m_overText.getLocalBounds().width / 2, -m_overText.getLocalBounds().height * 4);
+}
+
+void Stage::animate()
+{
+	m_background->animate();
+	for (Entity* entity : m_entitys)
+	{
+		if (entity->isAlive())
+		{
+			entity->animate();
+		}
+	}
 }
 
 void Stage::update()
@@ -339,10 +390,17 @@ void Stage::update()
 		{
 			m_gameStatus = Over;
 		}
+		update();
 		draw();
 		return;
 	}
 	if (m_gameStatus == Over || m_gameStatus == Waiting)
+	{
+		update();
+		draw();
+		return;
+	}
+	if (m_gameStatus == Paused)
 	{
 		draw();
 		return;
@@ -439,6 +497,7 @@ void Stage::update()
 			((Enemy*)m_entitys[i])->fire(m_hero->getPosition());
 		}
 	}
+	animate();
     draw();
 }
 

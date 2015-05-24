@@ -15,6 +15,7 @@ class Menu : public sf::Drawable
 		void next();
 		void previous();
 		MenuStatus getMenuStatus();
+		void setMenuCursor(int menuCursor);
 		int getMenuCursor();
 		void refresh();
 		void setMenu(MenuStatus menuStatus, float offsetY);

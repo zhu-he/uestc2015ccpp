@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include "Global.hpp"
+#include "Menu.hpp"
 #include "Entity.hpp"
 #include "Background.hpp"
 
@@ -71,8 +72,12 @@ class Stage
 		GameStatus m_gameStatus;
 		Entity* m_hero;
 		Background* m_background;
+		Menu m_pausedMenu;
 		bool m_waitingTextSwitch;
 		bool m_isBombing;
+		bool m_isRunning;
+		void init();
+		void animate();
 		void draw();
 		float cross(const sf::Vector2f& vectorA, const sf::Vector2f& vectorB) const;
 		bool hitTest(const sf::ConvexShape& collisionA, const sf::ConvexShape& collisionB) const;

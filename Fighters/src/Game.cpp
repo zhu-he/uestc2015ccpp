@@ -59,7 +59,7 @@ void Game::play()
 				case sf::Keyboard::Up:
 					menu.previous();
 					break;
-				case sf::Keyboard::Space:
+				case sf::Keyboard::Space: case sf::Keyboard::Return:
 					switch (menu.getMenuStatus())
 					{
 					case MainMenu:

@@ -19,7 +19,7 @@ enum GameStatus
 {
 	Waiting,
 	Playing,
-	Pausing,
+	Paused,
 	Overing,
 	Over
 };
@@ -63,6 +63,7 @@ const std::vector<std::vector<std::string> > menuString =
 	},
 	{
 		"Resume",
+		"Restart",
 		"Back To Menu"
 	}
 };
