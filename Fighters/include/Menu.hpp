@@ -3,13 +3,15 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <algorithm>
 #include <vector>
-#include <Global.hpp>
+#include "Global.hpp"
+#include "MenuItem.hpp"
 
 class Menu : public sf::Drawable
 {
 	public:
-		Menu(MenuStatus menuStatus, float offsetY);
+		Menu(MenuStatus menuStatus, float offsetY = screenHeight / 2 + 150);
 		virtual ~Menu();
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 		void next();
@@ -18,15 +20,16 @@ class Menu : public sf::Drawable
 		void setMenuCursor(int menuCursor);
 		int getMenuCursor();
 		void refresh();
-		void setMenu(MenuStatus menuStatus, float offsetY);
+		void bindSwitch(int index, bool (*getter)(), void (*switcher)());
+		void toggleSwitch();
+		void input(int code);
+		void setMenu(MenuStatus menuStatus, float offsetY = screenHeight / 2 + 150);
 	private:
 		MenuStatus m_menuStatus;
-		std::vector<sf::Text> m_menuItems;
+		std::vector<MenuItem*> m_menuItems;
 		sf::Font m_font;
 		int m_menuCursor;
 		float m_offsetY;
-		void highlight();
-		void lowlight();
 };
 
 #endif // __MENU_HPP__

@@ -39,8 +39,6 @@ class Hero : public Entity
 		sf::Clock m_lastShootTime;
 		sf::Clock m_invincible;
 		sf::Clock m_invincibleFlash;
-		sf::SoundBuffer m_bulletSoundBuffer;
-		sf::Sound m_bulletSound;
 		bool m_isFlash;
 		int m_hp;
 		int m_level;

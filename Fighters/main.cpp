@@ -6,12 +6,12 @@
 #include "Enemy.hpp"
 #include "Ufo.hpp"
 #include "Game.hpp"
+#include "Sound.hpp"
+#include "Font.hpp"
 
 using namespace std;
 
 sf::Clock gameClock;
-bool musicSwitch = true;
-bool sfxSwitch = true;
 
 int main()
 {
@@ -22,6 +22,8 @@ int main()
 	Enemy::loadResources();
 	Bullet::loadResources();
 	Ufo::loadResources();
+	Sound::loadResources();
+	Font::loadResources();
     Game game;
     game.play();
     return 0;

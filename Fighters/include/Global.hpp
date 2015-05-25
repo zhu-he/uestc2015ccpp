@@ -12,7 +12,8 @@ enum MenuStatus
 	MainMenu,
 	MultiplayerMenu,
 	SettingMenu,
-	PauseMenu
+	PauseMenu,
+	JoinMenu
 };
 
 enum GameStatus
@@ -43,28 +44,40 @@ enum UfoType
 	Bomb
 };
 
-const std::vector<std::vector<std::string> > menuString =
+enum MenuItemType
+{
+	Text,
+	Switch,
+	Input
+};
+
+const std::vector<std::vector<std::pair<MenuItemType, std::string> > > menuString =
 {
 	{
-		"Single Player",
-		"Multi Player",
-		"Setting",
-		"Quit"
+		{Text, "Single Player"},
+		{Text, "Multi Player"},
+		{Text, "Setting"},
+		{Text, "Quit"}
 	},
 	{
-		"Create Game",
-		"Join Game",
-		"Back"
+		{Text, "Create Game"},
+		{Text, "Join Game"},
+		{Text, "Back"}
 	},
 	{
-		"Music",
-		"SFX",
-		"Back"
+		{Switch, "BGM"},
+		{Switch, "SFX"},
+		{Text, "Back"}
 	},
 	{
-		"Resume",
-		"Restart",
-		"Back To Menu"
+		{Text, "Resume"},
+		{Text, "Restart"},
+		{Text, "Back To Menu"}
+	},
+	{
+		{Input, "IP"},
+		{Text, "Join"},
+		{Text, "Back"}
 	}
 };
 

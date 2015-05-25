@@ -3,16 +3,14 @@
 #include "Stage.hpp"
 #include "Hero.hpp"
 #include "Global.hpp"
-
-extern bool musicSwitch;
-extern bool sfxSwitch;
+#include "Sound.hpp"
+#include "Font.hpp"
 
 Game::Game() : m_window(sf::VideoMode(screenWidth, screenHeight), "Fighters", sf::Style::Titlebar | sf::Style::Close)
 {
 	m_window.setFramerateLimit(60);
 	m_window.setSize(sf::Vector2u(360, 600));
-	m_font.loadFromFile(fontPath);
-	m_titleText.setFont(m_font);
+	m_titleText.setFont(Font::getFont());
 	m_titleText.setString("Fighters");
 	m_titleText.setCharacterSize(100);
 	m_titleText.setColor(sf::Color::White);
@@ -34,8 +32,9 @@ void Game::quit()
 
 void Game::play()
 {
+	Sound::playGameMusicSound();
 	m_isRunning = true;
-	Menu menu(MainMenu, screenHeight / 2 + 150);
+	Menu menu(MainMenu);
 	Stage stage(m_window);
 	stage.setBackground(&m_background);
 	Hero hero;
@@ -69,10 +68,12 @@ void Game::play()
 							stage.play();
 							break;
 						case 1:
-							menu.setMenu(MultiplayerMenu, screenHeight / 2 + 150);
+							menu.setMenu(MultiplayerMenu);
 							break;
 						case 2:
-							menu.setMenu(SettingMenu, screenHeight / 2 + 150);
+							menu.setMenu(SettingMenu);
+							menu.bindSwitch(0, Sound::getBgmSwitch, Sound::switchBgm);
+							menu.bindSwitch(1, Sound::getSfxSwitch, Sound::switchSfx);
 							break;
 						case 3:
 							m_window.close();
@@ -88,10 +89,10 @@ void Game::play()
 
 							break;
 						case 1:
-
+							menu.setMenu(JoinMenu);
 							break;
 						case 2:
-							menu.setMenu(MainMenu, screenHeight / 2 + 150);
+							menu.setMenu(MainMenu);
 							break;
 						default:
 							break;
@@ -101,15 +102,29 @@ void Game::play()
 						switch (menu.getMenuCursor())
 						{
 						case 0:
-							musicSwitch = !musicSwitch;
-							menu.refresh();
+							menu.toggleSwitch();
 							break;
 						case 1:
-							sfxSwitch = !sfxSwitch;
-							menu.refresh();
+							menu.toggleSwitch();
 							break;
 						case 2:
-							menu.setMenu(MainMenu, screenHeight / 2 + 150);
+							menu.setMenu(MainMenu);
+							break;
+						default:
+							break;
+						}
+						break;
+					case JoinMenu:
+						switch (menu.getMenuCursor())
+						{
+						case 0:
+
+							break;
+						case 1:
+
+							break;
+						case 2:
+							menu.setMenu(MultiplayerMenu);
 							break;
 						default:
 							break;
@@ -118,6 +133,7 @@ void Game::play()
 					}
 					break;
 				default:
+					menu.input(event.key.code);
 					break;
                 }
 				break;

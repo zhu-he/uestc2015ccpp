@@ -1,4 +1,5 @@
 #include "Hero.hpp"
+#include "Sound.hpp"
 
 std::vector<sf::Texture> Hero::m_heroTexture;
 std::vector<sf::Texture> Hero::m_heroBlowupTexture;
@@ -10,8 +11,6 @@ Hero::Hero()
 	setOrigin(getTextureRect().width / 2, getTextureRect().height / 2);
 	setPosition(screenWidth / 2, screenHeight - getTextureRect().height / 2);
 	m_isAlive = true;
-	m_bulletSoundBuffer.loadFromFile(bulletSoundPath);
-	m_bulletSound.setBuffer(m_bulletSoundBuffer);
 	m_hp = heroHp;
 	m_status = Normal;
 	m_collision.setPointCount(3);
@@ -160,7 +159,7 @@ void Hero::fire()
 {
 	if (m_lastShootTime.getElapsedTime() >= sf::seconds(heroBulletInterval))
 	{
-		m_bulletSound.play();
+		Sound::playBulletSound();
 		for (int i = 0; i < (int)heroBulletDirection[m_level].size(); ++i)
 		{
 			sf::Transform transform;

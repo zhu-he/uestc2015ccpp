@@ -15,7 +15,6 @@ class Game
 		void quit();
 	private:
 		sf::RenderWindow m_window;
-		sf::Font m_font;
 		sf::Text m_titleText;
 		sf::Shader m_invertShader;
 		bool m_isRunning;

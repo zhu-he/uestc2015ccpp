@@ -1,9 +1,8 @@
 #include "Ufo.hpp"
 #include "SpriteSheet.hpp"
+#include "Sound.hpp"
 
 sf::Texture Ufo::m_ufoTexture[2];
-sf::SoundBuffer Ufo::m_ufoSoundBuffer[2];
-sf::Sound Ufo::m_ufoSound[2];
 
 Ufo::Ufo(UfoType ufoType)
 {
@@ -57,7 +56,7 @@ bool Ufo::isAlive()
 void Ufo::die()
 {
 	m_isAlive = false;
-	m_ufoSound[m_ufoType].play();
+	Sound::playUfoSound(m_ufoType);
 }
 
 UfoType Ufo::getUfoType()
@@ -75,10 +74,5 @@ void Ufo::loadResources()
 	for (int i = 0; i < (int)ufoImage.size(); ++i)
 	{
 		m_ufoTexture[i] = SpriteSheet::getTexture(ufoImage[i]);
-	}
-	for (int i = 0; i < (int)ufoSoundPath.size(); ++i)
-	{
-		m_ufoSoundBuffer[i].loadFromFile(ufoSoundPath[i]);
-		m_ufoSound[i].setBuffer(m_ufoSoundBuffer[i]);
 	}
 }

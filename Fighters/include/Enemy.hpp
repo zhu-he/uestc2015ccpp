@@ -27,8 +27,6 @@ class Enemy : public Entity
 		static std::vector<sf::Texture> m_enemyTexture[3];
 		static std::vector<sf::Texture> m_enemyDownTexture[3];
 		static sf::Texture m_enemyHitTexture[3];
-		static sf::SoundBuffer m_enemyDownSoundBuffer[3];
-		static sf::Sound m_enemyDownSound[3];
         sf::Clock m_enemyAnimateClock;
         sf::Clock m_lastShootTime;
 		int m_enemyImageCounter;

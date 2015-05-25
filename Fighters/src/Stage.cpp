@@ -4,51 +4,44 @@
 #include "Hero.hpp"
 #include "Ufo.hpp"
 #include "SpriteSheet.hpp"
+#include "Sound.hpp"
+#include "Font.hpp"
 
 extern sf::Clock gameClock;
 
 Stage::Stage(sf::RenderWindow& window) : m_window(window), m_pausedMenu(PauseMenu, screenHeight / 2)
 {
 	m_score = 0;
-	m_font.loadFromFile(fontPath);
-	m_scoreText.setFont(m_font);
+	m_scoreText.setFont(Font::getFont());
 	m_scoreText.setCharacterSize(24);
 	m_scoreText.setColor(textColor);
 	m_scoreText.setPosition(10, 5);
 	m_scoreText.setStyle(sf::Text::Bold);
-	m_hpText.setFont(m_font);
+	m_hpText.setFont(Font::getFont());
 	m_hpText.setCharacterSize(30);
 	m_hpText.setColor(heartColor);
 	m_hpText.setStyle(sf::Text::Bold);
 	m_hpText.setPosition(screenWidth - m_hpText.getLocalBounds().width - 10, 0);
-	m_waitingText.setFont(m_font);
+	m_waitingText.setFont(Font::getFont());
 	m_waitingText.setString("Press any key to start\n\nMove: \tArrow Keys\nFire: \t\tSpace\nBomb: \tShift\n");
 	m_waitingText.setCharacterSize(30);
 	m_waitingText.setColor(textColor);
 	m_waitingText.setStyle(sf::Text::Bold);
 	m_waitingText.setPosition(screenWidth / 2 - m_waitingText.getLocalBounds().width / 2, screenHeight / 2 - m_waitingText.getLocalBounds().height / 2);
-	m_overScoreText.setFont(m_font);
+	m_overScoreText.setFont(Font::getFont());
 	m_overScoreText.setCharacterSize(40);
 	m_overScoreText.setColor(textColor);
 	m_overScoreText.setStyle(sf::Text::Bold);
-	m_overHighScoreText.setFont(m_font);
+	m_overHighScoreText.setFont(Font::getFont());
 	m_overHighScoreText.setCharacterSize(40);
 	m_overHighScoreText.setColor(textColor);
 	m_overHighScoreText.setStyle(sf::Text::Bold);
-	m_overText.setFont(m_font);
+	m_overText.setFont(Font::getFont());
 	m_overText.setString("Game Over");
 	m_overText.setCharacterSize(40);
 	m_overText.setColor(textColor);
 	m_overText.setStyle(sf::Text::Bold);
 	m_gameStatus = Waiting;
-	m_gameMusicSoundBuffer.loadFromFile(gameMusicPath);
-	m_gameOverSoundBuffer.loadFromFile(gameOverPath);
-	m_useBombSoundBuffer.loadFromFile(useBombSoundPath);
-	m_gameMusicSound.setBuffer(m_gameMusicSoundBuffer);
-	m_gameOverSound.setBuffer(m_gameOverSoundBuffer);
-	m_useBombSound.setBuffer(m_useBombSoundBuffer);
-	m_gameMusicSound.setLoop(true);
-	m_gameMusicSound.play();
 	m_waitingTextSwitch = true;
 	m_highScore = 0;
 	m_bombCount = 0;
@@ -135,7 +128,6 @@ void Stage::setHpText(int hp)
 
 void Stage::init()
 {
-	m_gameMusicSound.play();
 	m_score = 0;
 	m_bombCount = 0;
 	m_isRunning = true;
@@ -158,6 +150,7 @@ void Stage::init()
 			it--;
 		}
 	}
+	Sound::playGameMusicSound();
 }
 
 void Stage::play()
@@ -236,6 +229,7 @@ void Stage::play()
 		}
 		update();
     }
+	Sound::playGameMusicSound();
 }
 
 void Stage::draw()
@@ -325,8 +319,8 @@ void Stage::draw()
 void Stage::gameOver()
 {
     m_gameStatus = Overing;
-    m_gameMusicSound.stop();
-	m_gameOverSound.play();
+    Sound::stopGameMusicSound();
+	Sound::playGameOverSound();
 	if (m_highScore < m_score)
 	{
 		m_highScore = m_score;
@@ -568,6 +562,6 @@ void Stage::useBomb()
 		m_bombCount--;
 		m_isBombing = true;
 		m_bombClock.restart();
-		m_useBombSound.play();
+		Sound::playUseBombSound();
 	}
 }

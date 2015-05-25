@@ -1,13 +1,12 @@
 #include "Enemy.hpp"
 #include "Bullet.hpp"
+#include "Sound.hpp"
 
 extern sf::Clock gameClock;
 
 std::vector<sf::Texture> Enemy::m_enemyTexture[3];
 std::vector<sf::Texture> Enemy::m_enemyDownTexture[3];
 sf::Texture Enemy::m_enemyHitTexture[3];
-sf::SoundBuffer Enemy::m_enemyDownSoundBuffer[3];
-sf::Sound Enemy::m_enemyDownSound[3];
 
 Enemy::Enemy(const int& enemyType)
 {
@@ -76,8 +75,6 @@ void Enemy::loadResources()
 		{
 			m_enemyHitTexture[enemyType] = SpriteSheet::getTexture(enemyHitImage[enemyType]);
 		}
-		m_enemyDownSoundBuffer[enemyType].loadFromFile(enemyDownSoundPath[enemyType]);
-		m_enemyDownSound[enemyType].setBuffer(m_enemyDownSoundBuffer[enemyType]);
 	}
 }
 
@@ -110,7 +107,7 @@ void Enemy::animate()
 		if (m_enemyImageCounter >= (int)m_enemyDownTexture[m_enemyType].size())
 		{
 			m_isAlive = false;
-			m_enemyDownSound[m_enemyType].play();
+			Sound::playEnemyDownSound(m_enemyType);
 		}
 		break;
 	default:

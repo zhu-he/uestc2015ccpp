@@ -1,8 +1,9 @@
 #include "Menu.hpp"
 #include "Global.hpp"
-
-extern bool musicSwitch;
-extern bool sfxSwitch;
+#include "Sound.hpp"
+#include "MenuText.hpp"
+#include "MenuSwitch.hpp"
+#include "MenuInput.hpp"
 
 Menu::Menu(MenuStatus menuStatus, float offsetY)
 {
@@ -12,51 +13,40 @@ Menu::Menu(MenuStatus menuStatus, float offsetY)
 
 Menu::~Menu()
 {
-
+	for (int i = 0; i < (int)m_menuItems.size(); ++i)
+	{
+		delete m_menuItems[i];
+	}
 }
 
 void Menu::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	for (int i = 0; i < (int)m_menuItems.size(); ++i)
 	{
-		target.draw(m_menuItems[i], states);
+		target.draw(*m_menuItems[i], states);
 	}
 }
 
 void Menu::next()
 {
-	lowlight();
+	m_menuItems[m_menuCursor]->leave();
 	m_menuCursor++;
 	if (m_menuCursor >= (int)menuString[m_menuStatus].size())
 	{
 		m_menuCursor = 0;
 	}
-	highlight();
+	m_menuItems[m_menuCursor]->focus();
 }
 
 void Menu::previous()
 {
-	lowlight();
+	m_menuItems[m_menuCursor]->leave();
 	m_menuCursor--;
 	if (m_menuCursor < 0)
 	{
 		m_menuCursor = menuString[m_menuStatus].size() - 1;
 	}
-	highlight();
-}
-
-void Menu::highlight()
-{
-	m_menuItems[m_menuCursor].setColor(sf::Color::White);
-	m_menuItems[m_menuCursor].setCharacterSize(50);
-	m_menuItems[m_menuCursor].setPosition(screenWidth / 2 - m_menuItems[m_menuCursor].getLocalBounds().width / 2, m_offsetY + (m_menuCursor - menuString[m_menuStatus].size() / 2.0f) * 60 - 5);
-}
-
-void Menu::lowlight()
-{
-	m_menuItems[m_menuCursor].setColor(textColor);
-	m_menuItems[m_menuCursor].setCharacterSize(40);
-	m_menuItems[m_menuCursor].setPosition(screenWidth / 2 - m_menuItems[m_menuCursor].getLocalBounds().width / 2, m_offsetY + (m_menuCursor - menuString[m_menuStatus].size() / 2.0f) * 60);
+	m_menuItems[m_menuCursor]->focus();
 }
 
 void Menu::setMenuCursor(int menuCursor)
@@ -75,6 +65,27 @@ MenuStatus Menu::getMenuStatus()
 	return m_menuStatus;
 }
 
+void Menu::bindSwitch(int index, bool (*getter)(), void (*switcher)())
+{
+	if (m_menuItems[index]->getMenuItemType() == Switch)
+	{
+		((MenuSwitch*)m_menuItems[index])->bind(getter, switcher);
+	}
+}
+
+void Menu::toggleSwitch()
+{
+	if (m_menuItems[m_menuCursor]->getMenuItemType() == Switch)
+	{
+		((MenuSwitch*)m_menuItems[m_menuCursor])->toggle();
+	}
+}
+
+void Menu::input(int code)
+{
+	m_menuItems[m_menuCursor]->input(code);
+}
+
 void Menu::setMenu(MenuStatus menuStatus, float offsetY)
 {
 	m_menuStatus = menuStatus;
@@ -85,27 +96,34 @@ void Menu::setMenu(MenuStatus menuStatus, float offsetY)
 
 void Menu::refresh()
 {
+	for (int i = 0; i < (int)m_menuItems.size(); ++i)
+	{
+		delete m_menuItems[i];
+	}
 	m_menuItems.clear();
     for (int i = 0; i < (int)menuString[m_menuStatus].size(); ++i)
 	{
-		sf::Text text;
-		text.setFont(m_font);
-		text.setCharacterSize(40);
-		if (menuString[m_menuStatus][i] == "Music")
+		if (menuString[m_menuStatus][i].first == Text)
 		{
-			text.setString(menuString[m_menuStatus][i] + (musicSwitch ? ": ON" : ": OFF"));
+			MenuText* menuText = new MenuText();
+			menuText->setString(menuString[m_menuStatus][i].second);
+			menuText->setOffestY(m_offsetY + (i - menuString[m_menuStatus].size() / 2.0f) * 60);
+			m_menuItems.push_back(menuText);
 		}
-		else if (menuString[m_menuStatus][i] == "SFX")
+		else if (menuString[m_menuStatus][i].first == Switch)
 		{
-			text.setString(menuString[m_menuStatus][i] + (sfxSwitch ? ": ON" : ": OFF"));
+			MenuSwitch* menuSwitch = new MenuSwitch();
+			menuSwitch->setString(menuString[m_menuStatus][i].second);
+			menuSwitch->setOffestY(m_offsetY + (i - menuString[m_menuStatus].size() / 2.0f) * 60);
+			m_menuItems.push_back(menuSwitch);
 		}
-		else
+		else if (menuString[m_menuStatus][i].first == Input)
 		{
-			text.setString(menuString[m_menuStatus][i]);
+			MenuInput* menuInput = new MenuInput();
+			menuInput->setString(menuString[m_menuStatus][i].second);
+			menuInput->setOffestY(m_offsetY + (i - menuString[m_menuStatus].size() / 2.0f) * 60);
+			m_menuItems.push_back(menuInput);
 		}
-		text.setColor(textColor);
-		text.setPosition(screenWidth / 2 - text.getLocalBounds().width / 2, m_offsetY + (i - menuString[m_menuStatus].size() / 2.0f) * 60);
-		m_menuItems.push_back(text);
 	}
-	highlight();
+	m_menuItems[m_menuCursor]->focus();
 }

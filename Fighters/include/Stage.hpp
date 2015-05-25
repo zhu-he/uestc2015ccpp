@@ -1,6 +1,3 @@
-// *** ADDED BY HEADER FIXUP ***
-#include <istream>
-// *** END ***
 #ifndef STAGE_HPP
 #define STAGE_HPP
 
@@ -41,19 +38,12 @@ class Stage
 		int m_highScore;
 		int m_score;
 		int m_bombCount;
-		sf::Font m_font;
 		sf::Text m_scoreText;
 		sf::Text m_hpText;
 		sf::Text m_waitingText;
 		sf::Text m_overText;
 		sf::Text m_overScoreText;
 		sf::Text m_overHighScoreText;
-		sf::SoundBuffer m_gameMusicSoundBuffer;
-		sf::SoundBuffer m_gameOverSoundBuffer;
-		sf::SoundBuffer m_useBombSoundBuffer;
-		sf::Sound m_gameMusicSound;
-		sf::Sound m_gameOverSound;
-		sf::Sound m_useBombSound;
 		sf::Clock m_enemyClock[3];
 		sf::Clock m_ufoClock;
 		sf::Clock m_waitingFlashClock;
