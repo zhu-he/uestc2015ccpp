@@ -97,6 +97,11 @@ void Hero::die()
 	m_heroImageCounter = 0;
 }
 
+void Hero::resetShootTime()
+{
+	m_lastShootTime.restart();
+}
+
 void Hero::animate()
 {
 	if (m_invincible.getElapsedTime() < sf::seconds(invincibleTime) && m_stage->getGameStatus() == Playing)

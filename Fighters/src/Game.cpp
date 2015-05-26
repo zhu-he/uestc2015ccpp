@@ -38,8 +38,6 @@ void Game::play()
 	Menu menu(MainMenu);
 	Stage stage(m_window);
 	stage.setBackground(&m_background);
-	Hero hero;
-	stage.addEntity(&hero);
 	Server server(m_window);
 	server.setBackground(&m_background);
 	Client client(m_window);
@@ -135,6 +133,8 @@ void Game::play()
 						default:
 							break;
 						}
+						break;
+					default:
 						break;
 					}
 					break;

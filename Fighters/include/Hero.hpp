@@ -24,14 +24,14 @@ class Hero : public Entity
 		void die();
 		void revive();
 		void levelup();
+		void resetShootTime();
 		virtual std::string getType();
 		bool isAlive();
 		bool isFlash();
-		void hit();
+		virtual void hit();
 		static void loadResources();
 	protected:
 		sf::Color m_color;
-	private:
 		static std::vector<sf::Texture> m_heroTexture;
 		static std::vector<sf::Texture> m_heroBlowupTexture;
 		int m_heroImageCounter;

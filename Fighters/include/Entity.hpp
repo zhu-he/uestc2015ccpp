@@ -14,6 +14,10 @@ class Entity : public sf::Sprite
 		virtual bool isAlive() = 0;
 		virtual void animate() = 0;
 		virtual sf::ConvexShape getCollision();
+		virtual int getId();
+		virtual void setId(int id);
+		virtual void hit();
+		virtual void die();
 		void setPosition(float x, float y);
 		void setPosition(const sf::Vector2f& position);
 		void setOrigin(float x, float y);
@@ -24,6 +28,7 @@ class Entity : public sf::Sprite
 	protected:
 		Stage* m_stage;
 		sf::ConvexShape m_collision;
+		int m_id;
 };
 
 #endif // ENTITY_HPP

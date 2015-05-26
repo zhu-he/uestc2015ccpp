@@ -113,7 +113,7 @@ void Enemy::animate()
 	default:
 		break;
     }
-	m_stage->drawLight(getPosition() - sf::Vector2f(0, getLocalBounds().height / 2), sf::Color(0, 0, 5 / m_lastShootTime.getElapsedTime().asSeconds()), 10);
+	// m_stage->drawLight(getPosition() - sf::Vector2f(0, getLocalBounds().height / 2), sf::Color(0, 0, 5 / m_lastShootTime.getElapsedTime().asSeconds()), 10);
 }
 
 void Enemy::hit()

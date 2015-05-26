@@ -4,20 +4,30 @@
 #include <SFML/Window.hpp>
 #include <SFML/Network.hpp>
 #include <iostream>
-#include "Stage.hpp"
+#include "MultiplayerStage.hpp"
 
-class ServerStage : public Stage
+class ServerStage : public MultiplayerStage
 {
 	public:
 		ServerStage(sf::RenderWindow& window, sf::TcpSocket& client);
 		virtual ~ServerStage();
 		void addEntity(Entity* entity);
-		void update();
+		bool update();
 	protected:
 		sf::TcpSocket& m_client;
-		Entity* m_hero2;
-		virtual void init();
-		int m_sendCounter;
+		int m_idCounter;
+		void hitEntity(Entity* entity);
+		void dieEntity(Entity* entity);
+		void fire();
+		void noFire();
+		void moveLeft();
+		void moveRight();
+		void moveUp();
+		void moveDown();
+		void moveNoLeft();
+		void moveNoRight();
+		void moveNoUp();
+		void moveNoDown();
 };
 
 #endif // __SERVERSTAGE_HPP__

@@ -1,5 +1,25 @@
 #include <Entity.hpp>
 
+int Entity::getId()
+{
+	return m_id;
+}
+
+void Entity::setId(int id)
+{
+	m_id = id;
+}
+
+void Entity::hit()
+{
+
+}
+
+void Entity::die()
+{
+
+}
+
 void Entity::setPosition(const sf::Vector2f& position)
 {
 	sf::Sprite::setPosition(position);

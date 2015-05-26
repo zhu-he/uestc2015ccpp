@@ -69,6 +69,9 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window), m_pausedMenu(PauseMen
 		m_highScoreIfstream >> m_highScore;
 		m_highScoreIfstream.close();
 	}
+	m_hero = new Hero();
+	m_controlHero = m_hero;
+	addEntity(m_hero);
 }
 
 Stage::~Stage()
@@ -82,9 +85,21 @@ void Stage::addEntity(Entity* entity)
 {
 	m_entitys.push_back(entity);
 	entity->m_stage = this;
-	if (entity->getType() == "Hero")
+}
+
+void Stage::dieEntity(Entity* entity)
+{
+	if (entity != nullptr)
 	{
-		m_hero = entity;
+		entity->die();
+	}
+}
+
+void Stage::hitEntity(Entity* entity)
+{
+	if (entity != nullptr)
+	{
+		entity->hit();
 	}
 }
 
@@ -203,30 +218,54 @@ void Stage::play()
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			{
-				((Hero*)m_hero)->moveLeft();
+				moveLeft();
+			}
+			else
+			{
+				moveNoLeft();
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 			{
-				((Hero*)m_hero)->moveRight();
+				moveRight();
+			}
+			else
+			{
+				moveNoRight();
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 			{
-				((Hero*)m_hero)->moveUp();
+				moveUp();
+			}
+			else
+			{
+				moveNoUp();
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 			{
-				((Hero*)m_hero)->moveDown();
+				moveDown();
+			}
+			else
+			{
+				moveNoDown();
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 			{
-				((Hero*)m_hero)->fire();
+				fire();
+			}
+			else
+			{
+				noFire();
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 			{
 				useBomb();
 			}
 		}
-		update();
+		if (!update())
+		{
+			break;
+		}
+		m_window.display();
     }
 	Sound::playGameMusicSound();
 }
@@ -315,12 +354,15 @@ void Stage::draw()
 	{
 		m_window.draw(m_pausedMenu);
 	}
-	m_window.display();
 	m_lightRenderTexture.clear(sf::Color::Transparent);
 }
 
 void Stage::gameOver()
 {
+	if (m_gameStatus == Overing || m_gameStatus == Over)
+	{
+		return;
+	}
     m_gameStatus = Overing;
     Sound::stopGameMusicSound();
 	Sound::playGameOverSound();
@@ -347,8 +389,12 @@ void Stage::animate()
 	}
 }
 
-void Stage::update()
+bool Stage::update()
 {
+	if (isOver())
+	{
+		gameOver();
+	}
 	if (m_isBombing)
 	{
 		if (m_bombClock.getElapsedTime() < sf::seconds(bombTime))
@@ -363,11 +409,11 @@ void Stage::update()
 				{
 					if (entity->getType() == "Enemy")
 					{
-						((Enemy*)entity)->die();
+						dieEntity(entity);
 					}
 					else if (entity->getType() == "Bullet" && ((Bullet*)entity)->getBulletType() == EnemyBullet)
 					{
-						((Bullet*)entity)->die();
+						dieEntity(entity);
 					}
 				}
 			}
@@ -387,20 +433,20 @@ void Stage::update()
 		{
 			m_gameStatus = Over;
 		}
-		update();
+		animate();
 		draw();
-		return;
+		return true;
 	}
 	if (m_gameStatus == Over || m_gameStatus == Waiting)
 	{
-		update();
+		animate();
 		draw();
-		return;
+		return true;
 	}
 	if (m_gameStatus == Paused)
 	{
 		draw();
-		return;
+		return true;
 	}
 	for (int i = 0; i < 3; ++i)
 	{
@@ -434,39 +480,60 @@ void Stage::update()
 				if (entityA->getType() == "Enemy" &&
 					entityB->getType() == "Bullet" &&
 					((Enemy*)entityA)->getStatus() != Dying &&
-					((Bullet*)entityB)->getBulletType() == HeroBullet)
+					((Bullet*)entityB)->getBulletType() != EnemyBullet)
 				{
-					((Enemy*)entityA)->hit();
-					((Bullet*)entityB)->die();
+					hitEntity(entityA);
+					dieEntity(entityB);
 				}
 				else if (entityA->getType() == "Hero" &&
 						entityB->getType() == "Bullet" &&
 						((Bullet*)entityB)->getBulletType() == EnemyBullet &&
 						!m_isBombing)
 				{
-					((Hero*)entityA)->hit();
-					((Bullet*)entityB)->die();
+					hitEntity(entityA);
+					dieEntity(entityB);
 				}
 				else if (entityA->getType() == "Enemy" &&
 						entityB->getType() == "Hero" &&
 						((Enemy*)entityA)->getStatus() != Dying &&
 						!m_isBombing)
 				{
-					((Enemy*)entityA)->die();
-					((Hero*)entityB)->hit();
+					hitEntity(entityB);
+					dieEntity(entityA);
+				}
+				else if (entityA->getType() == "Enemy" &&
+						entityB->getType() == "Hero2" &&
+						((Enemy*)entityA)->getStatus() != Dying &&
+						!m_isBombing)
+				{
+					hitEntity(entityB);
+					dieEntity(entityA);
 				}
 				else if (entityA->getType() == "Ufo" &&
 						entityB->getType() == "Hero")
 				{
 					if (((Ufo*)entityA)->getUfoType() == Weapon)
 					{
-						((Hero*)m_hero)->levelup();
+						((Hero*)entityB)->levelup();
 					}
-					else
+					else if (m_controlHero->getType() == "Hero")
 					{
 						m_bombCount++;
 					}
-					((Ufo*)entityA)->die();
+					dieEntity(entityA);
+				}
+				else if (entityA->getType() == "Ufo" &&
+						entityB->getType() == "Hero2")
+				{
+					if (((Ufo*)entityA)->getUfoType() == Weapon)
+					{
+						((Hero*)entityB)->levelup();
+					}
+					else if (m_controlHero->getType() == "Hero2")
+					{
+						m_bombCount++;
+					}
+					dieEntity(entityA);
 				}
 			}
 		}
@@ -475,11 +542,7 @@ void Stage::update()
 	{
 		if (!(*it)->isAlive())
 		{
-			if ((*it)->getType() == "Hero")
-			{
-				gameOver();
-			}
-			else
+			if ((*it)->getType() != "Hero" && (*it)->getType() != "Hero2")
 			{
 				delete *it;
 				m_entitys.erase(it);
@@ -496,6 +559,12 @@ void Stage::update()
 	}
 	animate();
     draw();
+	return true;
+}
+
+bool Stage::isOver()
+{
+	return !m_hero->isAlive();
 }
 
 float Stage::cross(const sf::Vector2f& vectorA, const sf::Vector2f& vectorB) const
@@ -567,4 +636,54 @@ void Stage::useBomb()
 		m_bombClock.restart();
 		Sound::playUseBombSound();
 	}
+}
+
+void Stage::fire()
+{
+	((Hero*)m_hero)->fire();
+}
+
+void Stage::noFire()
+{
+
+}
+
+void Stage::moveLeft()
+{
+	((Hero*)m_controlHero)->moveLeft();
+}
+
+void Stage::moveRight()
+{
+	((Hero*)m_controlHero)->moveRight();
+}
+
+void Stage::moveUp()
+{
+	((Hero*)m_controlHero)->moveUp();
+}
+
+void Stage::moveDown()
+{
+	((Hero*)m_controlHero)->moveDown();
+}
+
+void Stage::moveNoLeft()
+{
+
+}
+
+void Stage::moveNoRight()
+{
+
+}
+
+void Stage::moveNoUp()
+{
+
+}
+
+void Stage::moveNoDown()
+{
+
 }
