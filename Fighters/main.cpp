@@ -3,11 +3,13 @@
 #include "SpriteSheet.hpp"
 #include "Background.hpp"
 #include "Hero.hpp"
+#include "Hero2.hpp"
 #include "Enemy.hpp"
 #include "Ufo.hpp"
 #include "Game.hpp"
 #include "Sound.hpp"
 #include "Font.hpp"
+#include "Shader.hpp"
 
 using namespace std;
 
@@ -24,6 +26,8 @@ int main()
 	Ufo::loadResources();
 	Sound::loadResources();
 	Font::loadResources();
+	Shader::loadResources();
+	Hero2::loadResources();
     Game game;
     game.play();
     return 0;

@@ -5,6 +5,7 @@ std::vector<sf::Texture> Bullet::m_bulletTexture;
 
 Bullet::Bullet(BulletType bulletType, const sf::Vector2f& position, const sf::Vector2f& direction)
 {
+	m_direction = direction;
 	m_bulletType = bulletType;
 	setTexture(m_bulletTexture[bulletType]);
 	setOrigin(getTextureRect().width / 2, getTextureRect().height / 2);
@@ -20,6 +21,10 @@ Bullet::Bullet(BulletType bulletType, const sf::Vector2f& position, const sf::Ve
 	float distance = sqrt(direction.x * direction.x + direction.y * direction.y);
 	m_bulletSpeed.x = direction.x * bulletSpeed[bulletType] / distance;
 	m_bulletSpeed.y = direction.y * bulletSpeed[bulletType] / distance;
+	if (bulletType == 2)
+	{
+		setColor(sf::Color::Green);
+	}
 }
 
 Bullet::~Bullet()
@@ -48,6 +53,11 @@ bool Bullet::isAlive()
 void Bullet::die()
 {
 	m_isAlive = false;
+}
+
+sf::Vector2f Bullet::getDirection()
+{
+    return m_direction;
 }
 
 void Bullet::animate()

@@ -86,6 +86,15 @@ void Menu::input(int code)
 	m_menuItems[m_menuCursor]->input(code);
 }
 
+std::string Menu::getInputString(int index)
+{
+	if (m_menuItems[index]->getMenuItemType() == Input)
+	{
+		((MenuInput*)m_menuItems[index])->getInputString();
+	}
+	return "";
+}
+
 void Menu::setMenu(MenuStatus menuStatus, float offsetY)
 {
 	m_menuStatus = menuStatus;

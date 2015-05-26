@@ -20,6 +20,7 @@ Hero::Hero()
 	m_collision.setFillColor(sf::Color(255, 0, 0, 100));
 	m_level = 0;
 	m_isFlash = false;
+	m_color = sf::Color(255, 64, 64);
 }
 
 Hero::~Hero()
@@ -116,8 +117,15 @@ void Hero::animate()
 	}
 	else
 	{
-		m_stage->drawLight(getPosition(), sf::Color(5 / m_lastShootTime.getElapsedTime().asSeconds(), 0, 0), 10);
-		setColor(sf::Color(255, 64, 64));
+		if (getType() == "Hero")
+		{
+			m_stage->drawLight(getPosition(), sf::Color(5 / m_lastShootTime.getElapsedTime().asSeconds(), 0, 0), 10);
+		}
+		else
+		{
+			m_stage->drawLight(getPosition(), sf::Color(0, 5 / m_lastShootTime.getElapsedTime().asSeconds(), 0), 10);
+		}
+		setColor(m_color);
 	}
 	if (m_enemyAnimateClock.getElapsedTime() < sf::seconds(animateInterval))
 	{
@@ -164,8 +172,16 @@ void Hero::fire()
 		{
 			sf::Transform transform;
 			transform.rotate(heroBulletDirection[m_level][i].y);
-			Bullet* bullet = new Bullet(HeroBullet, getPosition() + sf::Vector2f(heroBulletDirection[m_level][i].x, bulletOffsetY), transform.transformPoint(sf::Vector2f(0, -1)));
-			m_stage->addEntity(bullet);
+			if (getType() == "Hero")
+			{
+				Bullet* bullet = new Bullet(HeroBullet, getPosition() + sf::Vector2f(heroBulletDirection[m_level][i].x, bulletOffsetY), transform.transformPoint(sf::Vector2f(0, -1)));
+				m_stage->addEntity(bullet);
+			}
+			else
+			{
+				Bullet* bullet = new Bullet(Hero2Bullet, getPosition() + sf::Vector2f(heroBulletDirection[m_level][i].x, bulletOffsetY), transform.transformPoint(sf::Vector2f(0, -1)));
+				m_stage->addEntity(bullet);
+			}
 		}
 		m_lastShootTime.restart();
 	}

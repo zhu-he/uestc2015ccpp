@@ -5,6 +5,9 @@
 #include "Global.hpp"
 #include "Sound.hpp"
 #include "Font.hpp"
+#include "Shader.hpp"
+#include "Server.hpp"
+#include "Client.hpp"
 
 Game::Game() : m_window(sf::VideoMode(screenWidth, screenHeight), "Fighters", sf::Style::Titlebar | sf::Style::Close)
 {
@@ -16,8 +19,6 @@ Game::Game() : m_window(sf::VideoMode(screenWidth, screenHeight), "Fighters", sf
 	m_titleText.setColor(sf::Color::White);
 	m_titleText.setStyle(sf::Text::Bold);
 	m_titleText.setPosition((screenWidth - m_titleText.getLocalBounds().width) / 2, 150);
-	m_invertShader.loadFromFile("resources/shader/invert.frag", sf::Shader::Fragment);
-	m_invertShader.setParameter("texture", m_invertShader.CurrentTexture);
 }
 
 Game::~Game()
@@ -39,6 +40,10 @@ void Game::play()
 	stage.setBackground(&m_background);
 	Hero hero;
 	stage.addEntity(&hero);
+	Server server(m_window);
+	server.setBackground(&m_background);
+	Client client(m_window);
+	client.setBackground(&m_background);
 	while (m_window.isOpen())
 	{
 		sf::Event event;
@@ -86,7 +91,7 @@ void Game::play()
 						switch (menu.getMenuCursor())
 						{
 						case 0:
-
+							server.start();
 							break;
 						case 1:
 							menu.setMenu(JoinMenu);
@@ -121,7 +126,8 @@ void Game::play()
 
 							break;
 						case 1:
-
+							client.setIp(menu.getInputString(0));
+							client.start();
 							break;
 						case 2:
 							menu.setMenu(MultiplayerMenu);
@@ -143,7 +149,7 @@ void Game::play()
 		}
 		m_background.animate();
 		m_window.clear();
-		m_window.draw(m_background, &m_invertShader);
+		m_window.draw(m_background, Shader::getInvertShader());
 		m_window.draw(m_titleText);
 		m_window.draw(menu);
 		m_window.display();

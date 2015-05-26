@@ -57,6 +57,11 @@ void MenuInput::input(int code)
 	m_inputText.setOrigin(0, m_inputText.getLocalBounds().height / 2);
 }
 
+std::string MenuInput::getInputString()
+{
+	return m_inputString;
+}
+
 void MenuInput::setString(std::string str)
 {
 	m_str = str;

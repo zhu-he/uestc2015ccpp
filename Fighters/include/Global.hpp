@@ -35,7 +35,8 @@ enum Status
 enum BulletType
 {
 	HeroBullet,
-	EnemyBullet
+	EnemyBullet,
+	Hero2Bullet
 };
 
 enum UfoType
@@ -122,7 +123,8 @@ const std::vector<std::string> heroBlowupImage =
 const std::vector<std::string> bulletImage =
 {
 	"bullet1",
-	"bullet2"
+	"bullet2",
+	"bullet1"
 };
 
 const std::vector<std::string> ufoImage =
@@ -219,7 +221,8 @@ const float ufoSpeed = 3.0f;
 const std::vector<float> bulletSpeed =
 {
 	20.0f,
-	4.0f
+	4.0f,
+	20.0f
 };
 
 const float heroBulletInterval = 0.2f;

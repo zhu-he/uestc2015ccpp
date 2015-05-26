@@ -6,6 +6,7 @@
 #include "SpriteSheet.hpp"
 #include "Sound.hpp"
 #include "Font.hpp"
+#include "Shader.hpp"
 
 extern sf::Clock gameClock;
 
@@ -46,17 +47,15 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window), m_pausedMenu(PauseMen
 	m_highScore = 0;
 	m_bombCount = 0;
 	m_isBombing = false;
-	m_lightShader.loadFromFile("resources/shader/light.frag", sf::Shader::Fragment);
-	m_invertShader.loadFromFile("resources/shader/invert.frag", sf::Shader::Fragment);
-	m_invertShader.setParameter("texture", m_invertShader.CurrentTexture);
-	m_shadowShader.loadFromFile("resources/shader/shadow.frag", sf::Shader::Fragment);
-	m_lightRenderStates.shader = &m_lightShader;
+	m_lightShader = Shader::getLightShader();
+	m_shadowShader = Shader::getShadowShader();
+	m_lightRenderStates.shader = m_lightShader;
 	m_lightRenderStates.blendMode = sf::BlendAdd;
 	m_lightRenderTexture.create(screenWidth, screenHeight);
 	m_lightSprite.setTexture(m_lightRenderTexture.getTexture());
 	m_shadowRenderTexture.create(screenWidth, screenHeight);
 	m_shadowSprite.setTexture(m_shadowRenderTexture.getTexture());
-	m_shadowRenderStates.shader = &m_shadowShader;
+	m_shadowRenderStates.shader = m_shadowShader;
 	m_bombTexture = SpriteSheet::getTexture(bombImage);
 	m_bombSprite.setTexture(m_bombTexture);
 	m_isRunning = true;
@@ -235,7 +234,7 @@ void Stage::play()
 void Stage::draw()
 {
 	m_window.clear();
-	m_window.draw(*m_background, &m_invertShader);
+	m_window.draw(*m_background, Shader::getInvertShader());
 	for (Entity* entity : m_entitys)
 	{
 		if (entity->isAlive())
@@ -246,9 +245,13 @@ void Stage::draw()
 				{
 					drawLight(entity->getPosition(), sf::Color::Blue, 200);
 				}
-				else
+				else if (((Bullet*)entity)->getBulletType() == HeroBullet)
 				{
 					drawLight(entity->getPosition(), sf::Color::Red, 200);
+				}
+				else
+				{
+					drawLight(entity->getPosition(), sf::Color::Green, 200);
 				}
 			}
 			else if (entity->getType() == "Ufo")
@@ -525,16 +528,16 @@ bool Stage::hitTest(const sf::ConvexShape& collisionA, const sf::ConvexShape& co
 
 void Stage::drawLight(sf::Vector2f lightPosition, sf::Color color, float lightAttenuation)
 {
-	m_lightShader.setParameter("frag_LightAttenuation", lightAttenuation);
-	m_lightShader.setParameter("frag_LightOrigin", lightPosition);
-	m_lightShader.setParameter("frag_LightColor", color.r, color.g, color.b, color.a);
+	m_lightShader->setParameter("frag_LightAttenuation", lightAttenuation);
+	m_lightShader->setParameter("frag_LightOrigin", lightPosition);
+	m_lightShader->setParameter("frag_LightColor", color.r, color.g, color.b, color.a);
 	m_lightRenderTexture.draw(m_lightSprite, m_lightRenderStates);
 }
 
 void Stage::drawShadow(sf::Vector2f lightPosition, float shadowAttenuation)
 {
-	m_shadowShader.setParameter("frag_LightOrigin", lightPosition);
-	m_shadowShader.setParameter("frag_shadowAttenuation", shadowAttenuation);
+	m_shadowShader->setParameter("frag_LightOrigin", lightPosition);
+	m_shadowShader->setParameter("frag_shadowAttenuation", shadowAttenuation);
 	for (Entity* castEntity : m_entitys)
 	{
 		if (castEntity->isAlive() && castEntity->getType() != "Bullet" && !(castEntity->getType() == "Hero" && ((Hero*)castEntity)->isFlash()))
@@ -546,8 +549,8 @@ void Stage::drawShadow(sf::Vector2f lightPosition, float shadowAttenuation)
 				const sf::Vector2f& B = transform.transformPoint(castEntity->getCollision().getPoint((i + 1) % castEntity->getCollision().getPointCount()));
 				if (cross(lightPosition - A, B - A) > 0)
 				{
-					m_shadowShader.setParameter("frag_castPosition1", A);
-					m_shadowShader.setParameter("frag_castPosition2", B);
+					m_shadowShader->setParameter("frag_castPosition1", A);
+					m_shadowShader->setParameter("frag_castPosition2", B);
 					m_shadowRenderTexture.draw(m_shadowSprite, m_shadowRenderStates);
 				}
 			}

@@ -18,19 +18,19 @@ class Stage
 	public:
 		Stage(sf::RenderWindow& window);
 		virtual ~Stage();
-		void addEntity(Entity* entity);
+		virtual void addEntity(Entity* entity);
 		void setBackground(Background* background);
-		void update();
+		virtual void update();
 		void gameOver();
 		GameStatus getGameStatus();
 		int getScore();
-		void play();
+		virtual void play();
 		void useBomb();
 		void setHpText(int hp);
 		void addScore(int score);
 		void drawShadow(sf::Vector2f lightPosition, float shadowAttenuation);
 		void drawLight(sf::Vector2f lightPosition, sf::Color color, float lightAttenuation);
-	private:
+	protected:
 		sf::RenderWindow& m_window;
 		std::vector<Entity*> m_entitys;
 		std::ifstream m_highScoreIfstream;
@@ -48,9 +48,8 @@ class Stage
 		sf::Clock m_ufoClock;
 		sf::Clock m_waitingFlashClock;
 		sf::Clock m_bombClock;
-		sf::Shader m_lightShader;
-		sf::Shader m_invertShader;
-		sf::Shader m_shadowShader;
+		sf::Shader* m_lightShader;
+		sf::Shader* m_shadowShader;
 		sf::RenderStates m_lightRenderStates;
 		sf::RenderStates m_shadowRenderStates;
 		sf::RenderTexture m_lightRenderTexture;
@@ -66,9 +65,9 @@ class Stage
 		bool m_waitingTextSwitch;
 		bool m_isBombing;
 		bool m_isRunning;
-		void init();
 		void animate();
 		void draw();
+		virtual void init();
 		float cross(const sf::Vector2f& vectorA, const sf::Vector2f& vectorB) const;
 		bool hitTest(const sf::ConvexShape& collisionA, const sf::ConvexShape& collisionB) const;
 };

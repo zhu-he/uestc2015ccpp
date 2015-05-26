@@ -16,7 +16,6 @@ class Game
 	private:
 		sf::RenderWindow m_window;
 		sf::Text m_titleText;
-		sf::Shader m_invertShader;
 		bool m_isRunning;
 		Background m_background;
 };

@@ -16,6 +16,7 @@ class Bullet : public Entity
 		void animate();
 		bool isAlive();
 		void die();
+		sf::Vector2f getDirection();
 		BulletType getBulletType();
 		std::string getType();
 		static void loadResources();
@@ -24,6 +25,7 @@ class Bullet : public Entity
 		bool m_isAlive;
 		BulletType m_bulletType;
 		sf::Vector2f m_bulletSpeed;
+		sf::Vector2f m_direction;
 };
 
 #endif // BULLET_HPP

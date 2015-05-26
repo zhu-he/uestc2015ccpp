@@ -5,6 +5,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <string>
 #include "Global.hpp"
 #include "MenuItem.hpp"
 
@@ -23,6 +24,7 @@ class Menu : public sf::Drawable
 		void bindSwitch(int index, bool (*getter)(), void (*switcher)());
 		void toggleSwitch();
 		void input(int code);
+		std::string getInputString(int index);
 		void setMenu(MenuStatus menuStatus, float offsetY = screenHeight / 2 + 150);
 	private:
 		MenuStatus m_menuStatus;

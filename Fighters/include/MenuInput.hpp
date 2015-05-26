@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <iostream>
+#include <string>
 #include "MenuItem.hpp"
 
 class MenuInput : public MenuItem
@@ -15,6 +16,7 @@ class MenuInput : public MenuItem
 		void focus();
 		void leave();
         void input(int code);
+        std::string getInputString();
 		void setString(std::string str);
 		void setOffestY(int offsetY);
 		void bind(bool (*getter)(), void (*switcher)());
