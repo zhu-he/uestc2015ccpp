@@ -90,7 +90,7 @@ std::string Menu::getInputString(int index)
 {
 	if (m_menuItems[index]->getMenuItemType() == Input)
 	{
-		((MenuInput*)m_menuItems[index])->getInputString();
+		return ((MenuInput*)m_menuItems[index])->getInputString();
 	}
 	return "";
 }

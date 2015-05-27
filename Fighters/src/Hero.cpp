@@ -12,6 +12,7 @@ Hero::Hero()
 	setPosition(screenWidth / 2, screenHeight - getTextureRect().height / 2);
 	m_isAlive = true;
 	m_hp = heroHp;
+	m_bomb = 0;
 	m_status = Normal;
 	m_collision.setPointCount(3);
 	m_collision.setPoint(0, sf::Vector2f(53, 5));
@@ -160,6 +161,7 @@ void Hero::revive()
 {
     m_status = Normal;
 	m_hp = heroHp;
+	m_bomb = 0;
 	m_isAlive = true;
 	m_heroImageCounter = 0;
 	setPosition(screenWidth / 2, screenHeight - getTextureRect().height / 2);
@@ -170,6 +172,10 @@ void Hero::revive()
 
 void Hero::fire()
 {
+	if (!m_isAlive)
+	{
+		return;
+	}
 	if (m_lastShootTime.getElapsedTime() >= sf::seconds(heroBulletInterval))
 	{
 		Sound::playBulletSound();
@@ -213,4 +219,19 @@ void Hero::levelup()
 	{
 		m_level++;
 	}
+}
+
+void Hero::bombup()
+{
+	m_bomb++;
+}
+
+int Hero::getBomb()
+{
+	return m_bomb;
+}
+
+void Hero::useBomb()
+{
+	m_bomb--;
 }

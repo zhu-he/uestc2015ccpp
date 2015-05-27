@@ -1,11 +1,12 @@
 #include "ServerStage.hpp"
+#include "Sound.hpp"
 #include "Hero.hpp"
 #include "Hero2.hpp"
 #include "Bullet.hpp"
 #include "Enemy.hpp"
 #include "Ufo.hpp"
 
-ServerStage::ServerStage(sf::RenderWindow& window, sf::TcpSocket& client) : MultiplayerStage(window), m_client(client)
+ServerStage::ServerStage(sf::RenderWindow& window, sf::TcpSocket& client) : MultiplayerStage(window, client)
 {
 	m_idCounter = 0;
 }
@@ -68,14 +69,14 @@ void ServerStage::hitEntity(Entity* entity)
 bool ServerStage::update()
 {
 	m_sendCounter++;
-	if (m_sendCounter % 5 == 0)
+	if (m_sendCounter % 10 == 0)
 	{
 		m_packet << "M";
 		m_packet << (int)m_hero->getPosition().x;
 		m_packet << (int)m_hero->getPosition().y;
 	}
 	sf::Packet packet;
-	m_client.receive(packet);
+	m_socket.receive(packet);
 	std::string cmd;
 	while (packet >> cmd)
 	{
@@ -125,6 +126,25 @@ bool ServerStage::update()
 		{
 			m_isHero2Down = false;
 		}
+		else if (cmd == "U")
+		{
+			((Hero*)m_hero2)->useBomb();
+			m_isBombing = true;
+			m_bombClock.restart();
+			Sound::playUseBombSound();
+		}
+		else if (cmd == "I")
+		{
+			init();
+		}
+		else if (cmd == "P")
+		{
+			Stage::pause();
+		}
+		else if (cmd == "C")
+		{
+			Stage::resume();
+		}
 	}
 	if (m_isHeroFire)
 	{
@@ -167,7 +187,11 @@ bool ServerStage::update()
 		((Hero2*)m_hero2)->moveDown();
 	}
 	Stage::update();
-	m_client.send(m_packet);
+	if (m_packet.getDataSize() > 0)
+	{
+		m_socket.send(m_packet);
+		m_packet.clear();
+	}
 	m_packet.clear();
 	return true;
 }
@@ -260,4 +284,17 @@ void ServerStage::moveNoDown()
 		m_packet << "b";
 		m_isHeroDown = false;
 	}
+}
+
+void ServerStage::bombup(Entity* hero)
+{
+	if (((Hero*)hero)->getType() == "Hero")
+	{
+		m_packet << "O";
+	}
+	else
+	{
+		m_packet << "o";
+	}
+	Stage::bombup(hero);
 }

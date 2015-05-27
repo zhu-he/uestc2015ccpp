@@ -24,6 +24,9 @@ class Hero : public Entity
 		void die();
 		void revive();
 		void levelup();
+		void bombup();
+		int getBomb();
+		void useBomb();
 		void resetShootTime();
 		virtual std::string getType();
 		bool isAlive();
@@ -43,6 +46,7 @@ class Hero : public Entity
 		sf::Clock m_invincibleFlash;
 		bool m_isFlash;
 		int m_hp;
+		int m_bomb;
 		int m_level;
 };
 

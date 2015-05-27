@@ -1,11 +1,13 @@
 #include "ClientStage.hpp"
+#include "SFML/Network.hpp"
+#include "Sound.hpp"
 #include "Hero.hpp"
 #include "Bullet.hpp"
 #include "Enemy.hpp"
 #include "Ufo.hpp"
 #include "Hero2.hpp"
 
-ClientStage::ClientStage(sf::RenderWindow& window, sf::TcpSocket& server) : MultiplayerStage(window), m_server(server)
+ClientStage::ClientStage(sf::RenderWindow& window, sf::TcpSocket& server) : MultiplayerStage(window, server)
 {
 	m_controlHero = m_hero2;
 }
@@ -22,9 +24,13 @@ void ClientStage::addEntity(Entity* entity)
 
 bool ClientStage::update()
 {
+	if (isOver())
+	{
+		gameOver();
+	}
 	sf::Packet packet;
 	std::string cmd;
-	if (m_server.receive(packet) == sf::Socket::Disconnected)
+	if (m_socket.receive(packet) == sf::Socket::Disconnected)
 	{
 		return false;
 	}
@@ -137,9 +143,60 @@ bool ClientStage::update()
 		{
 			m_isHeroDown = false;
 		}
+		else if (cmd == "U")
+		{
+			((Hero*)m_hero)->useBomb();
+			m_isBombing = true;
+			m_bombClock.restart();
+			Sound::playUseBombSound();
+		}
+		else if (cmd == "I")
+		{
+			init();
+		}
+		else if (cmd == "P")
+		{
+			Stage::pause();
+		}
+		else if (cmd == "C")
+		{
+			Stage::resume();
+		}
+		else if (cmd == "O")
+		{
+			((Hero*)m_hero)->bombup();
+		}
+		else if (cmd == "o")
+		{
+			((Hero2*)m_hero2)->bombup();
+		}
+	}
+	if (m_gameStatus == Overing)
+	{
+		m_overText.move(0, 10);
+		m_overScoreText.move(0, -10);
+		m_overHighScoreText.move(0, -10);
+		if (m_overText.getPosition().y >= screenHeight / 2 - m_overText.getLocalBounds().height * 4)
+		{
+			m_gameStatus = Over;
+		}
+		animate();
+		draw();
+		return true;
+	}
+	if (m_gameStatus == Over || m_gameStatus == Waiting)
+	{
+		animate();
+		draw();
+		return true;
+	}
+	if (m_gameStatus == Paused)
+	{
+		draw();
+		return true;
 	}
 	m_sendCounter++;
-	if (m_sendCounter % 5 == 0)
+	if (m_sendCounter % 10 == 0)
 	{
 		m_packet << "M";
 		m_packet << (int)m_hero2->getPosition().x;
@@ -177,10 +234,13 @@ bool ClientStage::update()
 	{
 		((Hero2*)m_hero2)->moveDown();
 	}
+	if (m_packet.getDataSize() > 0)
+	{
+		m_socket.send(m_packet);
+		m_packet.clear();
+	}
 	animate();
 	draw();
-	m_server.send(m_packet);
-	m_packet.clear();
 	return true;
 }
 

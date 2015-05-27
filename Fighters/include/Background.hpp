@@ -5,16 +5,18 @@
 #include <string>
 #include "Global.hpp"
 
-class Background : public sf::Sprite
+class Background : public sf::Drawable
 {
 	public:
 		Background();
 		virtual ~Background();
 		void animate();
 		static void loadResources();
+		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	private:
 		static sf::Texture m_backgroundTexture;
-		float m_backgroundTextureHeight;
+		sf::Sprite m_background1;
+		sf::Sprite m_background2;
 };
 
 #endif // BACKGROUND_HPP

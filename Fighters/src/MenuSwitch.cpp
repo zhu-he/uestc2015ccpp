@@ -1,6 +1,7 @@
 #include "MenuSwitch.hpp"
 #include "Global.hpp"
 #include "Font.hpp"
+#include "Shader.hpp"
 
 MenuSwitch::MenuSwitch()
 {
@@ -8,6 +9,10 @@ MenuSwitch::MenuSwitch()
 	m_slashText.setFont(Font::getFont());
 	m_onText.setFont(Font::getFont());
 	m_offText.setFont(Font::getFont());
+	m_text.setColor(Font::getColor());
+	m_slashText.setColor(Font::getColor());
+	m_onText.setColor(Font::getColor());
+	m_offText.setColor(Font::getColor());
 	m_text.setCharacterSize(40);
 	m_slashText.setCharacterSize(40);
 	m_onText.setCharacterSize(30);

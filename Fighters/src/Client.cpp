@@ -29,6 +29,7 @@ void Client::setIp(std::string ip)
 
 void Client::start()
 {
+	m_loading.setColor(Font::getColor());
 	m_isRunning = true;
 	sf::TcpSocket socket;
 	sf::Socket::Status status;
@@ -61,7 +62,14 @@ void Client::start()
 		}
 		m_window.clear();
 		m_background->animate();
-		m_window.draw(*m_background, Shader::getInvertShader());
+		if (Shader::isAvailable())
+		{
+			m_window.draw(*m_background, Shader::getInvertShader());
+		}
+		else
+		{
+			m_window.draw(*m_background);
+		}
 		m_window.draw(m_loading);
 		m_window.display();
 	}

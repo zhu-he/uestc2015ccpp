@@ -21,11 +21,11 @@ class Stage
 		virtual void addEntity(Entity* entity);
 		void setBackground(Background* background);
 		virtual bool update();
-		void gameOver();
+		virtual void gameOver();
 		GameStatus getGameStatus();
 		int getScore();
 		virtual void play();
-		void useBomb();
+		virtual void useBomb();
 		virtual void setHpText(int hp);
 		void addScore(int score);
 		void drawShadow(sf::Vector2f lightPosition, float shadowAttenuation);
@@ -37,7 +37,6 @@ class Stage
 		std::ofstream m_highScoreOfstream;
 		int m_highScore;
 		int m_score;
-		int m_bombCount;
 		sf::Text m_scoreText;
 		sf::Text m_hpText;
 		sf::Text m_waitingText;
@@ -68,6 +67,8 @@ class Stage
 		bool m_isRunning;
 		void animate();
 		virtual bool isOver();
+		virtual void pause();
+		virtual void resume();
 		virtual void draw();
 		virtual void fire();
 		virtual void noFire();
@@ -79,7 +80,9 @@ class Stage
 		virtual void moveNoRight();
 		virtual void moveNoUp();
 		virtual void moveNoDown();
+		virtual void bombup(Entity* hero);
 		virtual void init();
+		virtual void restart();
 		virtual void hitEntity(Entity* entity);
 		virtual void dieEntity(Entity* entity);
 		float cross(const sf::Vector2f& vectorA, const sf::Vector2f& vectorB) const;

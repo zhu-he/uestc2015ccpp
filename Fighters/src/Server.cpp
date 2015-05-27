@@ -25,6 +25,7 @@ void Server::setBackground(Background* background)
 
 void Server::start()
 {
+	m_loading.setColor(Font::getColor());
 	m_isRunning = true;
 	sf::TcpListener listener;
 	listener.listen(54000);
@@ -58,7 +59,14 @@ void Server::start()
 		}
 		m_window.clear();
 		m_background->animate();
-		m_window.draw(*m_background, Shader::getInvertShader());
+		if (Shader::isAvailable())
+		{
+			m_window.draw(*m_background, Shader::getInvertShader());
+		}
+		else
+		{
+			m_window.draw(*m_background);
+		}
 		m_window.draw(m_loading);
 		m_window.display();
 	}

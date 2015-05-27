@@ -15,7 +15,6 @@ class ClientStage : public MultiplayerStage
 		void addEntity(Entity* entity);
 		bool update();
 	protected:
-		sf::TcpSocket& m_server;
 		Entity* findEntityById(int id);
 		void fire();
 		void noFire();

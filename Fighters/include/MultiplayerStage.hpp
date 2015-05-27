@@ -8,15 +8,20 @@
 class MultiplayerStage : public Stage
 {
 	public:
-		MultiplayerStage(sf::RenderWindow& window);
+		MultiplayerStage(sf::RenderWindow& window, sf::TcpSocket& socket);
 		virtual ~MultiplayerStage();
 		void setHpText(int hp);
 		void setHp2Text(int hp);
+		void useBomb();
 	protected:
+		sf::TcpSocket& m_socket;
 		sf::Packet m_packet;
 		sf::Text m_hp2Text;
 		Entity* m_hero2;
+		void pause();
+		void resume();
 		void init();
+		void restart();
 		void draw();
 		bool isOver();
 		int m_sendCounter;

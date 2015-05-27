@@ -14,10 +14,10 @@ class ServerStage : public MultiplayerStage
 		void addEntity(Entity* entity);
 		bool update();
 	protected:
-		sf::TcpSocket& m_client;
 		int m_idCounter;
 		void hitEntity(Entity* entity);
 		void dieEntity(Entity* entity);
+		void bombup(Entity* hero);
 		void fire();
 		void noFire();
 		void moveLeft();

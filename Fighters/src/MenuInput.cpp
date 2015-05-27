@@ -8,8 +8,10 @@ MenuInput::MenuInput()
 	m_inputText.setFont(Font::getFont());
 	m_text.setCharacterSize(40);
 	m_inputText.setCharacterSize(40);
-	m_line.setFillColor(sf::Color::White);
 	m_line.setSize(sf::Vector2f(270, 2));
+	m_text.setColor(Font::getColor());
+	m_inputText.setColor(Font::getColor());
+	m_line.setFillColor(Font::getColor());
 }
 
 MenuInput::~MenuInput()

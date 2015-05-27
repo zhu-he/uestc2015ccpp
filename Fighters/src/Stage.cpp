@@ -15,7 +15,7 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window), m_pausedMenu(PauseMen
 	m_score = 0;
 	m_scoreText.setFont(Font::getFont());
 	m_scoreText.setCharacterSize(24);
-	m_scoreText.setColor(textColor);
+	m_scoreText.setColor(Font::getColor());
 	m_scoreText.setPosition(10, 5);
 	m_scoreText.setStyle(sf::Text::Bold);
 	m_hpText.setFont(Font::getFont());
@@ -26,36 +26,38 @@ Stage::Stage(sf::RenderWindow& window) : m_window(window), m_pausedMenu(PauseMen
 	m_waitingText.setFont(Font::getFont());
 	m_waitingText.setString("Press any key to start\n\nMove: \tArrow Keys\nFire: \t\tSpace\nBomb: \tShift\n");
 	m_waitingText.setCharacterSize(30);
-	m_waitingText.setColor(textColor);
+	m_waitingText.setColor(Font::getColor());
 	m_waitingText.setStyle(sf::Text::Bold);
 	m_waitingText.setPosition(screenWidth / 2 - m_waitingText.getLocalBounds().width / 2, screenHeight / 2 - m_waitingText.getLocalBounds().height / 2);
 	m_overScoreText.setFont(Font::getFont());
 	m_overScoreText.setCharacterSize(40);
-	m_overScoreText.setColor(textColor);
+	m_overScoreText.setColor(Font::getColor());
 	m_overScoreText.setStyle(sf::Text::Bold);
 	m_overHighScoreText.setFont(Font::getFont());
 	m_overHighScoreText.setCharacterSize(40);
-	m_overHighScoreText.setColor(textColor);
+	m_overHighScoreText.setColor(Font::getColor());
 	m_overHighScoreText.setStyle(sf::Text::Bold);
 	m_overText.setFont(Font::getFont());
 	m_overText.setString("Game Over");
 	m_overText.setCharacterSize(40);
-	m_overText.setColor(textColor);
+	m_overText.setColor(Font::getColor());
 	m_overText.setStyle(sf::Text::Bold);
 	m_gameStatus = Waiting;
 	m_waitingTextSwitch = true;
 	m_highScore = 0;
-	m_bombCount = 0;
 	m_isBombing = false;
-	m_lightShader = Shader::getLightShader();
-	m_shadowShader = Shader::getShadowShader();
-	m_lightRenderStates.shader = m_lightShader;
-	m_lightRenderStates.blendMode = sf::BlendAdd;
-	m_lightRenderTexture.create(screenWidth, screenHeight);
-	m_lightSprite.setTexture(m_lightRenderTexture.getTexture());
-	m_shadowRenderTexture.create(screenWidth, screenHeight);
-	m_shadowSprite.setTexture(m_shadowRenderTexture.getTexture());
-	m_shadowRenderStates.shader = m_shadowShader;
+	if (Shader::isAvailable())
+	{
+		m_lightShader = Shader::getLightShader();
+		m_shadowShader = Shader::getShadowShader();
+		m_lightRenderStates.shader = m_lightShader;
+		m_lightRenderStates.blendMode = sf::BlendAdd;
+		m_lightRenderTexture.create(screenWidth, screenHeight);
+		m_lightSprite.setTexture(m_lightRenderTexture.getTexture());
+		m_shadowRenderTexture.create(screenWidth, screenHeight);
+		m_shadowSprite.setTexture(m_shadowRenderTexture.getTexture());
+		m_shadowRenderStates.shader = m_shadowShader;
+	}
 	m_bombTexture = SpriteSheet::getTexture(bombImage);
 	m_bombSprite.setTexture(m_bombTexture);
 	m_isRunning = true;
@@ -143,7 +145,6 @@ void Stage::setHpText(int hp)
 void Stage::init()
 {
 	m_score = 0;
-	m_bombCount = 0;
 	m_isRunning = true;
 	m_scoreText.setString("Score: 0");
 	setHpText(heroHp);
@@ -183,8 +184,7 @@ void Stage::play()
 			case sf::Event::KeyPressed:
 				if (event.key.code == sf::Keyboard::Escape)
 				{
-					m_gameStatus = Paused;
-					m_pausedMenu.setMenuCursor(0);
+					pause();
 				}
 				else if (event.key.code == sf::Keyboard::Down && m_gameStatus == Paused)
 				{
@@ -198,23 +198,27 @@ void Stage::play()
 				{
 					if (m_pausedMenu.getMenuCursor() == 0)
 					{
-						m_gameStatus = Playing;
+						resume();
 					}
 					else if (m_pausedMenu.getMenuCursor() == 1)
 					{
-						init();
+						restart();
 					}
 					else
 					{
 						m_isRunning = false;
 					}
 				}
+				else if ((event.key.code == sf::Keyboard::Space || event.key.code == sf::Keyboard::Return) && m_gameStatus == Over)
+				{
+					restart();
+				}
 				break;
 			default:
 				break;
 			}
 		}
-		if (getGameStatus() == Playing)
+		if (getGameStatus() == Playing && m_controlHero->isAlive())
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			{
@@ -273,7 +277,14 @@ void Stage::play()
 void Stage::draw()
 {
 	m_window.clear();
-	m_window.draw(*m_background, Shader::getInvertShader());
+	if (Shader::isAvailable())
+	{
+		m_window.draw(*m_background, Shader::getInvertShader());
+	}
+	else
+	{
+		m_window.draw(*m_background);
+	}
 	for (Entity* entity : m_entitys)
 	{
 		if (entity->isAlive())
@@ -306,10 +317,6 @@ void Stage::draw()
 			}
 		}
 	}
-	for (int i = 0; i < m_bombCount; ++i)
-	{
-		drawLight(sf::Vector2f((i + 0.5f) * m_bombTexture.getSize().x , screenHeight - m_bombTexture.getSize().y / 2), sf::Color::Red, 100);
-	}
 	m_shadowRenderTexture.clear(sf::Color::Transparent);
 	drawShadow(sf::Vector2f(screenWidth / 2, screenHeight / 2), 50);
 	m_window.draw(m_shadowSprite);
@@ -320,11 +327,6 @@ void Stage::draw()
 			m_window.draw(*entity);
 			// m_window.draw(entity->getCollision());
 		}
-	}
-	for (int i = 0; i < m_bombCount; ++i)
-	{
-		m_bombSprite.setPosition(i * m_bombTexture.getSize().x, screenHeight - m_bombTexture.getSize().y);
-		m_window.draw(m_bombSprite);
 	}
 	m_window.draw(m_lightSprite, sf::BlendAdd);
 	if (m_gameStatus == Playing || m_gameStatus == Paused)
@@ -355,11 +357,22 @@ void Stage::draw()
 		m_window.draw(m_pausedMenu);
 	}
 	m_lightRenderTexture.clear(sf::Color::Transparent);
+	for (int i = 0; i < ((Hero*)m_hero)->getBomb(); ++i)
+	{
+		m_bombSprite.setPosition(i * m_bombTexture.getSize().x, screenHeight - m_bombTexture.getSize().y);
+		m_window.draw(m_bombSprite);
+	}
+	for (int i = 0; i < ((Hero*)m_hero)->getBomb(); ++i)
+	{
+		drawLight(sf::Vector2f((i + 0.5f) * m_bombTexture.getSize().x , screenHeight - m_bombTexture.getSize().y / 2), sf::Color::Red, 100);
+	}
+	m_window.draw(m_lightSprite, sf::BlendAdd);
+	m_lightRenderTexture.clear(sf::Color::Transparent);
 }
 
 void Stage::gameOver()
 {
-	if (m_gameStatus == Overing || m_gameStatus == Over)
+	if (m_gameStatus != Playing)
 	{
 		return;
 	}
@@ -379,22 +392,6 @@ void Stage::gameOver()
 
 void Stage::animate()
 {
-	m_background->animate();
-	for (Entity* entity : m_entitys)
-	{
-		if (entity->isAlive())
-		{
-			entity->animate();
-		}
-	}
-}
-
-bool Stage::update()
-{
-	if (isOver())
-	{
-		gameOver();
-	}
 	if (m_isBombing)
 	{
 		if (m_bombClock.getElapsedTime() < sf::seconds(bombTime))
@@ -423,6 +420,31 @@ bool Stage::update()
 		{
 			m_isBombing = false;
 		}
+	}
+	m_background->animate();
+	for (std::vector<Entity*>::iterator it = m_entitys.begin(); it != m_entitys.end(); ++it)
+	{
+		if (!(*it)->isAlive())
+		{
+			if ((*it)->getType() != "Hero" && (*it)->getType() != "Hero2")
+			{
+				delete *it;
+				m_entitys.erase(it);
+				it--;
+			}
+		}
+		else
+		{
+			(*it)->animate();
+		}
+	}
+}
+
+bool Stage::update()
+{
+	if (isOver())
+	{
+		gameOver();
 	}
 	if (m_gameStatus == Overing)
 	{
@@ -485,7 +507,8 @@ bool Stage::update()
 					hitEntity(entityA);
 					dieEntity(entityB);
 				}
-				else if (entityA->getType() == "Hero" &&
+				else if ((entityA->getType() == "Hero" ||
+						entityA->getType() == "Hero2") &&
 						entityB->getType() == "Bullet" &&
 						((Bullet*)entityB)->getBulletType() == EnemyBullet &&
 						!m_isBombing)
@@ -494,15 +517,8 @@ bool Stage::update()
 					dieEntity(entityB);
 				}
 				else if (entityA->getType() == "Enemy" &&
-						entityB->getType() == "Hero" &&
-						((Enemy*)entityA)->getStatus() != Dying &&
-						!m_isBombing)
-				{
-					hitEntity(entityB);
-					dieEntity(entityA);
-				}
-				else if (entityA->getType() == "Enemy" &&
-						entityB->getType() == "Hero2" &&
+						(entityB->getType() == "Hero" ||
+						entityB->getType() == "Hero") &&
 						((Enemy*)entityA)->getStatus() != Dying &&
 						!m_isBombing)
 				{
@@ -510,43 +526,19 @@ bool Stage::update()
 					dieEntity(entityA);
 				}
 				else if (entityA->getType() == "Ufo" &&
-						entityB->getType() == "Hero")
+						(entityB->getType() == "Hero" ||
+						entityB->getType() == "Hero2"))
 				{
 					if (((Ufo*)entityA)->getUfoType() == Weapon)
 					{
 						((Hero*)entityB)->levelup();
 					}
-					else if (m_controlHero->getType() == "Hero")
+					else
 					{
-						m_bombCount++;
+						bombup(entityB);
 					}
 					dieEntity(entityA);
 				}
-				else if (entityA->getType() == "Ufo" &&
-						entityB->getType() == "Hero2")
-				{
-					if (((Ufo*)entityA)->getUfoType() == Weapon)
-					{
-						((Hero*)entityB)->levelup();
-					}
-					else if (m_controlHero->getType() == "Hero2")
-					{
-						m_bombCount++;
-					}
-					dieEntity(entityA);
-				}
-			}
-		}
-	}
-	for (std::vector<Entity*>::iterator it = m_entitys.begin(); it != m_entitys.end(); ++it)
-	{
-		if (!(*it)->isAlive())
-		{
-			if ((*it)->getType() != "Hero" && (*it)->getType() != "Hero2")
-			{
-				delete *it;
-				m_entitys.erase(it);
-				it--;
 			}
 		}
 	}
@@ -597,30 +589,36 @@ bool Stage::hitTest(const sf::ConvexShape& collisionA, const sf::ConvexShape& co
 
 void Stage::drawLight(sf::Vector2f lightPosition, sf::Color color, float lightAttenuation)
 {
-	m_lightShader->setParameter("frag_LightAttenuation", lightAttenuation);
-	m_lightShader->setParameter("frag_LightOrigin", lightPosition);
-	m_lightShader->setParameter("frag_LightColor", color.r, color.g, color.b, color.a);
-	m_lightRenderTexture.draw(m_lightSprite, m_lightRenderStates);
+	if (Shader::isAvailable())
+	{
+		m_lightShader->setParameter("frag_LightAttenuation", lightAttenuation);
+		m_lightShader->setParameter("frag_LightOrigin", lightPosition);
+		m_lightShader->setParameter("frag_LightColor", color.r, color.g, color.b, color.a);
+		m_lightRenderTexture.draw(m_lightSprite, m_lightRenderStates);
+	}
 }
 
 void Stage::drawShadow(sf::Vector2f lightPosition, float shadowAttenuation)
 {
-	m_shadowShader->setParameter("frag_LightOrigin", lightPosition);
-	m_shadowShader->setParameter("frag_shadowAttenuation", shadowAttenuation);
-	for (Entity* castEntity : m_entitys)
+	if (Shader::isAvailable())
 	{
-		if (castEntity->isAlive() && castEntity->getType() != "Bullet" && !(castEntity->getType() == "Hero" && ((Hero*)castEntity)->isFlash()))
+		m_shadowShader->setParameter("frag_LightOrigin", lightPosition);
+		m_shadowShader->setParameter("frag_shadowAttenuation", shadowAttenuation);
+		for (Entity* castEntity : m_entitys)
 		{
-			sf::Transform transform = castEntity->getCollision().getTransform();
-			for	(int i = 0; i < (int)castEntity->getCollision().getPointCount(); ++i)
+			if (castEntity->isAlive() && castEntity->getType() != "Bullet" && !(castEntity->getType() == "Hero" && ((Hero*)castEntity)->isFlash()))
 			{
-				const sf::Vector2f& A = transform.transformPoint(castEntity->getCollision().getPoint(i % castEntity->getCollision().getPointCount()));
-				const sf::Vector2f& B = transform.transformPoint(castEntity->getCollision().getPoint((i + 1) % castEntity->getCollision().getPointCount()));
-				if (cross(lightPosition - A, B - A) > 0)
+				sf::Transform transform = castEntity->getCollision().getTransform();
+				for	(int i = 0; i < (int)castEntity->getCollision().getPointCount(); ++i)
 				{
-					m_shadowShader->setParameter("frag_castPosition1", A);
-					m_shadowShader->setParameter("frag_castPosition2", B);
-					m_shadowRenderTexture.draw(m_shadowSprite, m_shadowRenderStates);
+					const sf::Vector2f& A = transform.transformPoint(castEntity->getCollision().getPoint(i % castEntity->getCollision().getPointCount()));
+					const sf::Vector2f& B = transform.transformPoint(castEntity->getCollision().getPoint((i + 1) % castEntity->getCollision().getPointCount()));
+					if (cross(lightPosition - A, B - A) > 0)
+					{
+						m_shadowShader->setParameter("frag_castPosition1", A);
+						m_shadowShader->setParameter("frag_castPosition2", B);
+						m_shadowRenderTexture.draw(m_shadowSprite, m_shadowRenderStates);
+					}
 				}
 			}
 		}
@@ -629,9 +627,9 @@ void Stage::drawShadow(sf::Vector2f lightPosition, float shadowAttenuation)
 
 void Stage::useBomb()
 {
-	if (m_bombCount > 0 && !m_isBombing)
+	if (((Hero*)m_controlHero)->getBomb() > 0 && !m_isBombing)
 	{
-		m_bombCount--;
+		((Hero*)m_controlHero)->useBomb();
 		m_isBombing = true;
 		m_bombClock.restart();
 		Sound::playUseBombSound();
@@ -686,4 +684,25 @@ void Stage::moveNoUp()
 void Stage::moveNoDown()
 {
 
+}
+
+void Stage::pause()
+{
+	m_gameStatus = Paused;
+	m_pausedMenu.setMenuCursor(0);
+}
+
+void Stage::resume()
+{
+	m_gameStatus = Playing;
+}
+
+void Stage::restart()
+{
+	init();
+}
+
+void Stage::bombup(Entity* hero)
+{
+    ((Hero*)hero)->bombup();
 }

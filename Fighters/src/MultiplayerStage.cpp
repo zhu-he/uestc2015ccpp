@@ -5,7 +5,7 @@
 
 extern sf::Clock gameClock;
 
-MultiplayerStage::MultiplayerStage(sf::RenderWindow& window) : Stage(window)
+MultiplayerStage::MultiplayerStage(sf::RenderWindow& window, sf::TcpSocket& socket) : Stage(window), m_socket(socket)
 {
 	m_sendCounter = 0;
 	m_hero2 = new Hero2();
@@ -39,7 +39,6 @@ void MultiplayerStage::init()
 	m_isHero2Up = false;
 	m_isHero2Down = false;
 	m_score = 0;
-	m_bombCount = 0;
 	m_isRunning = true;
 	m_scoreText.setString("Score: 0");
 	setHpText(heroHp);
@@ -47,8 +46,8 @@ void MultiplayerStage::init()
 	m_gameStatus = Playing;
 	((Hero*)m_hero)->revive();
 	((Hero2*)m_hero2)->revive();
-	m_hero->setPosition(screenWidth / 4, m_hero->getPosition().y);
-	m_hero2->setPosition(screenWidth / 4 * 3, m_hero->getPosition().y);
+	m_hero->setPosition(screenWidth / 3, m_hero->getPosition().y);
+	m_hero2->setPosition(screenWidth / 3 * 2, m_hero->getPosition().y);
 	gameClock.restart();
 	for (int i = 0; i < 3; ++i)
 	{
@@ -95,16 +94,63 @@ void MultiplayerStage::setHp2Text(int hp)
 	}
 	heartString[hp] = 0;
 	m_hp2Text.setString(heartString);
-	m_hp2Text.setPosition(screenWidth - m_hpText.getLocalBounds().width - 10, 0);
+	m_hp2Text.setPosition(screenWidth - m_hp2Text.getLocalBounds().width - 10, 0);
+}
+
+void MultiplayerStage::useBomb()
+{
+	if (((Hero*)m_controlHero)->getBomb() > 0 && !m_isBombing)
+	{
+		m_packet << "U";
+		((Hero*)m_controlHero)->useBomb();
+		m_isBombing = true;
+		m_bombClock.restart();
+		Sound::playUseBombSound();
+	}
 }
 
 void MultiplayerStage::draw()
 {
 	Stage::draw();
+	for (int i = 0; i < ((Hero2*)m_hero2)->getBomb(); ++i)
+	{
+		m_bombSprite.setPosition(screenWidth - (i + 1) * m_bombTexture.getSize().x, screenHeight - m_bombTexture.getSize().y);
+		m_window.draw(m_bombSprite);
+	}
+	for (int i = 0; i < ((Hero2*)m_hero2)->getBomb(); ++i)
+	{
+		drawLight(sf::Vector2f(screenWidth - (i + 0.5f) * m_bombTexture.getSize().x , screenHeight - m_bombTexture.getSize().y / 2), sf::Color::Red, 100);
+	}
+	m_window.draw(m_lightSprite, sf::BlendAdd);
+	m_lightRenderTexture.clear(sf::Color::Transparent);
 	m_window.draw(m_hp2Text);
 }
 
 bool MultiplayerStage::isOver()
 {
 	return !m_hero->isAlive() && !m_hero2->isAlive();
+}
+
+void MultiplayerStage::pause()
+{
+	m_packet << "P";
+	m_socket.send(m_packet);
+	m_packet.clear();
+	Stage::pause();
+}
+
+void MultiplayerStage::resume()
+{
+	m_packet << "C";
+	m_socket.send(m_packet);
+	m_packet.clear();
+	Stage::resume();
+}
+
+void MultiplayerStage::restart()
+{
+    m_packet << "I";
+	m_socket.send(m_packet);
+	m_packet.clear();
+	init();
 }

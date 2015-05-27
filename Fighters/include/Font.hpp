@@ -8,6 +8,7 @@ class Font
 	public:
 		static void loadResources();
 		static sf::Font& getFont();
+		static sf::Color getColor();
 	private:
 		static sf::Font m_font;
 };

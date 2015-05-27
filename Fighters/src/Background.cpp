@@ -1,14 +1,14 @@
 #include "Background.hpp"
+#include "Shader.hpp"
 
 sf::Texture Background::m_backgroundTexture;
 
 Background::Background()
 {
-	setTexture(m_backgroundTexture);
-	m_backgroundTextureHeight = getTextureRect().height;
-	setPosition(0, -m_backgroundTextureHeight);
-	setTextureRect(sf::IntRect(0, 0, getTextureRect().width, getTextureRect().height * 2));
-	setColor(sf::Color(128, 128, 128));
+	m_background1.setTexture(m_backgroundTexture);
+	m_background1.setPosition(0, -screenHeight);
+	m_background2.setTexture(m_backgroundTexture);
+	m_background2.setPosition(0, 0);
 }
 
 Background::~Background()
@@ -19,14 +19,31 @@ Background::~Background()
 void Background::loadResources()
 {
 	m_backgroundTexture.loadFromFile(backgroundImagePath);
-	m_backgroundTexture.setRepeated(true);
 }
 
 void Background::animate()
 {
-    move(0, backgroundSpeed);
-    if (getPosition().y >= 0)
+	if (Shader::isAvailable())
 	{
-		setPosition(0, getPosition().y - m_backgroundTextureHeight);
+		m_background1.setColor(sf::Color(128, 128, 128));
+		m_background2.setColor(sf::Color(128, 128, 128));
 	}
+	else
+	{
+		m_background1.setColor(sf::Color::White);
+		m_background2.setColor(sf::Color::White);
+	}
+	m_background1.move(0, backgroundSpeed);
+	m_background2.move(0, backgroundSpeed);
+    if (m_background1.getPosition().y >= 0)
+	{
+		m_background1.setPosition(0, m_background1.getPosition().y - screenHeight);
+		m_background2.setPosition(0, m_background2.getPosition().y - screenHeight);
+	}
+}
+
+void Background::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+	target.draw(m_background1, states);
+	target.draw(m_background2, states);
 }

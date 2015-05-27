@@ -5,6 +5,7 @@ MenuText::MenuText()
 {
 	m_text.setCharacterSize(40);
 	m_text.setFont(Font::getFont());
+	m_text.setColor(Font::getColor());
 }
 
 MenuText::~MenuText()

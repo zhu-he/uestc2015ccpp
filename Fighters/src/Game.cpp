@@ -16,7 +16,7 @@ Game::Game() : m_window(sf::VideoMode(screenWidth, screenHeight), "Fighters", sf
 	m_titleText.setFont(Font::getFont());
 	m_titleText.setString("Fighters");
 	m_titleText.setCharacterSize(100);
-	m_titleText.setColor(sf::Color::White);
+	m_titleText.setColor(Font::getColor());
 	m_titleText.setStyle(sf::Text::Bold);
 	m_titleText.setPosition((screenWidth - m_titleText.getLocalBounds().width) / 2, 150);
 }
@@ -77,6 +77,7 @@ void Game::play()
 							menu.setMenu(SettingMenu);
 							menu.bindSwitch(0, Sound::getBgmSwitch, Sound::switchBgm);
 							menu.bindSwitch(1, Sound::getSfxSwitch, Sound::switchSfx);
+							menu.bindSwitch(2, Shader::isAvailable, Shader::switchShader);
 							break;
 						case 3:
 							m_window.close();
@@ -111,6 +112,14 @@ void Game::play()
 							menu.toggleSwitch();
 							break;
 						case 2:
+							menu.toggleSwitch();
+							menu.refresh();
+							menu.bindSwitch(0, Sound::getBgmSwitch, Sound::switchBgm);
+							menu.bindSwitch(1, Sound::getSfxSwitch, Sound::switchSfx);
+							menu.bindSwitch(2, Shader::isAvailable, Shader::switchShader);
+							m_titleText.setColor(Font::getColor());
+							break;
+						case 3:
 							menu.setMenu(MainMenu);
 							break;
 						default:
@@ -138,6 +147,25 @@ void Game::play()
 						break;
 					}
 					break;
+				case sf::Keyboard::Escape:
+					switch (menu.getMenuStatus())
+					{
+					case MainMenu:
+						m_window.close();
+						break;
+					case MultiplayerMenu:
+						menu.setMenu(MainMenu);
+						break;
+					case SettingMenu:
+						menu.setMenu(MainMenu);
+						break;
+					case JoinMenu:
+						menu.setMenu(MultiplayerMenu);
+						break;
+					default:
+						break;
+					}
+					break;
 				default:
 					menu.input(event.key.code);
 					break;
@@ -149,7 +177,14 @@ void Game::play()
 		}
 		m_background.animate();
 		m_window.clear();
-		m_window.draw(m_background, Shader::getInvertShader());
+		if (Shader::isAvailable())
+		{
+			m_window.draw(m_background, Shader::getInvertShader());
+		}
+		else
+		{
+			m_window.draw(m_background);
+		}
 		m_window.draw(m_titleText);
 		m_window.draw(menu);
 		m_window.display();

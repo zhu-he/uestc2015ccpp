@@ -68,6 +68,7 @@ const std::vector<std::vector<std::pair<MenuItemType, std::string> > > menuStrin
 	{
 		{Switch, "BGM"},
 		{Switch, "SFX"},
+		{Switch, "Shader"},
 		{Text, "Back"}
 	},
 	{
@@ -304,7 +305,9 @@ const float invincibleTime = 2.0f;
 
 const float invincibleFlashInterval = 0.08f;
 
-const sf::Color textColor = sf::Color(196, 196, 196);
+const sf::Color textColor = sf::Color(235, 235, 235);
+
+const sf::Color textColorNoShader = sf::Color(40, 40, 40);
 
 const sf::Color heartColor = sf::Color(196, 0, 0);
 
