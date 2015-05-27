@@ -9,10 +9,13 @@
 #include "Server.hpp"
 #include "Client.hpp"
 
-Game::Game() : m_window(sf::VideoMode(screenWidth, screenHeight), "Fighters", sf::Style::Titlebar | sf::Style::Close)
+Game::Game() : m_window(sf::VideoMode(360, 600), "Fighters", sf::Style::Titlebar | sf::Style::Close)
 {
+	sf::View view;
+	view.setCenter(screenWidth / 2, screenHeight / 2);
+	view.setSize(screenWidth, screenHeight);
+	m_window.setView(view);
 	m_window.setFramerateLimit(60);
-	m_window.setSize(sf::Vector2u(360, 600));
 	m_titleText.setFont(Font::getFont());
 	m_titleText.setString("Fighters");
 	m_titleText.setCharacterSize(100);
@@ -36,12 +39,9 @@ void Game::play()
 	Sound::playGameMusicSound();
 	m_isRunning = true;
 	Menu menu(MainMenu);
-	Stage stage(m_window);
-	stage.setBackground(&m_background);
-	Server server(m_window);
-	server.setBackground(&m_background);
-	Client client(m_window);
-	client.setBackground(&m_background);
+	Stage stage(m_window, m_background);
+	Server server(m_window, m_background);
+	Client client(m_window, m_background);
 	while (m_window.isOpen())
 	{
 		sf::Event event;
@@ -130,7 +130,8 @@ void Game::play()
 						switch (menu.getMenuCursor())
 						{
 						case 0:
-
+							client.setIp(menu.getInputString(0));
+							client.start();
 							break;
 						case 1:
 							client.setIp(menu.getInputString(0));

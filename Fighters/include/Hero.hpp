@@ -35,19 +35,21 @@ class Hero : public Entity
 		static void loadResources();
 	protected:
 		sf::Color m_color;
+		Status m_status;
+		sf::Clock m_invincible;
+		sf::Clock m_invincibleFlash;
+		int m_hp;
+	private:
 		static std::vector<sf::Texture> m_heroTexture;
 		static std::vector<sf::Texture> m_heroBlowupTexture;
 		int m_heroImageCounter;
 		bool m_isAlive;
-		Status m_status;
         sf::Clock m_enemyAnimateClock;
 		sf::Clock m_lastShootTime;
-		sf::Clock m_invincible;
-		sf::Clock m_invincibleFlash;
 		bool m_isFlash;
-		int m_hp;
 		int m_bomb;
 		int m_level;
+
 };
 
 #endif // HERO_HPP

@@ -16,8 +16,6 @@ class SpriteSheet
 public:
     static bool loadFromFile(const std::string& filename);
     static sf::Texture& getTexture(const std::string& texturename);
-    static std::string getFilename();
-    static std::string getTextureFilename();
 private:
     static std::string m_filename;
     static std::string m_textureFilename;

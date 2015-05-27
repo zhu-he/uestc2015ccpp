@@ -5,14 +5,14 @@
 
 extern sf::Clock gameClock;
 
-MultiplayerStage::MultiplayerStage(sf::RenderWindow& window, sf::TcpSocket& socket) : Stage(window), m_socket(socket)
+MultiplayerStage::MultiplayerStage(sf::RenderWindow& window, Background& background, sf::TcpSocket& socket) : Stage(window, background), m_socket(socket)
 {
 	m_sendCounter = 0;
 	m_hero2 = new Hero2();
 	addEntity(m_hero2);
 	m_hero->setId(-1);
 	m_hero2->setId(-2);
-	m_scoreText.setPosition(screenWidth / 2 - 50, 5);
+	m_scoreText.setPosition(screenWidth / 2 - 55, 4);
 	m_hpText.setPosition(10, 0);
 	m_hp2Text.setFont(Font::getFont());
 	m_hp2Text.setCharacterSize(30);
@@ -21,13 +21,9 @@ MultiplayerStage::MultiplayerStage(sf::RenderWindow& window, sf::TcpSocket& sock
 	m_hp2Text.setPosition(screenWidth - m_hpText.getLocalBounds().width - 10, 0);
 }
 
-MultiplayerStage::~MultiplayerStage()
-{
-
-}
-
 void MultiplayerStage::init()
 {
+	Stage::init();
 	m_isHeroFire = false;
 	m_isHeroLeft = false;
 	m_isHeroRight = false;
@@ -38,32 +34,10 @@ void MultiplayerStage::init()
 	m_isHero2Right = false;
 	m_isHero2Up = false;
 	m_isHero2Down = false;
-	m_score = 0;
-	m_isRunning = true;
-	m_scoreText.setString("Score: 0");
-	setHpText(heroHp);
 	setHp2Text(heroHp);
-	m_gameStatus = Playing;
-	((Hero*)m_hero)->revive();
 	((Hero2*)m_hero2)->revive();
 	m_hero->setPosition(screenWidth / 3, m_hero->getPosition().y);
 	m_hero2->setPosition(screenWidth / 3 * 2, m_hero->getPosition().y);
-	gameClock.restart();
-	for (int i = 0; i < 3; ++i)
-	{
-		m_enemyClock[i].restart();
-	}
-	m_ufoClock.restart();
-	for (std::vector<Entity*>::iterator it = m_entitys.begin(); it != m_entitys.end(); ++it)
-	{
-		if ((*it) != m_hero && (*it) != m_hero2)
-		{
-			delete *it;
-			m_entitys.erase(it);
-			it--;
-		}
-	}
-	Sound::playGameMusicSound();
 }
 
 void MultiplayerStage::setHpText(int hp)
@@ -121,8 +95,6 @@ void MultiplayerStage::draw()
 	{
 		drawLight(sf::Vector2f(screenWidth - (i + 0.5f) * m_bombTexture.getSize().x , screenHeight - m_bombTexture.getSize().y / 2), sf::Color::Red, 100);
 	}
-	m_window.draw(m_lightSprite, sf::BlendAdd);
-	m_lightRenderTexture.clear(sf::Color::Transparent);
 	m_window.draw(m_hp2Text);
 }
 
@@ -153,4 +125,17 @@ void MultiplayerStage::restart()
 	m_socket.send(m_packet);
 	m_packet.clear();
 	init();
+}
+
+sf::Vector2f MultiplayerStage::getHeroPosition()
+{
+	if (m_hero2->isAlive())
+	{
+		if (m_hero->isAlive())
+		{
+			return rand() % 2 ? m_hero->getPosition() : m_hero2->getPosition();
+		}
+		return m_hero2->getPosition();
+	}
+	return m_hero->getPosition();
 }

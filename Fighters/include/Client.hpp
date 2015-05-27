@@ -11,16 +11,15 @@
 class Client
 {
 	public:
-		Client(sf::RenderWindow& window);
+		Client(sf::RenderWindow& window, Background& background);
 		virtual ~Client();
-		void setBackground(Background* background);
 		void setIp(std::string ip);
 		void start();
 	private:
 		sf::RenderWindow& m_window;
 		sf::Text m_loading;
 		std::string m_ip;
-		Background* m_background;
+		Background& m_background;
 		bool m_isRunning;
 };
 

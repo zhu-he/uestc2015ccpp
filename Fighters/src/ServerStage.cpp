@@ -6,14 +6,9 @@
 #include "Enemy.hpp"
 #include "Ufo.hpp"
 
-ServerStage::ServerStage(sf::RenderWindow& window, sf::TcpSocket& client) : MultiplayerStage(window, client)
+ServerStage::ServerStage(sf::RenderWindow& window, Background& background, sf::TcpSocket& client) : MultiplayerStage(window, background, client)
 {
 	m_idCounter = 0;
-}
-
-ServerStage::~ServerStage()
-{
-
 }
 
 void ServerStage::addEntity(Entity* entity)
@@ -27,8 +22,8 @@ void ServerStage::addEntity(Entity* entity)
 		m_packet << ((Bullet*)entity)->getBulletType();
 		m_packet << (int)entity->getPosition().x;
 		m_packet << (int)entity->getPosition().y;
-		m_packet << (int)((Bullet*)entity)->getDirection().x;
-		m_packet << (int)((Bullet*)entity)->getDirection().y;
+		m_packet << (float)((Bullet*)entity)->getDirection().x;
+		m_packet << (float)((Bullet*)entity)->getDirection().y;
 	}
 	else if (entity->getType() == "Enemy")
 	{
@@ -146,45 +141,48 @@ bool ServerStage::update()
 			Stage::resume();
 		}
 	}
-	if (m_isHeroFire)
+	if (m_gameStatus == Playing)
 	{
-		((Hero*)m_hero)->fire();
-	}
-	if (m_isHeroLeft)
-	{
-		((Hero*)m_hero)->moveLeft();
-	}
-	if (m_isHeroRight)
-	{
-		((Hero*)m_hero)->moveRight();
-	}
-	if (m_isHeroUp)
-	{
-		((Hero*)m_hero)->moveUp();
-	}
-	if (m_isHeroDown)
-	{
-		((Hero*)m_hero)->moveDown();
-	}
-	if (m_isHero2Fire)
-	{
-		((Hero2*)m_hero2)->fire();
-	}
-	if (m_isHero2Left)
-	{
-		((Hero2*)m_hero2)->moveLeft();
-	}
-	if (m_isHero2Right)
-	{
-		((Hero2*)m_hero2)->moveRight();
-	}
-	if (m_isHero2Up)
-	{
-		((Hero2*)m_hero2)->moveUp();
-	}
-	if (m_isHero2Down)
-	{
-		((Hero2*)m_hero2)->moveDown();
+		if (m_isHeroFire)
+		{
+			((Hero*)m_hero)->fire();
+		}
+		if (m_isHeroLeft)
+		{
+			((Hero*)m_hero)->moveLeft();
+		}
+		if (m_isHeroRight)
+		{
+			((Hero*)m_hero)->moveRight();
+		}
+		if (m_isHeroUp)
+		{
+			((Hero*)m_hero)->moveUp();
+		}
+		if (m_isHeroDown)
+		{
+			((Hero*)m_hero)->moveDown();
+		}
+		if (m_isHero2Fire)
+		{
+			((Hero2*)m_hero2)->fire();
+		}
+		if (m_isHero2Left)
+		{
+			((Hero2*)m_hero2)->moveLeft();
+		}
+		if (m_isHero2Right)
+		{
+			((Hero2*)m_hero2)->moveRight();
+		}
+		if (m_isHero2Up)
+		{
+			((Hero2*)m_hero2)->moveUp();
+		}
+		if (m_isHero2Down)
+		{
+			((Hero2*)m_hero2)->moveDown();
+		}
 	}
 	Stage::update();
 	if (m_packet.getDataSize() > 0)
@@ -297,4 +295,17 @@ void ServerStage::bombup(Entity* hero)
 		m_packet << "o";
 	}
 	Stage::bombup(hero);
+}
+
+void ServerStage::levelup(Entity* hero)
+{
+	if (((Hero*)hero)->getType() == "Hero")
+	{
+		m_packet << "V";
+	}
+	else
+	{
+		m_packet << "v";
+	}
+	Stage::levelup(hero);
 }

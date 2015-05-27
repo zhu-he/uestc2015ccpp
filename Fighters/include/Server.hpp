@@ -10,14 +10,13 @@
 class Server
 {
 	public:
-		Server(sf::RenderWindow& window);
+		Server(sf::RenderWindow& window, Background& background);
 		virtual ~Server();
-		void setBackground(Background* background);
 		void start();
 	private:
 		sf::RenderWindow& m_window;
 		sf::Text m_loading;
-		Background* m_background;
+		Background& m_background;
 		bool m_isRunning;
 };
 

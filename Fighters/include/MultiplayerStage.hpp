@@ -8,23 +8,16 @@
 class MultiplayerStage : public Stage
 {
 	public:
-		MultiplayerStage(sf::RenderWindow& window, sf::TcpSocket& socket);
-		virtual ~MultiplayerStage();
+		MultiplayerStage(sf::RenderWindow& window, Background& background, sf::TcpSocket& socket);
 		void setHpText(int hp);
 		void setHp2Text(int hp);
-		void useBomb();
 	protected:
 		sf::TcpSocket& m_socket;
 		sf::Packet m_packet;
-		sf::Text m_hp2Text;
 		Entity* m_hero2;
-		void pause();
-		void resume();
-		void init();
-		void restart();
-		void draw();
 		bool isOver();
-		int m_sendCounter;
+		void init();
+		void draw();
 		bool m_isHeroFire;
 		bool m_isHeroLeft;
 		bool m_isHeroRight;
@@ -35,6 +28,14 @@ class MultiplayerStage : public Stage
 		bool m_isHero2Right;
 		bool m_isHero2Up;
 		bool m_isHero2Down;
+		int m_sendCounter;
+	private:
+		void useBomb();
+		sf::Text m_hp2Text;
+		sf::Vector2f getHeroPosition();
+		void pause();
+		void resume();
+		void restart();
 };
 
 #endif // __MULTIPLAYERSTAGE_HPP__

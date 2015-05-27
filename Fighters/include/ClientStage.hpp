@@ -10,12 +10,11 @@
 class ClientStage : public MultiplayerStage
 {
 	public:
-		ClientStage(sf::RenderWindow& window, sf::TcpSocket& server);
-		virtual ~ClientStage();
+		ClientStage(sf::RenderWindow& window, Background& background, sf::TcpSocket& server);
+	private:
+		Entity* findEntityById(int id);
 		void addEntity(Entity* entity);
 		bool update();
-	protected:
-		Entity* findEntityById(int id);
 		void fire();
 		void noFire();
 		void moveLeft();

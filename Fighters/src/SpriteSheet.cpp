@@ -90,13 +90,3 @@ void SpriteSheet::trim(std::string& str)
         str.erase(str.find_last_not_of(" ") + 1);
     }
 }
-
-std::string SpriteSheet::getFilename()
-{
-    return m_filename;
-}
-
-std::string SpriteSheet::getTextureFilename()
-{
-    return m_textureFilename;
-}

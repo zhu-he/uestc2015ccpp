@@ -3,7 +3,7 @@
 #include "Shader.hpp"
 #include "ClientStage.hpp"
 
-Client::Client(sf::RenderWindow& window) : m_window(window)
+Client::Client(sf::RenderWindow& window, Background& background) : m_window(window), m_background(background)
 {
 	m_loading.setFont(Font::getFont());
 	m_loading.setCharacterSize(30);
@@ -17,11 +17,6 @@ Client::~Client()
 
 }
 
-void Client::setBackground(Background* background)
-{
-	m_background = background;
-}
-
 void Client::setIp(std::string ip)
 {
 	m_ip = ip;
@@ -32,7 +27,7 @@ void Client::start()
 	m_loading.setColor(Font::getColor());
 	m_isRunning = true;
 	sf::TcpSocket socket;
-	sf::Socket::Status status;
+	int port = 54000;
 	socket.setBlocking(false);
 	while (m_isRunning)
 	{
@@ -55,28 +50,24 @@ void Client::start()
 				break;
 			}
 		}
-		status = socket.connect(m_ip.c_str(), 54000);
-		if (status == sf::Socket::Done)
+		if (socket.connect(m_ip.c_str(), port) == sf::Socket::Done)
 		{
 			break;
 		}
+		port++;
+		if (port == 54005)
+		{
+			port = 54000;
+		}
 		m_window.clear();
-		m_background->animate();
-		if (Shader::isAvailable())
-		{
-			m_window.draw(*m_background, Shader::getInvertShader());
-		}
-		else
-		{
-			m_window.draw(*m_background);
-		}
+		m_background.animate();
+		m_window.draw(m_background);
 		m_window.draw(m_loading);
 		m_window.display();
 	}
 	if (m_isRunning)
 	{
-		ClientStage stage(m_window, socket);
-		stage.setBackground(m_background);
+		ClientStage stage(m_window, m_background, socket);
 		stage.play();
 	}
 }

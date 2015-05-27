@@ -1,5 +1,4 @@
 #include "Background.hpp"
-#include "Shader.hpp"
 
 sf::Texture Background::m_backgroundTexture;
 
@@ -44,6 +43,14 @@ void Background::animate()
 
 void Background::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	target.draw(m_background1, states);
-	target.draw(m_background2, states);
+	if (Shader::isAvailable())
+	{
+		target.draw(m_background1, Shader::getInvertShader());
+		target.draw(m_background2, Shader::getInvertShader());
+	}
+	else
+	{
+		target.draw(m_background1);
+		target.draw(m_background2);
+	}
 }

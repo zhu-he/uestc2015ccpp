@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "Global.hpp"
+#include "Shader.hpp"
 
 class Background : public sf::Drawable
 {

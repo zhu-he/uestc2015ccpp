@@ -9,15 +9,15 @@
 class ServerStage : public MultiplayerStage
 {
 	public:
-		ServerStage(sf::RenderWindow& window, sf::TcpSocket& client);
-		virtual ~ServerStage();
+		ServerStage(sf::RenderWindow& window, Background& background, sf::TcpSocket& client);
+	private:
+		int m_idCounter;
 		void addEntity(Entity* entity);
 		bool update();
-	protected:
-		int m_idCounter;
 		void hitEntity(Entity* entity);
 		void dieEntity(Entity* entity);
 		void bombup(Entity* hero);
+		void levelup(Entity* hero);
 		void fire();
 		void noFire();
 		void moveLeft();

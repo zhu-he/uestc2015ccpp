@@ -7,14 +7,9 @@
 #include "Ufo.hpp"
 #include "Hero2.hpp"
 
-ClientStage::ClientStage(sf::RenderWindow& window, sf::TcpSocket& server) : MultiplayerStage(window, server)
+ClientStage::ClientStage(sf::RenderWindow& window, Background& background, sf::TcpSocket& server) : MultiplayerStage(window, background, server)
 {
 	m_controlHero = m_hero2;
-}
-
-ClientStage::~ClientStage()
-{
-
 }
 
 void ClientStage::addEntity(Entity* entity)
@@ -48,17 +43,19 @@ bool ClientStage::update()
 				packet >> type;
 				int positionX, positionY;
 				packet >> positionX >> positionY;
-				int directionX, directionY;
+				float directionX, directionY;
 				packet >> directionX >> directionY;
 				Bullet* bullet = new Bullet((BulletType)type, sf::Vector2f(positionX, positionY), sf::Vector2f(directionX, directionY));
 				bullet->setId(id);
 				if (type == HeroBullet)
 				{
 					((Hero*)m_hero)->resetShootTime();
+					Sound::playBulletSound();
 				}
 				else if (type == Hero2Bullet)
 				{
 					((Hero2*)m_hero2)->resetShootTime();
+					Sound::playBulletSound();
 				}
 				addEntity(bullet);
 			}
@@ -165,10 +162,22 @@ bool ClientStage::update()
 		else if (cmd == "O")
 		{
 			((Hero*)m_hero)->bombup();
+			Sound::playUfoSound(Bomb);
 		}
 		else if (cmd == "o")
 		{
 			((Hero2*)m_hero2)->bombup();
+			Sound::playUfoSound(Bomb);
+		}
+		else if (cmd == "V")
+		{
+			((Hero*)m_hero)->levelup();
+			Sound::playUfoSound(Weapon);
+		}
+		else if (cmd == "v")
+		{
+			((Hero2*)m_hero2)->levelup();
+			Sound::playUfoSound(Weapon);
 		}
 	}
 	if (m_gameStatus == Overing)
@@ -184,7 +193,7 @@ bool ClientStage::update()
 		draw();
 		return true;
 	}
-	if (m_gameStatus == Over || m_gameStatus == Waiting)
+	if (m_gameStatus == Over)
 	{
 		animate();
 		draw();
@@ -202,37 +211,40 @@ bool ClientStage::update()
 		m_packet << (int)m_hero2->getPosition().x;
 		m_packet << (int)m_hero2->getPosition().y;
 	}
-	if (m_isHeroLeft)
+	if (m_gameStatus == Playing)
 	{
-		((Hero*)m_hero)->moveLeft();
-	}
-	if (m_isHeroRight)
-	{
-		((Hero*)m_hero)->moveRight();
-	}
-	if (m_isHeroUp)
-	{
-		((Hero*)m_hero)->moveUp();
-	}
-	if (m_isHeroDown)
-	{
-		((Hero*)m_hero)->moveDown();
-	}
-	if (m_isHero2Left)
-	{
-		((Hero2*)m_hero2)->moveLeft();
-	}
-	if (m_isHero2Right)
-	{
-		((Hero2*)m_hero2)->moveRight();
-	}
-	if (m_isHero2Up)
-	{
-		((Hero2*)m_hero2)->moveUp();
-	}
-	if (m_isHero2Down)
-	{
-		((Hero2*)m_hero2)->moveDown();
+		if (m_isHeroLeft)
+		{
+			((Hero*)m_hero)->moveLeft();
+		}
+		if (m_isHeroRight)
+		{
+			((Hero*)m_hero)->moveRight();
+		}
+		if (m_isHeroUp)
+		{
+			((Hero*)m_hero)->moveUp();
+		}
+		if (m_isHeroDown)
+		{
+			((Hero*)m_hero)->moveDown();
+		}
+		if (m_isHero2Left)
+		{
+			((Hero2*)m_hero2)->moveLeft();
+		}
+		if (m_isHero2Right)
+		{
+			((Hero2*)m_hero2)->moveRight();
+		}
+		if (m_isHero2Up)
+		{
+			((Hero2*)m_hero2)->moveUp();
+		}
+		if (m_isHero2Down)
+		{
+			((Hero2*)m_hero2)->moveDown();
+		}
 	}
 	if (m_packet.getDataSize() > 0)
 	{

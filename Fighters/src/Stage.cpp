@@ -10,54 +10,39 @@
 
 extern sf::Clock gameClock;
 
-Stage::Stage(sf::RenderWindow& window) : m_window(window), m_pausedMenu(PauseMenu, screenHeight / 2)
+Stage::Stage(sf::RenderWindow& window, Background& background) : m_window(window), m_background(background), m_pausedMenu(PauseMenu, screenHeight / 2)
 {
 	m_score = 0;
 	m_scoreText.setFont(Font::getFont());
 	m_scoreText.setCharacterSize(24);
-	m_scoreText.setColor(Font::getColor());
-	m_scoreText.setPosition(10, 5);
+	m_scoreText.setPosition(10, 4);
 	m_scoreText.setStyle(sf::Text::Bold);
 	m_hpText.setFont(Font::getFont());
 	m_hpText.setCharacterSize(30);
 	m_hpText.setColor(heartColor);
 	m_hpText.setStyle(sf::Text::Bold);
 	m_hpText.setPosition(screenWidth - m_hpText.getLocalBounds().width - 10, 0);
-	m_waitingText.setFont(Font::getFont());
-	m_waitingText.setString("Press any key to start\n\nMove: \tArrow Keys\nFire: \t\tSpace\nBomb: \tShift\n");
-	m_waitingText.setCharacterSize(30);
-	m_waitingText.setColor(Font::getColor());
-	m_waitingText.setStyle(sf::Text::Bold);
-	m_waitingText.setPosition(screenWidth / 2 - m_waitingText.getLocalBounds().width / 2, screenHeight / 2 - m_waitingText.getLocalBounds().height / 2);
 	m_overScoreText.setFont(Font::getFont());
 	m_overScoreText.setCharacterSize(40);
-	m_overScoreText.setColor(Font::getColor());
 	m_overScoreText.setStyle(sf::Text::Bold);
 	m_overHighScoreText.setFont(Font::getFont());
 	m_overHighScoreText.setCharacterSize(40);
-	m_overHighScoreText.setColor(Font::getColor());
 	m_overHighScoreText.setStyle(sf::Text::Bold);
 	m_overText.setFont(Font::getFont());
 	m_overText.setString("Game Over");
 	m_overText.setCharacterSize(40);
-	m_overText.setColor(Font::getColor());
 	m_overText.setStyle(sf::Text::Bold);
-	m_gameStatus = Waiting;
-	m_waitingTextSwitch = true;
 	m_highScore = 0;
 	m_isBombing = false;
-	if (Shader::isAvailable())
-	{
-		m_lightShader = Shader::getLightShader();
-		m_shadowShader = Shader::getShadowShader();
-		m_lightRenderStates.shader = m_lightShader;
-		m_lightRenderStates.blendMode = sf::BlendAdd;
-		m_lightRenderTexture.create(screenWidth, screenHeight);
-		m_lightSprite.setTexture(m_lightRenderTexture.getTexture());
-		m_shadowRenderTexture.create(screenWidth, screenHeight);
-		m_shadowSprite.setTexture(m_shadowRenderTexture.getTexture());
-		m_shadowRenderStates.shader = m_shadowShader;
-	}
+	m_lightShader = Shader::getLightShader();
+	m_shadowShader = Shader::getShadowShader();
+	m_lightRenderStates.shader = m_lightShader;
+	m_lightRenderStates.blendMode = sf::BlendAdd;
+	m_lightRenderTexture.create(screenWidth, screenHeight);
+	m_lightSprite.setTexture(m_lightRenderTexture.getTexture());
+	m_shadowRenderTexture.create(screenWidth, screenHeight);
+	m_shadowSprite.setTexture(m_shadowRenderTexture.getTexture());
+	m_shadowRenderStates.shader = m_shadowShader;
 	m_bombTexture = SpriteSheet::getTexture(bombImage);
 	m_bombSprite.setTexture(m_bombTexture);
 	m_isRunning = true;
@@ -105,11 +90,6 @@ void Stage::hitEntity(Entity* entity)
 	}
 }
 
-void Stage::setBackground(Background* background)
-{
-	m_background = background;
-}
-
 void Stage::addScore(int score)
 {
 	m_score += score;
@@ -119,11 +99,6 @@ void Stage::addScore(int score)
 GameStatus Stage::getGameStatus()
 {
 	return m_gameStatus;
-}
-
-int Stage::getScore()
-{
-	return m_score;
 }
 
 void Stage::setHpText(int hp)
@@ -151,6 +126,10 @@ void Stage::init()
 	m_gameStatus = Playing;
 	((Hero*)m_hero)->revive();
 	gameClock.restart();
+	m_scoreText.setColor(Font::getColor());
+	m_overScoreText.setColor(Font::getColor());
+	m_overHighScoreText.setColor(Font::getColor());
+	m_overText.setColor(Font::getColor());
 	for (int i = 0; i < 3; ++i)
 	{
 		m_enemyClock[i].restart();
@@ -158,7 +137,7 @@ void Stage::init()
 	m_ufoClock.restart();
 	for (std::vector<Entity*>::iterator it = m_entitys.begin(); it != m_entitys.end(); ++it)
 	{
-		if ((*it) != m_hero)
+		if ((*it)->getType() != "Hero" && (*it)->getType() != "Hero2")
 		{
 			delete *it;
 			m_entitys.erase(it);
@@ -182,9 +161,13 @@ void Stage::play()
 				m_window.close();
 				break;
 			case sf::Event::KeyPressed:
-				if (event.key.code == sf::Keyboard::Escape)
+				if (event.key.code == sf::Keyboard::Escape && m_gameStatus == Playing)
 				{
 					pause();
+				}
+				else if (event.key.code == sf::Keyboard::Escape && m_gameStatus == Over)
+				{
+					m_isRunning = false;
 				}
 				else if (event.key.code == sf::Keyboard::Down && m_gameStatus == Paused)
 				{
@@ -269,6 +252,8 @@ void Stage::play()
 		{
 			break;
 		}
+		m_window.draw(m_lightSprite, sf::BlendAdd);
+		m_lightRenderTexture.clear(sf::Color::Transparent);
 		m_window.display();
     }
 	Sound::playGameMusicSound();
@@ -277,14 +262,7 @@ void Stage::play()
 void Stage::draw()
 {
 	m_window.clear();
-	if (Shader::isAvailable())
-	{
-		m_window.draw(*m_background, Shader::getInvertShader());
-	}
-	else
-	{
-		m_window.draw(*m_background);
-	}
+	m_window.draw(m_background);
 	for (Entity* entity : m_entitys)
 	{
 		if (entity->isAlive())
@@ -328,23 +306,10 @@ void Stage::draw()
 			// m_window.draw(entity->getCollision());
 		}
 	}
-	m_window.draw(m_lightSprite, sf::BlendAdd);
-	if (m_gameStatus == Playing || m_gameStatus == Paused)
+	if (m_gameStatus == Playing)
 	{
 		m_window.draw(m_scoreText);
 		m_window.draw(m_hpText);
-	}
-	if (m_gameStatus == Waiting)
-	{
-		if (m_waitingFlashClock.getElapsedTime() >= sf::seconds(waitingFlashInterval))
-		{
-			m_waitingTextSwitch = !m_waitingTextSwitch;
-			m_waitingFlashClock.restart();
-		}
-		if (m_waitingTextSwitch)
-		{
-			m_window.draw(m_waitingText);
-		}
 	}
 	else if (m_gameStatus == Overing || m_gameStatus == Over)
 	{
@@ -354,9 +319,10 @@ void Stage::draw()
 	}
 	else if (m_gameStatus == Paused)
 	{
+		m_window.draw(m_scoreText);
+		m_window.draw(m_hpText);
 		m_window.draw(m_pausedMenu);
 	}
-	m_lightRenderTexture.clear(sf::Color::Transparent);
 	for (int i = 0; i < ((Hero*)m_hero)->getBomb(); ++i)
 	{
 		m_bombSprite.setPosition(i * m_bombTexture.getSize().x, screenHeight - m_bombTexture.getSize().y);
@@ -366,8 +332,6 @@ void Stage::draw()
 	{
 		drawLight(sf::Vector2f((i + 0.5f) * m_bombTexture.getSize().x , screenHeight - m_bombTexture.getSize().y / 2), sf::Color::Red, 100);
 	}
-	m_window.draw(m_lightSprite, sf::BlendAdd);
-	m_lightRenderTexture.clear(sf::Color::Transparent);
 }
 
 void Stage::gameOver()
@@ -421,7 +385,7 @@ void Stage::animate()
 			m_isBombing = false;
 		}
 	}
-	m_background->animate();
+	m_background.animate();
 	for (std::vector<Entity*>::iterator it = m_entitys.begin(); it != m_entitys.end(); ++it)
 	{
 		if (!(*it)->isAlive())
@@ -459,7 +423,7 @@ bool Stage::update()
 		draw();
 		return true;
 	}
-	if (m_gameStatus == Over || m_gameStatus == Waiting)
+	if (m_gameStatus == Over)
 	{
 		animate();
 		draw();
@@ -518,7 +482,7 @@ bool Stage::update()
 				}
 				else if (entityA->getType() == "Enemy" &&
 						(entityB->getType() == "Hero" ||
-						entityB->getType() == "Hero") &&
+						entityB->getType() == "Hero2") &&
 						((Enemy*)entityA)->getStatus() != Dying &&
 						!m_isBombing)
 				{
@@ -531,7 +495,7 @@ bool Stage::update()
 				{
 					if (((Ufo*)entityA)->getUfoType() == Weapon)
 					{
-						((Hero*)entityB)->levelup();
+						levelup(entityB);
 					}
 					else
 					{
@@ -546,7 +510,7 @@ bool Stage::update()
 	{
 		if (m_entitys[i]->getType() == "Enemy" && ((Enemy*)m_entitys[i])->getStatus() != Dying)
 		{
-			((Enemy*)m_entitys[i])->fire(m_hero->getPosition());
+			((Enemy*)m_entitys[i])->fire(getHeroPosition());
 		}
 	}
 	animate();
@@ -623,6 +587,11 @@ void Stage::drawShadow(sf::Vector2f lightPosition, float shadowAttenuation)
 			}
 		}
 	}
+}
+
+sf::Vector2f Stage::getHeroPosition()
+{
+	return m_hero->getPosition();
 }
 
 void Stage::useBomb()
@@ -705,4 +674,9 @@ void Stage::restart()
 void Stage::bombup(Entity* hero)
 {
     ((Hero*)hero)->bombup();
+}
+
+void Stage::levelup(Entity* hero)
+{
+    ((Hero*)hero)->levelup();
 }

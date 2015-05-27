@@ -3,7 +3,6 @@
 
 #include "Hero.hpp"
 
-
 class Hero2 : public Hero
 {
 	public:

@@ -18,7 +18,6 @@ enum MenuStatus
 
 enum GameStatus
 {
-	Waiting,
 	Playing,
 	Paused,
 	Overing,
@@ -221,18 +220,18 @@ const float ufoSpeed = 3.0f;
 
 const std::vector<float> bulletSpeed =
 {
-	20.0f,
+	15.0f,
 	4.0f,
-	20.0f
+	15.0f
 };
 
-const float heroBulletInterval = 0.2f;
+const float heroBulletInterval = 0.25f;
 
 const std::vector<float> enemyBulletInterval =
 {
-	2.0f,
-	2.0f,
-	2.0f
+	1.2f,
+	1.2f,
+	1.2f
 };
 
 const std::vector<std::vector<float> > enemyBulletDirection =
@@ -283,13 +282,13 @@ const std::vector<std::vector<sf::Vector2i> > heroBulletDirection =
 const std::vector<float> enemySpawnTime =
 {
 	5.0f,
-	17.0f,
-	23.0f,
+	10.0f,
+	20.0f,
 };
 
 const float bulletOffsetY = -60.0f;
 
-const float ufoSpawnTime = 10.0f;
+const float ufoSpawnTime = 9.0f;
 
 const float animateInterval = 0.05f;
 
