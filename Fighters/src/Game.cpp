@@ -24,20 +24,9 @@ Game::Game() : m_window(sf::VideoMode(360, 600), "Fighters", sf::Style::Titlebar
 	m_titleText.setPosition((screenWidth - m_titleText.getLocalBounds().width) / 2, 150);
 }
 
-Game::~Game()
-{
-
-}
-
-void Game::quit()
-{
-	m_isRunning = false;
-}
-
 void Game::play()
 {
 	Sound::playGameMusicSound();
-	m_isRunning = true;
 	Menu menu(MainMenu);
 	Stage stage(m_window, m_background);
 	Server server(m_window, m_background);
@@ -178,14 +167,7 @@ void Game::play()
 		}
 		m_background.animate();
 		m_window.clear();
-		if (Shader::isAvailable())
-		{
-			m_window.draw(m_background, Shader::getInvertShader());
-		}
-		else
-		{
-			m_window.draw(m_background);
-		}
+		m_window.draw(m_background);
 		m_window.draw(m_titleText);
 		m_window.draw(menu);
 		m_window.display();

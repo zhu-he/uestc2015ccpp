@@ -1,8 +1,5 @@
-// *** ADDED BY HEADER FIXUP ***
-#include <istream>
-// *** END ***
-#ifndef SFML_SPRITESHEET_HPP
-#define SFML_SPRITESHEET_HPP
+#ifndef __SPRITESHEET_HPP__
+#define __SPRITESHEET_HPP__
 
 #include <fstream>
 #include <string>
@@ -23,4 +20,4 @@ private:
     static void trim(std::string& str);
 };
 
-#endif // SFML_SPRITESHEET_HPP
+#endif // __SPRITESHEET_HPP__

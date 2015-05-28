@@ -54,11 +54,6 @@ Enemy::Enemy(const int& enemyType)
 	setColor(sf::Color(64, 64, 255));
 }
 
-Enemy::~Enemy()
-{
-
-}
-
 void Enemy::loadResources()
 {
 	for (int enemyType = 0; enemyType < 3; ++enemyType)
@@ -150,11 +145,6 @@ std::string Enemy::getType()
 int Enemy::getEnemyType()
 {
 	return m_enemyType;
-}
-
-bool Enemy::isAlive()
-{
-	return m_isAlive;
 }
 
 Status Enemy::getStatus()

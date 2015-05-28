@@ -12,7 +12,6 @@ class Client
 {
 	public:
 		Client(sf::RenderWindow& window, Background& background);
-		virtual ~Client();
 		void setIp(std::string ip);
 		void start();
 	private:

@@ -11,7 +11,6 @@ std::string Hero2::getType()
 	return "Hero2";
 }
 
-
 void Hero2::hit()
 {
 	if (m_invincible.getElapsedTime() < sf::seconds(invincibleTime))

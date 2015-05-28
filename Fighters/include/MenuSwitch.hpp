@@ -8,7 +8,6 @@ class MenuSwitch : public MenuItem
 {
 	public:
 		MenuSwitch();
-		virtual ~MenuSwitch();
 		MenuItemType getMenuItemType();
 		void focus();
 		void leave();

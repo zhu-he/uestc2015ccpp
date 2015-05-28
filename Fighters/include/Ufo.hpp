@@ -8,16 +8,14 @@ class Ufo : public Entity
 {
 	public:
 		Ufo(UfoType ufoType);
-		virtual ~Ufo();
 		void animate();
-		bool isAlive();
+		void hit();
 		void die();
 		UfoType getUfoType();
 		std::string getType();
 		static void loadResources();
 	private:
 		static sf::Texture m_ufoTexture[2];
-		bool m_isAlive;
 		UfoType m_ufoType;
 		sf::Vector2f m_ufoSpeed;
 };

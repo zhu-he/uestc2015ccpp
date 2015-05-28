@@ -25,11 +25,6 @@ MenuSwitch::MenuSwitch()
 	m_offText.setOrigin(m_offText.getLocalBounds().width / 2, m_offText.getLocalBounds().height / 2);
 }
 
-MenuSwitch::~MenuSwitch()
-{
-
-}
-
 MenuItemType MenuSwitch::getMenuItemType()
 {
 	return Switch;

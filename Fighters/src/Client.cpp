@@ -12,11 +12,6 @@ Client::Client(sf::RenderWindow& window, Background& background) : m_window(wind
 	m_loading.setPosition(screenWidth / 2, screenHeight / 2);
 }
 
-Client::~Client()
-{
-
-}
-
 void Client::setIp(std::string ip)
 {
 	m_ip = ip;

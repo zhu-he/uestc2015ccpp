@@ -11,7 +11,6 @@ class Server
 {
 	public:
 		Server(sf::RenderWindow& window, Background& background);
-		virtual ~Server();
 		void start();
 	private:
 		sf::RenderWindow& m_window;

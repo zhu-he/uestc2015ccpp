@@ -1,5 +1,5 @@
-#ifndef HERO_HPP
-#define HERO_HPP
+#ifndef __HERO_HPP__
+#define __HERO_HPP__
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
@@ -14,7 +14,6 @@ class Hero : public Entity
 {
 	public:
 		Hero();
-		virtual ~Hero();
 		void moveLeft();
 		void moveRight();
 		void moveUp();
@@ -29,7 +28,6 @@ class Hero : public Entity
 		void useBomb();
 		void resetShootTime();
 		virtual std::string getType();
-		bool isAlive();
 		bool isFlash();
 		virtual void hit();
 		static void loadResources();
@@ -43,7 +41,6 @@ class Hero : public Entity
 		static std::vector<sf::Texture> m_heroTexture;
 		static std::vector<sf::Texture> m_heroBlowupTexture;
 		int m_heroImageCounter;
-		bool m_isAlive;
         sf::Clock m_enemyAnimateClock;
 		sf::Clock m_lastShootTime;
 		bool m_isFlash;
@@ -52,4 +49,4 @@ class Hero : public Entity
 
 };
 
-#endif // HERO_HPP
+#endif // __HERO_HPP__

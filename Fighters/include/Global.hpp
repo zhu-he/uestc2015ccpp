@@ -1,5 +1,5 @@
-#ifndef GLOBAL_HPP_INCLUDED
-#define GLOBAL_HPP_INCLUDED
+#ifndef __GLOBAL_HPP_INCLUDED__
+#define __GLOBAL_HPP_INCLUDED__
 
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -310,4 +310,4 @@ const sf::Color textColorNoShader = sf::Color(40, 40, 40);
 
 const sf::Color heartColor = sf::Color(196, 0, 0);
 
-#endif // GLOBAL_HPP_INCLUDED
+#endif // __GLOBAL_HPP_INCLUDED__

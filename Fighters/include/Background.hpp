@@ -1,8 +1,8 @@
-#ifndef BACKGROUND_HPP
-#define BACKGROUND_HPP
+#ifndef __BACKGROUND_HPP__
+#define __BACKGROUND_HPP__
 
 #include <SFML/Graphics.hpp>
-#include <string>
+#include <iostream>
 #include "Global.hpp"
 #include "Shader.hpp"
 
@@ -10,7 +10,6 @@ class Background : public sf::Drawable
 {
 	public:
 		Background();
-		virtual ~Background();
 		void animate();
 		static void loadResources();
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -20,4 +19,4 @@ class Background : public sf::Drawable
 		sf::Sprite m_background2;
 };
 
-#endif // BACKGROUND_HPP
+#endif // __BACKGROUND_HPP__

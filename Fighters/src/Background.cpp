@@ -5,14 +5,9 @@ sf::Texture Background::m_backgroundTexture;
 Background::Background()
 {
 	m_background1.setTexture(m_backgroundTexture);
-	m_background1.setPosition(0, -screenHeight);
+	m_background1.setPosition(0, -m_background1.getLocalBounds().height);
 	m_background2.setTexture(m_backgroundTexture);
 	m_background2.setPosition(0, 0);
-}
-
-Background::~Background()
-{
-
 }
 
 void Background::loadResources()
@@ -36,8 +31,8 @@ void Background::animate()
 	m_background2.move(0, backgroundSpeed);
     if (m_background1.getPosition().y >= 0)
 	{
-		m_background1.setPosition(0, m_background1.getPosition().y - screenHeight);
-		m_background2.setPosition(0, m_background2.getPosition().y - screenHeight);
+		m_background1.setPosition(0, m_background1.getPosition().y - m_background1.getLocalBounds().height);
+		m_background2.setPosition(0, m_background2.getPosition().y - m_background2.getLocalBounds().height);
 	}
 }
 

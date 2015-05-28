@@ -1,5 +1,6 @@
-#include <ctime>
 #include <SFML/System.hpp>
+#include <ctime>
+#include <cstdlib>
 #include "SpriteSheet.hpp"
 #include "Background.hpp"
 #include "Hero.hpp"
@@ -15,11 +16,20 @@ using namespace std;
 
 sf::Clock gameClock;
 
+void init();
+
 int main()
+{
+	init();
+	Game game;
+    game.play();
+    return 0;
+}
+
+void init()
 {
 	srand((int)time(0));
 	SpriteSheet::loadFromFile(packPath);
-	Background::loadResources();
 	Hero::loadResources();
 	Enemy::loadResources();
 	Bullet::loadResources();
@@ -28,7 +38,5 @@ int main()
 	Font::loadResources();
 	Shader::loadResources();
 	Hero2::loadResources();
-    Game game;
-    game.play();
-    return 0;
+	Background::loadResources();
 }

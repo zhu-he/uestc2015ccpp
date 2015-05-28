@@ -14,11 +14,6 @@ MenuInput::MenuInput()
 	m_line.setFillColor(Font::getColor());
 }
 
-MenuInput::~MenuInput()
-{
-
-}
-
 MenuItemType MenuInput::getMenuItemType()
 {
 	return Input;

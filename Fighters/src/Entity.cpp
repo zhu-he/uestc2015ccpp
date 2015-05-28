@@ -10,14 +10,9 @@ void Entity::setId(int id)
 	m_id = id;
 }
 
-void Entity::hit()
+bool Entity::isAlive()
 {
-
-}
-
-void Entity::die()
-{
-
+	return m_isAlive;
 }
 
 void Entity::setPosition(const sf::Vector2f& position)

@@ -27,11 +27,6 @@ Bullet::Bullet(BulletType bulletType, const sf::Vector2f& position, const sf::Ve
 	}
 }
 
-Bullet::~Bullet()
-{
-
-}
-
 BulletType Bullet::getBulletType()
 {
 	return m_bulletType;
@@ -45,9 +40,9 @@ void Bullet::loadResources()
 	}
 }
 
-bool Bullet::isAlive()
+void Bullet::hit()
 {
-	return m_isAlive;
+
 }
 
 void Bullet::die()

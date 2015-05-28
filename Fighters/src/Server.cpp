@@ -13,11 +13,6 @@ Server::Server(sf::RenderWindow& window, Background& background) : m_window(wind
 	m_loading.setPosition(screenWidth / 2, screenHeight / 2);
 }
 
-Server::~Server()
-{
-
-}
-
 void Server::start()
 {
 	m_loading.setColor(Font::getColor());

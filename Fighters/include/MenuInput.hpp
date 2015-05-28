@@ -11,7 +11,6 @@ class MenuInput : public MenuItem
 {
 	public:
 		MenuInput();
-		virtual ~MenuInput();
 		MenuItemType getMenuItemType();
 		void focus();
 		void leave();

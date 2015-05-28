@@ -8,7 +8,6 @@ class MenuText : public MenuItem
 {
 	public:
 		MenuText();
-		virtual ~MenuText();
 		MenuItemType getMenuItemType();
 		void focus();
 		void leave();

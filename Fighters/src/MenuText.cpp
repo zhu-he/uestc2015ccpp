@@ -8,11 +8,6 @@ MenuText::MenuText()
 	m_text.setColor(Font::getColor());
 }
 
-MenuText::~MenuText()
-{
-
-}
-
 MenuItemType MenuText::getMenuItemType()
 {
 	return Text;

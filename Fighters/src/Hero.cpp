@@ -24,11 +24,6 @@ Hero::Hero()
 	m_color = sf::Color(255, 64, 64);
 }
 
-Hero::~Hero()
-{
-
-}
-
 void Hero::loadResources()
 {
     for (int i = 0; i < (int)heroImage.size(); ++i)
@@ -201,11 +196,6 @@ void Hero::fire()
 std::string Hero::getType()
 {
 	return "Hero";
-}
-
-bool Hero::isAlive()
-{
-	return m_isAlive;
 }
 
 bool Hero::isFlash()

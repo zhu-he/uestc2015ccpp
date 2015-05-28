@@ -34,11 +34,6 @@ Ufo::Ufo(UfoType ufoType)
 	}
 }
 
-Ufo::~Ufo()
-{
-
-}
-
 void Ufo::animate()
 {
 	move(0, ufoSpeed);
@@ -48,9 +43,9 @@ void Ufo::animate()
 	}
 }
 
-bool Ufo::isAlive()
+void Ufo::hit()
 {
-	return m_isAlive;
+
 }
 
 void Ufo::die()
