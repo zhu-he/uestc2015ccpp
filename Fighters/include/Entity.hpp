@@ -28,7 +28,7 @@ class Entity : public sf::Sprite
 		void move(float offsetX, float offsetY);
 		void rotate(float angle);
 	private:
-		virtual void animate() = 0;
+		virtual void animate(sf::Time frameTime) = 0;
 		virtual sf::ConvexShape getCollision();
 		int m_id;
 };

@@ -12,7 +12,7 @@ class Bullet : public Entity
 {
 	public:
 		Bullet(BulletType bulletType, const sf::Vector2f& from, const sf::Vector2f& to);
-		void animate();
+		void animate(sf::Time frameTime);
 		void hit();
 		void die();
 		sf::Vector2f getDirection();

@@ -10,7 +10,7 @@ class Background : public sf::Drawable
 {
 	public:
 		Background();
-		void animate();
+		void animate(sf::Time frameTime);
 		static void loadResources();
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	private:

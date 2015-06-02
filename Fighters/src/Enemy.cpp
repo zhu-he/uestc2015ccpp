@@ -73,9 +73,9 @@ void Enemy::loadResources()
 	}
 }
 
-void Enemy::animate()
+void Enemy::animate(sf::Time frameTime)
 {
-    move(0, m_speed);
+    move(0, m_speed * frameTime.asSeconds());
 	if (getPosition().y < 0)
 	{
 		m_isAlive = false;

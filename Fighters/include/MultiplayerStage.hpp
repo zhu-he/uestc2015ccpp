@@ -18,11 +18,6 @@ class MultiplayerStage : public Stage
 		bool isOver();
 		void init();
 		void draw();
-		bool m_isHeroFire;
-		bool m_isHeroLeft;
-		bool m_isHeroRight;
-		bool m_isHeroUp;
-		bool m_isHeroDown;
 		bool m_isHero2Fire;
 		bool m_isHero2Left;
 		bool m_isHero2Right;

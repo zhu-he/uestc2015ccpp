@@ -55,9 +55,9 @@ sf::Vector2f Bullet::getDirection()
     return m_direction;
 }
 
-void Bullet::animate()
+void Bullet::animate(sf::Time frameTime)
 {
-	move(m_bulletSpeed);
+	move(m_bulletSpeed * frameTime.asSeconds());
 	if (getPosition().x + getTextureRect().width / 2 < 0 ||
 		getPosition().y + getTextureRect().height / 2 < 0 ||
 		getPosition().x - getTextureRect().width / 2 > screenWidth ||

@@ -14,7 +14,7 @@ class ClientStage : public MultiplayerStage
 	private:
 		Entity* findEntityById(int id);
 		void addEntity(Entity* entity);
-		bool update();
+		bool update(sf::Time frameTime);
 		void fire();
 		void noFire();
 		void moveLeft();

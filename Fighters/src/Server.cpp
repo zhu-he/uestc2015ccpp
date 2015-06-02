@@ -30,6 +30,7 @@ void Server::start()
 	sf::TcpSocket client;
 	listener.setBlocking(false);
 	client.setBlocking(false);
+	sf::Clock frameClock;
 	while (m_isRunning)
 	{
 		sf::Event event;
@@ -56,7 +57,7 @@ void Server::start()
 			break;
 		}
 		m_window.clear();
-		m_background.animate();
+		m_background.animate(frameClock.restart());
 		m_window.draw(m_background);
 		m_window.draw(m_loading);
 		m_window.display();

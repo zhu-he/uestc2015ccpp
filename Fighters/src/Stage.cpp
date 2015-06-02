@@ -32,6 +32,9 @@ Stage::Stage(sf::RenderWindow& window, Background& background) : m_window(window
 	m_overText.setString("Game Over");
 	m_overText.setCharacterSize(40);
 	m_overText.setStyle(sf::Text::Bold);
+	m_fpsText.setFont(Font::getFont());
+	m_fpsText.setCharacterSize(20);
+	m_fpsText.setPosition(10, 50);
 	m_highScore = 0;
 	m_isBombing = false;
 	m_lightShader = Shader::getLightShader();
@@ -119,6 +122,11 @@ void Stage::setHpText(int hp)
 
 void Stage::init()
 {
+	m_isHeroFire = false;
+	m_isHeroLeft = false;
+	m_isHeroRight = false;
+	m_isHeroUp = false;
+	m_isHeroDown = false;
 	m_score = 0;
 	m_isRunning = true;
 	m_scoreText.setString("Score: 0");
@@ -130,6 +138,7 @@ void Stage::init()
 	m_overScoreText.setColor(Font::getColor());
 	m_overHighScoreText.setColor(Font::getColor());
 	m_overText.setColor(Font::getColor());
+	m_fpsText.setFont(Font::getFont());
 	for (int i = 0; i < 3; ++i)
 	{
 		m_enemyClock[i].restart();
@@ -150,6 +159,7 @@ void Stage::init()
 void Stage::play()
 {
 	init();
+	sf::Clock frameClock;
 	while (m_window.isOpen() && m_isRunning)
     {
         sf::Event event;
@@ -235,7 +245,7 @@ void Stage::play()
 			{
 				moveNoDown();
 			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 			{
 				fire();
 			}
@@ -243,17 +253,20 @@ void Stage::play()
 			{
 				noFire();
 			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
 			{
 				useBomb();
 			}
 		}
-		if (!update())
+		if (!update(frameClock.restart()))
 		{
 			break;
 		}
-		m_window.draw(m_lightSprite, sf::BlendAdd);
-		m_lightRenderTexture.clear(sf::Color::Transparent);
+		if (Shader::isAvailable())
+		{
+			m_window.draw(m_lightSprite, sf::BlendAdd);
+			m_lightRenderTexture.clear(sf::Color::Transparent);
+		}
 		m_window.display();
     }
 	Sound::playGameMusicSound();
@@ -295,9 +308,12 @@ void Stage::draw()
 			}
 		}
 	}
-	m_shadowRenderTexture.clear(sf::Color::Transparent);
-	drawShadow(sf::Vector2f(screenWidth / 2, screenHeight / 2), 50);
-	m_window.draw(m_shadowSprite);
+	if (Shader::isAvailable())
+	{
+		m_shadowRenderTexture.clear(sf::Color::Transparent);
+		drawShadow(sf::Vector2f(screenWidth / 2, screenHeight / 2), 50);
+		m_window.draw(m_shadowSprite);
+	}
 	for (Entity* entity : m_entitys)
 	{
 		if (entity->isAlive())
@@ -332,6 +348,7 @@ void Stage::draw()
 	{
 		drawLight(sf::Vector2f((i + 0.5f) * m_bombTexture.getSize().x , screenHeight - m_bombTexture.getSize().y / 2), sf::Color::Red, 100);
 	}
+	m_window.draw(m_fpsText);
 }
 
 void Stage::gameOver()
@@ -354,8 +371,13 @@ void Stage::gameOver()
 	m_overText.setPosition(screenWidth / 2 - m_overText.getLocalBounds().width / 2, -m_overText.getLocalBounds().height * 4);
 }
 
-void Stage::animate()
+void Stage::animate(sf::Time frameTime)
 {
+	if (m_fpsClock.getElapsedTime() > sf::seconds(0.5f))
+	{
+		m_fpsText.setString(std::string("fps: ") + std::to_string(1 / frameTime.asSeconds()));
+		m_fpsClock.restart();
+	}
 	if (m_isBombing)
 	{
 		if (m_bombClock.getElapsedTime() < sf::seconds(bombTime))
@@ -385,7 +407,7 @@ void Stage::animate()
 			m_isBombing = false;
 		}
 	}
-	m_background.animate();
+	m_background.animate(frameTime);
 	for (std::vector<Entity*>::iterator it = m_entitys.begin(); it != m_entitys.end(); ++it)
 	{
 		if (!(*it)->isAlive())
@@ -399,12 +421,12 @@ void Stage::animate()
 		}
 		else
 		{
-			(*it)->animate();
+			(*it)->animate(frameTime);
 		}
 	}
 }
 
-bool Stage::update()
+bool Stage::update(sf::Time frameTime)
 {
 	if (isOver())
 	{
@@ -412,20 +434,20 @@ bool Stage::update()
 	}
 	if (m_gameStatus == Overing)
 	{
-		m_overText.move(0, 10);
-		m_overScoreText.move(0, -10);
-		m_overHighScoreText.move(0, -10);
+		m_overText.move(0, 600 * frameTime.asSeconds());
+		m_overScoreText.move(0, -600 * frameTime.asSeconds());
+		m_overHighScoreText.move(0, -600 * frameTime.asSeconds());
 		if (m_overText.getPosition().y >= screenHeight / 2 - m_overText.getLocalBounds().height * 4)
 		{
 			m_gameStatus = Over;
 		}
-		animate();
+		animate(frameTime);
 		draw();
 		return true;
 	}
 	if (m_gameStatus == Over)
 	{
-		animate();
+		animate(frameTime);
 		draw();
 		return true;
 	}
@@ -513,7 +535,30 @@ bool Stage::update()
 			((Enemy*)m_entitys[i])->fire(getHeroPosition());
 		}
 	}
-	animate();
+	if (m_gameStatus == Playing)
+	{
+		if (m_isHeroFire)
+		{
+			((Hero*)m_hero)->fire();
+		}
+		if (m_isHeroLeft)
+		{
+			((Hero*)m_hero)->moveLeft(frameTime);
+		}
+		if (m_isHeroRight)
+		{
+			((Hero*)m_hero)->moveRight(frameTime);
+		}
+		if (m_isHeroUp)
+		{
+			((Hero*)m_hero)->moveUp(frameTime);
+		}
+		if (m_isHeroDown)
+		{
+			((Hero*)m_hero)->moveDown(frameTime);
+		}
+	}
+	animate(frameTime);
     draw();
 	return true;
 }
@@ -607,52 +652,52 @@ void Stage::useBomb()
 
 void Stage::fire()
 {
-	((Hero*)m_hero)->fire();
+	m_isHeroFire = true;
 }
 
 void Stage::noFire()
 {
-
+	m_isHeroFire = false;
 }
 
 void Stage::moveLeft()
 {
-	((Hero*)m_controlHero)->moveLeft();
+	m_isHeroLeft = true;
 }
 
 void Stage::moveRight()
 {
-	((Hero*)m_controlHero)->moveRight();
+	m_isHeroRight = true;
 }
 
 void Stage::moveUp()
 {
-	((Hero*)m_controlHero)->moveUp();
+	m_isHeroUp = true;
 }
 
 void Stage::moveDown()
 {
-	((Hero*)m_controlHero)->moveDown();
+	m_isHeroDown = true;
 }
 
 void Stage::moveNoLeft()
 {
-
+	m_isHeroLeft = false;
 }
 
 void Stage::moveNoRight()
 {
-
+	m_isHeroRight = false;
 }
 
 void Stage::moveNoUp()
 {
-
+	m_isHeroUp = false;
 }
 
 void Stage::moveNoDown()
 {
-
+	m_isHeroDown = false;
 }
 
 void Stage::pause()

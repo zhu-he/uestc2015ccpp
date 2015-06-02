@@ -36,35 +36,35 @@ void Hero::loadResources()
 	}
 }
 
-void Hero::moveLeft()
+void Hero::moveLeft(sf::Time frameTime)
 {
 	if (getPosition().x > 0)
 	{
-		move(-heroSpeed, 0);
+		move(-heroSpeed * frameTime.asSeconds(), 0);
 	}
 }
 
-void Hero::moveRight()
+void Hero::moveRight(sf::Time frameTime)
 {
 	if (getPosition().x < screenWidth)
 	{
-		move(heroSpeed, 0);
+		move(heroSpeed * frameTime.asSeconds(), 0);
 	}
 }
 
-void Hero::moveUp()
+void Hero::moveUp(sf::Time frameTime)
 {
 	if (getPosition().y > 0)
 	{
-		move(0, -heroSpeed);
+		move(0, -heroSpeed * frameTime.asSeconds());
 	}
 }
 
-void Hero::moveDown()
+void Hero::moveDown(sf::Time frameTime)
 {
 	if (getPosition().y < screenHeight)
 	{
-		move(0, heroSpeed);
+		move(0, heroSpeed * frameTime.asSeconds());
 	}
 }
 
@@ -98,7 +98,7 @@ void Hero::resetShootTime()
 	m_lastShootTime.restart();
 }
 
-void Hero::animate()
+void Hero::animate(sf::Time frameTime)
 {
 	if (m_invincible.getElapsedTime() < sf::seconds(invincibleTime) && m_stage->getGameStatus() == Playing)
 	{

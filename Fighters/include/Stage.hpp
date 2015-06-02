@@ -29,9 +29,9 @@ class Stage
 		Entity* m_hero;
 		Entity* m_controlHero;
 		std::vector<Entity*> m_entitys;
-		void animate();
+		void animate(sf::Time frameTime);
 		virtual void draw();
-		virtual bool update();
+		virtual bool update(sf::Time frameTime);
 		virtual void gameOver();
 		virtual void dieEntity(Entity* entity);
 		virtual void hitEntity(Entity* entity);
@@ -40,6 +40,11 @@ class Stage
 		virtual void resume();
 		virtual void bombup(Entity* hero);
 		virtual void levelup(Entity* hero);
+		bool m_isHeroFire;
+		bool m_isHeroLeft;
+		bool m_isHeroRight;
+		bool m_isHeroUp;
+		bool m_isHeroDown;
 		sf::Texture m_bombTexture;
 		sf::Sprite m_bombSprite;
 		bool m_isBombing;
@@ -50,6 +55,7 @@ class Stage
 		sf::Text m_overHighScoreText;
 		sf::Text m_scoreText;
 		sf::Text m_hpText;
+		sf::Text m_fpsText;
 	private:
 		std::ifstream m_highScoreIfstream;
 		std::ofstream m_highScoreOfstream;
@@ -57,6 +63,7 @@ class Stage
 		int m_score;
 		sf::Clock m_enemyClock[3];
 		sf::Clock m_ufoClock;
+		sf::Clock m_fpsClock;
 		sf::Shader* m_lightShader;
 		sf::Shader* m_shadowShader;
 		sf::RenderStates m_lightRenderStates;

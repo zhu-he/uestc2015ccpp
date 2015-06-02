@@ -34,9 +34,9 @@ Ufo::Ufo(UfoType ufoType)
 	}
 }
 
-void Ufo::animate()
+void Ufo::animate(sf::Time frameTime)
 {
-	move(0, ufoSpeed);
+	move(0, ufoSpeed * frameTime.asSeconds());
 	if (getPosition().y > screenHeight + getTextureRect().height)
 	{
         m_isAlive = false;

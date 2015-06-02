@@ -207,22 +207,22 @@ const std::vector<int> enemyScore =
 
 const std::vector<float> enemySpeed =
 {
-	3.0f,
-	2.5f,
-	2.0f
+	180.0f,
+	150.0f,
+	120.0f
 };
 
-const float heroSpeed = 8.0f;
+const float heroSpeed = 480.0f;
 
-const float backgroundSpeed = 2.0f;
+const float backgroundSpeed = 120.0f;
 
-const float ufoSpeed = 3.0f;
+const float ufoSpeed = 180.0f;
 
 const std::vector<float> bulletSpeed =
 {
-	15.0f,
-	4.0f,
-	15.0f
+	900.0f,
+	240.0f,
+	900.0f
 };
 
 const float heroBulletInterval = 0.25f;

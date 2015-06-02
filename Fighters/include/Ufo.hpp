@@ -8,7 +8,7 @@ class Ufo : public Entity
 {
 	public:
 		Ufo(UfoType ufoType);
-		void animate();
+		void animate(sf::Time frameTime);
 		void hit();
 		void die();
 		UfoType getUfoType();

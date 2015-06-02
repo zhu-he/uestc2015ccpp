@@ -13,7 +13,7 @@ class ServerStage : public MultiplayerStage
 	private:
 		int m_idCounter;
 		void addEntity(Entity* entity);
-		bool update();
+		bool update(sf::Time frameTime);
 		void hitEntity(Entity* entity);
 		void dieEntity(Entity* entity);
 		void bombup(Entity* hero);

@@ -14,12 +14,12 @@ class Hero : public Entity
 {
 	public:
 		Hero();
-		void moveLeft();
-		void moveRight();
-		void moveUp();
-		void moveDown();
+		void moveLeft(sf::Time frameTime);
+		void moveRight(sf::Time frameTime);
+		void moveUp(sf::Time frameTime);
+		void moveDown(sf::Time frameTime);
 		void fire();
-		void animate();
+		void animate(sf::Time frameTime);
 		void die();
 		void revive();
 		void levelup();

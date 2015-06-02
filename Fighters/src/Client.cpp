@@ -24,6 +24,7 @@ void Client::start()
 	sf::TcpSocket socket;
 	int port = 54000;
 	socket.setBlocking(false);
+	sf::Clock frameClock;
 	while (m_isRunning)
 	{
 		sf::Event event;
@@ -55,7 +56,7 @@ void Client::start()
 			port = 54000;
 		}
 		m_window.clear();
-		m_background.animate();
+		m_background.animate(frameClock.restart());
 		m_window.draw(m_background);
 		m_window.draw(m_loading);
 		m_window.display();

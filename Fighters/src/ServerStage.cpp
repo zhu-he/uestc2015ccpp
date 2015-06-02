@@ -61,7 +61,7 @@ void ServerStage::hitEntity(Entity* entity)
 	entity->hit();
 }
 
-bool ServerStage::update()
+bool ServerStage::update(sf::Time frameTime)
 {
 	m_sendCounter++;
 	if (m_sendCounter % 10 == 0)
@@ -143,48 +143,28 @@ bool ServerStage::update()
 	}
 	if (m_gameStatus == Playing)
 	{
-		if (m_isHeroFire)
-		{
-			((Hero*)m_hero)->fire();
-		}
-		if (m_isHeroLeft)
-		{
-			((Hero*)m_hero)->moveLeft();
-		}
-		if (m_isHeroRight)
-		{
-			((Hero*)m_hero)->moveRight();
-		}
-		if (m_isHeroUp)
-		{
-			((Hero*)m_hero)->moveUp();
-		}
-		if (m_isHeroDown)
-		{
-			((Hero*)m_hero)->moveDown();
-		}
 		if (m_isHero2Fire)
 		{
 			((Hero2*)m_hero2)->fire();
 		}
 		if (m_isHero2Left)
 		{
-			((Hero2*)m_hero2)->moveLeft();
+			((Hero2*)m_hero2)->moveLeft(frameTime);
 		}
 		if (m_isHero2Right)
 		{
-			((Hero2*)m_hero2)->moveRight();
+			((Hero2*)m_hero2)->moveRight(frameTime);
 		}
 		if (m_isHero2Up)
 		{
-			((Hero2*)m_hero2)->moveUp();
+			((Hero2*)m_hero2)->moveUp(frameTime);
 		}
 		if (m_isHero2Down)
 		{
-			((Hero2*)m_hero2)->moveDown();
+			((Hero2*)m_hero2)->moveDown(frameTime);
 		}
 	}
-	Stage::update();
+	Stage::update(frameTime);
 	if (m_packet.getDataSize() > 0)
 	{
 		m_socket.send(m_packet);

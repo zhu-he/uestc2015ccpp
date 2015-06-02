@@ -17,7 +17,7 @@ void ClientStage::addEntity(Entity* entity)
 	Stage::addEntity(entity);
 }
 
-bool ClientStage::update()
+bool ClientStage::update(sf::Time frameTime)
 {
 	if (isOver())
 	{
@@ -182,20 +182,20 @@ bool ClientStage::update()
 	}
 	if (m_gameStatus == Overing)
 	{
-		m_overText.move(0, 10);
-		m_overScoreText.move(0, -10);
-		m_overHighScoreText.move(0, -10);
+		m_overText.move(0, 600 * frameTime.asSeconds());
+		m_overScoreText.move(0, -600 * frameTime.asSeconds());
+		m_overHighScoreText.move(0, -600 * frameTime.asSeconds());
 		if (m_overText.getPosition().y >= screenHeight / 2 - m_overText.getLocalBounds().height * 4)
 		{
 			m_gameStatus = Over;
 		}
-		animate();
+		animate(frameTime);
 		draw();
 		return true;
 	}
 	if (m_gameStatus == Over)
 	{
-		animate();
+		animate(frameTime);
 		draw();
 		return true;
 	}
@@ -215,35 +215,35 @@ bool ClientStage::update()
 	{
 		if (m_isHeroLeft)
 		{
-			((Hero*)m_hero)->moveLeft();
+			((Hero*)m_hero)->moveLeft(frameTime);
 		}
 		if (m_isHeroRight)
 		{
-			((Hero*)m_hero)->moveRight();
+			((Hero*)m_hero)->moveRight(frameTime);
 		}
 		if (m_isHeroUp)
 		{
-			((Hero*)m_hero)->moveUp();
+			((Hero*)m_hero)->moveUp(frameTime);
 		}
 		if (m_isHeroDown)
 		{
-			((Hero*)m_hero)->moveDown();
+			((Hero*)m_hero)->moveDown(frameTime);
 		}
 		if (m_isHero2Left)
 		{
-			((Hero2*)m_hero2)->moveLeft();
+			((Hero2*)m_hero2)->moveLeft(frameTime);
 		}
 		if (m_isHero2Right)
 		{
-			((Hero2*)m_hero2)->moveRight();
+			((Hero2*)m_hero2)->moveRight(frameTime);
 		}
 		if (m_isHero2Up)
 		{
-			((Hero2*)m_hero2)->moveUp();
+			((Hero2*)m_hero2)->moveUp(frameTime);
 		}
 		if (m_isHero2Down)
 		{
-			((Hero2*)m_hero2)->moveDown();
+			((Hero2*)m_hero2)->moveDown(frameTime);
 		}
 	}
 	if (m_packet.getDataSize() > 0)
@@ -251,7 +251,7 @@ bool ClientStage::update()
 		m_socket.send(m_packet);
 		m_packet.clear();
 	}
-	animate();
+	animate(frameTime);
 	draw();
 	return true;
 }

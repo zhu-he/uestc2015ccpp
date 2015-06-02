@@ -13,7 +13,7 @@ class Enemy : public Entity
 {
 	public:
 		Enemy(const int& enemyType);
-		void animate();
+		void animate(sf::Time frameTime);
 		void die();
 		void hit();
 		void fire(const sf::Vector2f& heroPosition);

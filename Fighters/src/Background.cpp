@@ -1,4 +1,5 @@
 #include "Background.hpp"
+#include <iostream>
 
 sf::Texture Background::m_backgroundTexture;
 
@@ -15,7 +16,7 @@ void Background::loadResources()
 	m_backgroundTexture.loadFromFile(backgroundImagePath);
 }
 
-void Background::animate()
+void Background::animate(sf::Time frameTime)
 {
 	if (Shader::isAvailable())
 	{
@@ -27,8 +28,8 @@ void Background::animate()
 		m_background1.setColor(sf::Color::White);
 		m_background2.setColor(sf::Color::White);
 	}
-	m_background1.move(0, backgroundSpeed);
-	m_background2.move(0, backgroundSpeed);
+	m_background1.move(0, backgroundSpeed * frameTime.asSeconds());
+	m_background2.move(0, backgroundSpeed * frameTime.asSeconds());
     if (m_background1.getPosition().y >= 0)
 	{
 		m_background1.setPosition(0, m_background1.getPosition().y - m_background1.getLocalBounds().height);

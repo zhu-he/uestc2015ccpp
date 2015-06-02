@@ -24,11 +24,6 @@ MultiplayerStage::MultiplayerStage(sf::RenderWindow& window, Background& backgro
 void MultiplayerStage::init()
 {
 	Stage::init();
-	m_isHeroFire = false;
-	m_isHeroLeft = false;
-	m_isHeroRight = false;
-	m_isHeroUp = false;
-	m_isHeroDown = false;
 	m_isHero2Fire = false;
 	m_isHero2Left = false;
 	m_isHero2Right = false;
