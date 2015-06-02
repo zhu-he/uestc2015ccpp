@@ -1,0 +1,245 @@
+@startuml
+
+class Background {
+	+animate()
+	+{static}loadResources()
+	+{abstract}draw()
+}
+
+class Bullet {
+	+animate()
+	+hit()
+	+die()
+	+getDirection()
+	+BulletType getBulletType()
+	+getType()
+	+{static}loadResources()
+}
+
+class Client {
+	+setIp()
+	+start()
+}
+
+class ClientStage {
+}
+
+class Enemy {
+	+animate()
+	+die()
+	+hit()
+	+fire()
+	+getType()
+	+Status getStatus()
+	+int getEnemyType()
+	+{static}loadResources()
+}
+
+class Entity {
+	+{abstract}setId()
+	+{abstract}int getId()
+	+{abstract}bool isAlive()
+	+{abstract}getType()
+	+{abstract}hit()
+	+{abstract}die()
+	+setPosition();
+}
+
+class Font {
+	+{static}loadResources()
+	+{static}sf::Font& getFont()
+	+{static}sf::Color getColor()
+}
+
+class Game {
+	+play()
+}
+
+class Hero {
+	+moveLeft()
+	+moveRight()
+	+moveUp()
+	+moveDown()
+	+fire()
+	+animate()
+	+die()
+	+revive()
+	+levelup()
+	+bombup()
+	+int getBomb()
+	+useBomb()
+	+resetShootTime()
+	+{abstract}getType()
+	+bool isFlash()
+	+{abstract}hit()
+	+{static}loadResources()
+}
+
+class Hero2 {
+	+getType()
+	+hit()
+}
+
+class Menu {
+	+{abstract}draw()
+	+next()
+	+previous()
+	+getMenuStatus()
+	+getMenuCursor(int menuCursor)
+	+getMenuCursor()
+	+refresh()
+	+bindSwitch()
+	+toggleSwitch()
+	+input()
+	+getInputString()
+	+setMenu()
+}
+
+class MenuItem {
+	+{abstract}getMenuItemType()
+	+{abstract}focus()
+	+{abstract}leave()
+	+{abstract}input()
+	+{abstract}setString()
+	+{abstract}setOffestY()
+	+{abstract}draw()
+}
+
+class MenuInput {
+	+getMenuItemType()
+	+focus()
+	+leave()
+	+input()
+	+getInputString()
+	+setString()
+	+setOffestY()
+	+bind()
+	+toggle()
+	+{abstract}draw()
+}
+
+class MenuSwitch {
+	+getMenuItemType()
+	+focus()
+	+leave()
+	+input()
+	+setString()
+	+setOffestY()
+	+bind()
+	+toggle()
+	+{abstract}draw()
+}
+
+class MenuText {
+	+getMenuItemType()
+	+focus()
+	+leave()
+	+input()
+	+setString(std::string str)
+	+setOffestY(int offsetY)
+	+{abstract}draw()
+}
+
+class MultiplayerStage {
+	+setHpText()
+	+setHp2Text()
+}
+
+class Server {
+	+start()
+}
+
+class ServerStage {
+}
+
+class Shader {
+	+{static}loadResources()
+	+{static}getInvertShader()
+	+{static}getShadowShader()
+	+{static}getLightShader()
+	+{static}isAvailable()
+	+{static}switchShader()
+}
+
+class Sound {
+	+{static}loadResources()
+	+{static}playEnemyDownSound()
+	+{static}playUfoSound()
+	+{static}playBulletSound()
+	+{static}playGameMusicSound()
+	+{static}stopGameMusicSound()
+	+{static}playGameOverSound()
+	+{static}playUseBombSound()
+	+{static}switchBgm()
+	+{static}switchSfx()
+	+{static}getBgmSwitch()
+	+{static}getSfxSwitch()
+}
+
+class SpriteSheet {
+    +{static}loadFromFile()
+    +{static}getTexture()
+}
+
+class Ufo {
+	+animate()
+	+hit()
+	+die()
+	+getUfoType()
+	+getType()
+	+{static}loadResources()
+}
+
+class Stage {
+	+{abstract}addEntity()
+	+getGameStatus()
+	+{abstract}play()
+	+{abstract}setHpText()
+	+addScore()
+	+drawLight()
+}
+
+namespace sf {
+	class Sprite
+	class Texture
+	class Drawable
+	class Shader
+	class Sound
+	class Font
+}
+
+sf.Drawable <|-- Background
+sf.Drawable <|-- Menu
+sf.Drawable <|-- MenuItem
+sf.Sprite <|-- Entity
+sf.Texture *-- SpriteSheet
+sf.Shader *-- Shader
+sf.Sound *-- Sound
+sf.Font *-- Font
+Background *-- Game
+Stage *-- Game
+Server *-- Game
+Client *-- Game
+ServerStage *-- Server
+ClientStage *-- Client
+Entity *-- Stage
+Menu *-- Game
+MenuItem *-- Menu
+SpriteSheet *-- Entity
+SpriteSheet *-- Background
+Shader *-- Game
+Sound *-- Game
+Font *-- Game
+Entity <|-- Bullet
+Entity <|-- Enemy
+Entity <|-- Hero
+Entity <|-- Ufo
+Hero <|-- Hero2
+MenuItem <|-- MenuInput
+MenuItem <|-- MenuSwitch
+MenuItem <|-- MenuText
+Stage <|-- MultiplayerStage
+MultiplayerStage <|-- ClientStage
+MultiplayerStage <|-- ServerStage
+
+@enduml
