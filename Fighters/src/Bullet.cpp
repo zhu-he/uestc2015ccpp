@@ -71,3 +71,18 @@ std::string Bullet::getType()
 {
 	return "Bullet";
 }
+
+sf::Color Bullet::getLightColor()
+{
+	switch (m_bulletType)
+	{
+	case EnemyBullet:
+		return sf::Color::Blue;
+	case HeroBullet:
+		return sf::Color::Red;
+	case Hero2Bullet:
+		return sf::Color::Green;
+	default:
+		return sf::Color::Transparent;
+	}
+}

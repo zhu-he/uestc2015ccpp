@@ -7,10 +7,11 @@
 #include "Sound.hpp"
 #include "Font.hpp"
 #include "Shader.hpp"
+#include "PausableClock.hpp"
 
-extern sf::Clock gameClock;
+extern PausableClock gameClock;
 
-Stage::Stage(sf::RenderWindow& window, Background& background) : m_window(window), m_background(background), m_pausedMenu(PauseMenu, screenHeight / 2)
+Stage::Stage(Window& window, Background& background) : m_window(window), m_background(background), m_pausedMenu(PauseMenu, screenHeight / 2)
 {
 	m_score = 0;
 	m_scoreText.setFont(Font::getFont());
@@ -159,7 +160,7 @@ void Stage::init()
 void Stage::play()
 {
 	init();
-	sf::Clock frameClock;
+	PausableClock frameClock;
 	while (m_window.isOpen() && m_isRunning)
     {
         sf::Event event;
@@ -282,29 +283,11 @@ void Stage::draw()
 		{
 			if (entity->getType() == "Bullet")
 			{
-				if (((Bullet*)entity)->getBulletType() == EnemyBullet)
-				{
-					drawLight(entity->getPosition(), sf::Color::Blue, 200);
-				}
-				else if (((Bullet*)entity)->getBulletType() == HeroBullet)
-				{
-					drawLight(entity->getPosition(), sf::Color::Red, 200);
-				}
-				else
-				{
-					drawLight(entity->getPosition(), sf::Color::Green, 200);
-				}
+				drawLight(entity->getPosition(), ((Bullet*)entity)->getLightColor(), 200);
 			}
 			else if (entity->getType() == "Ufo")
 			{
-				if (((Ufo*)entity)->getUfoType() == Weapon)
-				{
-					drawLight(entity->getPosition(), sf::Color::Blue, 100);
-				}
-				else
-				{
-					drawLight(entity->getPosition(), sf::Color::Red, 100);
-				}
+				drawLight(entity->getPosition(), ((Ufo*)entity)->getLightColor(), 100);
 			}
 		}
 	}
@@ -704,11 +687,23 @@ void Stage::pause()
 {
 	m_gameStatus = Paused;
 	m_pausedMenu.setMenuCursor(0);
+	for (int i = 0; i < 3; ++i)
+	{
+		m_enemyClock[i].pause();
+	}
+	m_ufoClock.pause();
+	gameClock.pause();
 }
 
 void Stage::resume()
 {
 	m_gameStatus = Playing;
+	for (int i = 0; i < 3; ++i)
+	{
+		m_enemyClock[i].resume();
+	}
+	m_ufoClock.resume();
+	gameClock.resume();
 }
 
 void Stage::restart()

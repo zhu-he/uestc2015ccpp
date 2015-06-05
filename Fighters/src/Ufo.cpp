@@ -71,3 +71,16 @@ void Ufo::loadResources()
 		m_ufoTexture[i] = SpriteSheet::getTexture(ufoImage[i]);
 	}
 }
+
+sf::Color Ufo::getLightColor()
+{
+	switch (m_ufoType)
+	{
+	case Weapon:
+		return sf::Color::Blue;
+	case Bomb:
+		return sf::Color::Red;
+	default:
+		return sf::Color::Transparent;
+	}
+}

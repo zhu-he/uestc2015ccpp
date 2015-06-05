@@ -8,6 +8,7 @@
 #include "SpriteSheet.hpp"
 #include "Global.hpp"
 #include "Entity.hpp"
+#include "PausableClock.hpp"
 
 class Enemy : public Entity
 {
@@ -25,8 +26,8 @@ class Enemy : public Entity
 		static std::vector<sf::Texture> m_enemyTexture[3];
 		static std::vector<sf::Texture> m_enemyDownTexture[3];
 		static sf::Texture m_enemyHitTexture[3];
-        sf::Clock m_enemyAnimateClock;
-        sf::Clock m_lastShootTime;
+        PausableClock m_enemyAnimateClock;
+        PausableClock m_lastShootTime;
 		int m_enemyImageCounter;
 		int m_hp;
 		float m_speed;

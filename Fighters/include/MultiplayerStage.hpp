@@ -4,11 +4,12 @@
 #include <SFML/Window.hpp>
 #include <SFML/Network.hpp>
 #include "Stage.hpp"
+#include "Window.hpp"
 
 class MultiplayerStage : public Stage
 {
 	public:
-		MultiplayerStage(sf::RenderWindow& window, Background& background, sf::TcpSocket& socket);
+		MultiplayerStage(Window& window, Background& background, sf::TcpSocket& socket);
 		void setHpText(int hp);
 		void setHp2Text(int hp);
 	protected:

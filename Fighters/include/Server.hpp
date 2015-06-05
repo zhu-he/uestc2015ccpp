@@ -6,14 +6,15 @@
 #include <SFML/Network/TcpSocket.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include "Background.hpp"
+#include "Window.hpp"
 
 class Server
 {
 	public:
-		Server(sf::RenderWindow& window, Background& background);
+		Server(Window& window, Background& background);
 		void start();
 	private:
-		sf::RenderWindow& m_window;
+		Window& m_window;
 		sf::Text m_loading;
 		Background& m_background;
 		bool m_isRunning;

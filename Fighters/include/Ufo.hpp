@@ -11,6 +11,7 @@ class Ufo : public Entity
 		void animate(sf::Time frameTime);
 		void hit();
 		void die();
+		sf::Color getLightColor();
 		UfoType getUfoType();
 		std::string getType();
 		static void loadResources();

@@ -7,7 +7,7 @@
 #include "Ufo.hpp"
 #include "Hero2.hpp"
 
-ClientStage::ClientStage(sf::RenderWindow& window, Background& background, sf::TcpSocket& server) : MultiplayerStage(window, background, server)
+ClientStage::ClientStage(Window& window, Background& background, sf::TcpSocket& server) : MultiplayerStage(window, background, server)
 {
 	m_controlHero = m_hero2;
 }

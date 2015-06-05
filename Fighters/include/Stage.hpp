@@ -10,13 +10,15 @@
 #include "Menu.hpp"
 #include "Entity.hpp"
 #include "Background.hpp"
+#include "Window.hpp"
+#include "PausableClock.hpp"
 
 class Entity;
 
 class Stage
 {
 	public:
-		Stage(sf::RenderWindow& window, Background& background);
+		Stage(Window& window, Background& background);
 		virtual ~Stage();
 		virtual void addEntity(Entity* entity);
 		GameStatus getGameStatus();
@@ -25,7 +27,7 @@ class Stage
 		void addScore(int score);
 		void drawLight(sf::Vector2f lightPosition, sf::Color color, float lightAttenuation);
 	protected:
-		sf::RenderWindow& m_window;
+		Window& m_window;
 		Entity* m_hero;
 		Entity* m_controlHero;
 		std::vector<Entity*> m_entitys;
@@ -48,7 +50,7 @@ class Stage
 		sf::Texture m_bombTexture;
 		sf::Sprite m_bombSprite;
 		bool m_isBombing;
-		sf::Clock m_bombClock;
+		PausableClock m_bombClock;
 		GameStatus m_gameStatus;
 		sf::Text m_overText;
 		sf::Text m_overScoreText;
@@ -61,9 +63,9 @@ class Stage
 		std::ofstream m_highScoreOfstream;
 		int m_highScore;
 		int m_score;
-		sf::Clock m_enemyClock[3];
-		sf::Clock m_ufoClock;
-		sf::Clock m_fpsClock;
+		PausableClock m_enemyClock[3];
+		PausableClock m_ufoClock;
+		PausableClock m_fpsClock;
 		sf::Shader* m_lightShader;
 		sf::Shader* m_shadowShader;
 		sf::RenderStates m_lightRenderStates;

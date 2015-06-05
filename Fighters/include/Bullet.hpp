@@ -16,6 +16,7 @@ class Bullet : public Entity
 		void hit();
 		void die();
 		sf::Vector2f getDirection();
+		sf::Color getLightColor();
 		BulletType getBulletType();
 		std::string getType();
 		static void loadResources();

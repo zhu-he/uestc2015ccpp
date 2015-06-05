@@ -6,11 +6,12 @@
 #include <iostream>
 #include <sstream>
 #include "MultiplayerStage.hpp"
+#include "Window.hpp"
 
 class ClientStage : public MultiplayerStage
 {
 	public:
-		ClientStage(sf::RenderWindow& window, Background& background, sf::TcpSocket& server);
+		ClientStage(Window& window, Background& background, sf::TcpSocket& server);
 	private:
 		Entity* findEntityById(int id);
 		void addEntity(Entity* entity);

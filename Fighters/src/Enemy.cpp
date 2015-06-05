@@ -1,8 +1,9 @@
 #include "Enemy.hpp"
 #include "Bullet.hpp"
 #include "Sound.hpp"
+#include "PausableClock.hpp"
 
-extern sf::Clock gameClock;
+extern PausableClock gameClock;
 
 std::vector<sf::Texture> Enemy::m_enemyTexture[3];
 std::vector<sf::Texture> Enemy::m_enemyDownTexture[3];

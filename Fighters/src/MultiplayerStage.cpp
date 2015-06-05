@@ -2,10 +2,10 @@
 #include "Sound.hpp"
 #include "Hero2.hpp"
 #include "Font.hpp"
+#include "PausableClock.hpp"
 
-extern sf::Clock gameClock;
-
-MultiplayerStage::MultiplayerStage(sf::RenderWindow& window, Background& background, sf::TcpSocket& socket) : Stage(window, background), m_socket(socket)
+extern PausableClock gameClock;
+MultiplayerStage::MultiplayerStage(Window& window, Background& background, sf::TcpSocket& socket) : Stage(window, background), m_socket(socket)
 {
 	m_sendCounter = 0;
 	m_hero2 = new Hero2();

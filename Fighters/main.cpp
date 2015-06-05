@@ -11,10 +11,11 @@
 #include "Sound.hpp"
 #include "Font.hpp"
 #include "Shader.hpp"
+#include "PausableClock.hpp"
 
 using namespace std;
 
-sf::Clock gameClock;
+PausableClock gameClock;
 
 void init();
 

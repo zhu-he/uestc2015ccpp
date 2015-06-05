@@ -6,7 +6,7 @@
 #include "Enemy.hpp"
 #include "Ufo.hpp"
 
-ServerStage::ServerStage(sf::RenderWindow& window, Background& background, sf::TcpSocket& client) : MultiplayerStage(window, background, client)
+ServerStage::ServerStage(Window& window, Background& background, sf::TcpSocket& client) : MultiplayerStage(window, background, client)
 {
 	m_idCounter = 0;
 }

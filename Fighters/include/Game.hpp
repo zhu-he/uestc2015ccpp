@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "Background.hpp"
+#include "Window.hpp"
 
 class Game
 {
@@ -10,7 +11,7 @@ class Game
 		Game();
 		void play();
 	private:
-		sf::RenderWindow m_window;
+		Window m_window;
 		sf::Text m_titleText;
 		Background m_background;
 };

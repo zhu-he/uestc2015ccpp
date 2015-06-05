@@ -9,6 +9,7 @@
 #include "Bullet.hpp"
 #include "Entity.hpp"
 #include "Stage.hpp"
+#include "PausableClock.hpp"
 
 class Hero : public Entity
 {
@@ -34,15 +35,15 @@ class Hero : public Entity
 	protected:
 		sf::Color m_color;
 		Status m_status;
-		sf::Clock m_invincible;
-		sf::Clock m_invincibleFlash;
+		PausableClock m_invincible;
+		PausableClock m_invincibleFlash;
 		int m_hp;
 	private:
 		static std::vector<sf::Texture> m_heroTexture;
 		static std::vector<sf::Texture> m_heroBlowupTexture;
 		int m_heroImageCounter;
-        sf::Clock m_enemyAnimateClock;
-		sf::Clock m_lastShootTime;
+        PausableClock m_enemyAnimateClock;
+		PausableClock m_lastShootTime;
 		bool m_isFlash;
 		int m_bomb;
 		int m_level;

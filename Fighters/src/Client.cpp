@@ -2,8 +2,9 @@
 #include "Font.hpp"
 #include "Shader.hpp"
 #include "ClientStage.hpp"
+#include "PausableClock.hpp"
 
-Client::Client(sf::RenderWindow& window, Background& background) : m_window(window), m_background(background)
+Client::Client(Window& window, Background& background) : m_window(window), m_background(background)
 {
 	m_loading.setFont(Font::getFont());
 	m_loading.setCharacterSize(30);
@@ -24,7 +25,7 @@ void Client::start()
 	sf::TcpSocket socket;
 	int port = 54000;
 	socket.setBlocking(false);
-	sf::Clock frameClock;
+	PausableClock frameClock;
 	while (m_isRunning)
 	{
 		sf::Event event;

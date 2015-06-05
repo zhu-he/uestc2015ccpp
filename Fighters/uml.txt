@@ -27,6 +27,7 @@ package Entity <<Rect>> {
 		+hit()
 		+die()
 		+getDirection()
+		+getLightColor()
 		+BulletType getBulletType()
 		+getType()
 		+{static}loadResources()
@@ -63,11 +64,18 @@ package Entity <<Rect>> {
 		+die()
 		+getUfoType()
 		+getType()
+		+getLightColor()
 		+{static}loadResources()
 	}
 }
 
 package Main <<Rect>> {
+	class Background {
+		+animate()
+		+{static}loadResources()
+		+{abstract}draw()
+	}
+	
 	class Game {
 		+play()
 	}
@@ -81,29 +89,12 @@ package Main <<Rect>> {
 		+start()
 	}
 
-	class Background {
-		+animate()
-		+{static}loadResources()
-		+{abstract}draw()
+	class Window {
+		+onResize()
 	}
 }
 
 package Menu <<Rect>> {
-	class Menu {
-		+{abstract}draw()
-		+next()
-		+previous()
-		+getMenuStatus()
-		+getMenuCursor()
-		+getMenuCursor()
-		+refresh()
-		+bindSwitch()
-		+toggleSwitch()
-		+input()
-		+getInputString()
-		+setMenu()
-	}
-
 	class MenuItem {
 		+{abstract}getMenuItemType()
 		+{abstract}focus()
@@ -148,6 +139,20 @@ package Menu <<Rect>> {
 		+setOffestY()
 		+{abstract}draw()
 	}
+
+	class Menu {
+		+{abstract}draw()
+		+next()
+		+previous()
+		+getMenuStatus()
+		+getMenuCursor()
+		+refresh()
+		+bindSwitch()
+		+toggleSwitch()
+		+input()
+		+getInputString()
+		+setMenu()
+	}
 }
 
 package Utils <<Rect>> {
@@ -182,8 +187,15 @@ package Utils <<Rect>> {
 	}
 
 	class SpriteSheet {
-	    +{static}loadFromFile()
-	    +{static}getTexture()
+		+{static}loadFromFile()
+		+{static}getTexture()
+	}
+
+	class PausableClock {
+		+pause()
+		+resume()
+		+restart()
+		+getElapsedTime()
 	}
 }
 
@@ -210,11 +222,13 @@ package Stage <<Rect>> {
 }
 
 namespace sf {
-	class Sprite
 	class Texture
+	class RenderWindow
 	class Shader
 	class Sound
 	class Font
+	class Clock
+	class Sprite
 	class Drawable
 }
 
@@ -222,6 +236,8 @@ sf.Drawable <|-- Background
 sf.Drawable <|-- Menu
 sf.Drawable <|-- MenuItem
 sf.Sprite <|-- Entity
+sf.RenderWindow <|-- Window
+PausableClock --|> sf.Clock
 SpriteSheet *-- sf.Texture
 Shader *-- sf.Shader
 Sound *-- sf.Sound
@@ -230,6 +246,7 @@ Background --* Game
 Stage --* Game
 Server --* Game
 Client --* Game
+Window --* Game
 ServerStage --* Server
 ClientStage --* Client
 Entity --* Stage

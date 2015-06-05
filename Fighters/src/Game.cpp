@@ -8,14 +8,10 @@
 #include "Shader.hpp"
 #include "Server.hpp"
 #include "Client.hpp"
+#include "PausableClock.hpp"
 
-Game::Game() : m_window(sf::VideoMode(360, 600), "Fighters", sf::Style::Titlebar | sf::Style::Close)
+Game::Game() : m_window()
 {
-	sf::View view;
-	view.setCenter(screenWidth / 2, screenHeight / 2);
-	view.setSize(screenWidth, screenHeight);
-	m_window.setView(view);
-	m_window.setVerticalSyncEnabled(true);
 	m_titleText.setFont(Font::getFont());
 	m_titleText.setString("Fighters");
 	m_titleText.setCharacterSize(100);
@@ -31,7 +27,7 @@ void Game::play()
 	Stage stage(m_window, m_background);
 	Server server(m_window, m_background);
 	Client client(m_window, m_background);
-	sf::Clock frameClock;
+	PausableClock frameClock;
 	while (m_window.isOpen())
 	{
 		sf::Event event;

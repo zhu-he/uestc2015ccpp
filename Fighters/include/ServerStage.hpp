@@ -5,11 +5,12 @@
 #include <SFML/Network.hpp>
 #include <iostream>
 #include "MultiplayerStage.hpp"
+#include "Window.hpp"
 
 class ServerStage : public MultiplayerStage
 {
 	public:
-		ServerStage(sf::RenderWindow& window, Background& background, sf::TcpSocket& client);
+		ServerStage(Window& window, Background& background, sf::TcpSocket& client);
 	private:
 		int m_idCounter;
 		void addEntity(Entity* entity);
