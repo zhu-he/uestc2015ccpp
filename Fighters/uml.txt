@@ -263,5 +263,5 @@ MenuItem <|-- MenuText
 Stage <|-- MultiplayerStage
 MultiplayerStage <|-- ClientStage
 MultiplayerStage <|-- ServerStage
-
+hide members
 @enduml

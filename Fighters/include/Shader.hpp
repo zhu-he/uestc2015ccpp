@@ -17,6 +17,7 @@ class Shader
 		static sf::Shader m_shadowShader;
 		static sf::Shader m_lightShader;
 		static bool m_shaderSwitch;
+		static bool m_shaderAvailable;
 };
 
 #endif // __SHADER_HPP__

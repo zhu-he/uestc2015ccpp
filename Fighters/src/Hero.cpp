@@ -38,7 +38,7 @@ void Hero::loadResources()
 
 void Hero::moveLeft(sf::Time frameTime)
 {
-	if (getPosition().x > 0)
+	if (getPosition().x > 0 && m_status == Normal)
 	{
 		move(-heroSpeed * frameTime.asSeconds(), 0);
 	}
@@ -46,7 +46,7 @@ void Hero::moveLeft(sf::Time frameTime)
 
 void Hero::moveRight(sf::Time frameTime)
 {
-	if (getPosition().x < screenWidth)
+	if (getPosition().x < screenWidth && m_status == Normal)
 	{
 		move(heroSpeed * frameTime.asSeconds(), 0);
 	}
@@ -54,7 +54,7 @@ void Hero::moveRight(sf::Time frameTime)
 
 void Hero::moveUp(sf::Time frameTime)
 {
-	if (getPosition().y > 0)
+	if (getPosition().y > 0 && m_status == Normal)
 	{
 		move(0, -heroSpeed * frameTime.asSeconds());
 	}
@@ -62,7 +62,7 @@ void Hero::moveUp(sf::Time frameTime)
 
 void Hero::moveDown(sf::Time frameTime)
 {
-	if (getPosition().y < screenHeight)
+	if (getPosition().y < screenHeight && m_status == Normal)
 	{
 		move(0, heroSpeed * frameTime.asSeconds());
 	}
@@ -80,7 +80,7 @@ void Hero::hit()
 	{
 		die();
 	}
-	else
+	else if (m_hp > 0)
 	{
 		m_invincible.restart();
 		m_invincibleFlash.restart();
